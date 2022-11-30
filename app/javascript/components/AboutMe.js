@@ -1,5 +1,8 @@
 import React from "react";
 
+// Assets
+import Desk from "../../assets/images/Desk.svg";
+
 // Bootstrap Components
 import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
@@ -26,7 +29,7 @@ function AboutMe() {
       </Col>
       <Col md>
         <Row className='justify-content-center'>
-          <div className='graphic' />
+          <img src={Desk} alt='Software Developer at Desk' />
         </Row>
       </Col>
     </Row>
