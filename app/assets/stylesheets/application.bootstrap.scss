@@ -25,3 +25,31 @@ $toast-color: #343a40;
 
 @import "bootstrap/scss/bootstrap";
 @import "bootstrap-icons/font/bootstrap-icons";
+
+.social {
+  justify-content: flex-start;
+  flex-direction: row;
+}
+
+// Custom CSS
+.section {
+  height: 100vh;
+  align-items: center;
+}
+
+$dark-bg: #37455a;
+
+.graphic {
+  background-image: url("./assets/Desk.svg"); /* The image used */
+  background-color: $body-bg; /* Used if the image is unavailable */
+  width: 100%; /* You must set a specified height */
+  height: 0;
+  padding-top: 70%;
+  background-position: center; /* Center the image */
+  background-repeat: no-repeat; /* Do not repeat the image */
+  background-size: contain; /* Resize the background image to cover the entire container */
+}
+
+.row {
+  --bs-gutter-x: 0;
+}
