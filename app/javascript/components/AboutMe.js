@@ -8,9 +8,6 @@ import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
 import Button from "react-bootstrap/Button";
 
-// API Route
-const API_URL = "https://radiant-ravine-94842.herokuapp.com/resume";
-
 function AboutMe() {
   return (
     <Row className='section justify-content-center' id='AboutMe'>
@@ -23,7 +20,7 @@ function AboutMe() {
           about projects in web engineering, mobile applications, and full-stack
           development.
         </p>
-        <Button variant='outline-primary' href={API_URL}>
+        <Button variant='outline-primary' href='/resume'>
           Resume
         </Button>
       </Col>
