@@ -17,6 +17,8 @@ jobs:
       - name: Build and run test
         env:
           RAILS_ENV: test
+          GMAIL_ACCOUNT: colin@gmail.com # Not real email accounts
+          ADMIN_EMAIL: admin@colinjsantee.com
 
         run: |
           gem install bundler
