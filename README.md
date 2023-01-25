@@ -1,24 +1,23 @@
-# README
+# Colin Santee
 
-This README would normally document whatever steps are necessary to get the
-application up and running.
+## Running in Development
 
-Things you may want to cover:
+```
+bin/dev
+```
 
-* Ruby version
+## Sending emails in development
 
-* System dependencies
+Update `config/environments/development.rb:44`
 
-* Configuration
+Change:
 
-* Database creation
+```
+	config.action_mailer.delivery_method = :test
+```
 
-* Database initialization
+To:
 
-* How to run the test suite
-
-* Services (job queues, cache servers, search engines, etc.)
-
-* Deployment instructions
-
-* ...
+```
+	config.action_mailer.delivery_method = :smtp
+```

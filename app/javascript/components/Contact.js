@@ -43,6 +43,9 @@ function Contact() {
   };
 
   const sendEmail = async (values) => {
+    if (status === "Sent") {
+      return;
+    }
     setStatus("Sending...");
     let response = await fetch("/contact", {
       method: "POST",
@@ -52,7 +55,7 @@ function Contact() {
       body: JSON.stringify(values),
     });
     let result = await response.json();
-    setStatus("Send");
+    setStatus("Sent");
     toast(
       result.status,
       "Your message has been sent and I will respond as soon as I can. \n Best, \n -Colin"
@@ -81,15 +84,7 @@ function Contact() {
               message: "",
             }}
           >
-            {({
-              handleSubmit,
-              handleChange,
-              handleBlur,
-              values,
-              touched,
-              isValid,
-              errors,
-            }) => (
+            {({ handleSubmit, handleChange, values, touched, errors }) => (
               <Form noValidate onSubmit={handleSubmit}>
                 <Form.Group className='mb-3'>
                   <Form.Label>Full name</Form.Label>
@@ -140,7 +135,11 @@ function Contact() {
                     {errors.message}
                   </Form.Control.Feedback>
                 </Form.Group>
-                <Button variant='primary' type='submit'>
+                <Button
+                  variant='primary'
+                  type='submit'
+                  disabled={status === "Sent"}
+                >
                   {status}
                 </Button>
               </Form>
