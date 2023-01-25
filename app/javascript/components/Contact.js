@@ -14,12 +14,9 @@ import Toast from "react-bootstrap/Toast";
 // Formik
 import { Formik } from "formik";
 
-// API Route
-const API_URL = "https://radiant-ravine-94842.herokuapp.com/contact";
-
 // Validation Schema
 const schema = Yup.object().shape({
-  name: Yup.string()
+  full_name: Yup.string()
     .min(2, "*Names must have at least 2 characters")
     .max(100, "*Names can't be longer than 100 characters")
     .required(),
@@ -47,7 +44,7 @@ function Contact() {
 
   const sendEmail = async (values) => {
     setStatus("Sending...");
-    let response = await fetch(API_URL, {
+    let response = await fetch("/contact", {
       method: "POST",
       headers: {
         "Content-Type": "application/json;charset=utf-8",
@@ -79,7 +76,7 @@ function Contact() {
               }, 1000);
             }}
             initialValues={{
-              name: "",
+              full_name: "",
               email: "",
               message: "",
             }}
@@ -98,12 +95,12 @@ function Contact() {
                   <Form.Label>Full name</Form.Label>
                   <Form.Control
                     type='text'
-                    name='name'
+                    name='full_name'
                     placeholder='Enter name'
-                    value={values.name}
+                    value={values.full_name}
                     onChange={handleChange}
-                    isValid={touched.name && !errors.name}
-                    isInvalid={!!errors.name}
+                    isValid={touched.full_name && !errors.full_name}
+                    isInvalid={!!errors.full_name}
                   />
                   <Form.Control.Feedback>Looks good!</Form.Control.Feedback>
                   <Form.Control.Feedback type='invalid'>

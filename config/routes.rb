@@ -6,4 +6,5 @@ Rails.application.routes.draw do
 	root 'pages#home'
 
 	get '/resume' => 'pages#download_resume'
+	post '/contact' => 'contact_forms#create'
 end
