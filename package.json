@@ -27,7 +27,6 @@
     "build": "rm -rf ./dist && NODE_ENV=production webpack --progress",
     "dev": "webpack serve",
     "dev:inspect": "INSPECT=1 npm run dev",
-    "prestart": "rm -rf ./dist && NODE_ENV=production webpack --progress",
     "start": "NODE_ENV=production node dist/main.js"
   }
 }
