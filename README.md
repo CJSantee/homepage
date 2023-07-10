@@ -1,4 +1,5 @@
-# Marko Widgets: UI Components Playground w/ Webpack
+Marko Widgets: UI Components Playground w/ Webpack
+==================================
 
 ## Getting Started
 
@@ -8,7 +9,6 @@ npm run dev
 ```
 
 ## Production Build
-
 ```bash
 npm run build
 npm start
