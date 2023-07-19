@@ -1,12 +1,10 @@
-<app-layout>
-  <@head>
-    <title>UI Components Playground</title>
-    <link
-      href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,700"
-      media="all"
-      rel="stylesheet"/>
-  </@head>
-  <@body>
-    <app-main/>
-  </@body>
-</app-layout>
+import layout from "../../layouts/app-layout.marko";
+
+<${layout} title="Colin Santee">
+	<@body>
+		<landing-header/>
+		<about-me-section/>
+		<projects-section/>
+		<landing-footer/>
+	</@body>
+</>

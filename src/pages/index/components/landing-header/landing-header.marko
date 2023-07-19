@@ -1,0 +1,17 @@
+$ const sections = [
+	{ title: "About Me", href: "#aboutme" },
+	{ title: "Projects", href: "#projects" },
+	{ title: "Contact", href: "#contact" },
+];
+<header class="container d-flex align-items-center py-2">
+	<h1 class="text-secondary me-3">
+		Colin Santee
+	</h1>
+	<nav class="navbar d-flex">
+		<for|section| of=sections>
+			<a class="link-primary p-2 fs-5 nav-link" href=section.href>
+				${section.title}
+			</a>
+		</for>
+	</nav>
+</header>
