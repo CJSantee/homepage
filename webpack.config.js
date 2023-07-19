@@ -5,6 +5,7 @@ const CSSExtractPlugin = require("mini-css-extract-plugin");
 const MarkoPlugin = require("@marko/webpack/plugin").default;
 const SpawnServerPlugin = require("spawn-server-webpack-plugin");
 const MinifyCSSPlugin = require("css-minimizer-webpack-plugin");
+const svgToMiniDataURI = require("mini-svg-data-uri");
 
 const markoPlugin = new MarkoPlugin();
 const { NODE_ENV = "development" } = process.env;
@@ -66,8 +67,18 @@ module.exports = [
           ],
         },
         {
-          test: /\.(jpg|jpeg|gif|png|svg)$/,
-          type: "asset",
+          test: /\.(jpg|jpeg|gif|png)$/,
+          type: "asset/resource",
+        },
+        {
+          test: /\.svg/,
+          type: "asset/inline",
+          generator: {
+            dataUrl: (content) => {
+              content = content.toString();
+              return svgToMiniDataURI(content);
+            },
+          },
         },
       ],
     },
