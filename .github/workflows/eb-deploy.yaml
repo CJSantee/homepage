@@ -18,6 +18,9 @@ jobs:
           npm install
           npm run build
           cd ..
+      - name: Build Server
+        run: |
+          npm run build
       - name: Install Python 3.9
         uses: actions/setup-python@v2
         with:
