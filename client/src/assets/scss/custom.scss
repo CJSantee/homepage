@@ -25,7 +25,7 @@ $modal-content-color: $secondary; // Offcanvas Title
 
 $toast-color: #343a40;
 
-@import "../../../../node_modules/bootstrap/scss/bootstrap";
+@import "../../../node_modules/bootstrap/scss/bootstrap";
 
 .social {
   justify-content: flex-start;
