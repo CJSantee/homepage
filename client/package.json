@@ -42,5 +42,12 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
+  },
+  "devDependencies": {
+    "eslint": "^8.46.0",
+    "lint-staged": "^13.2.3"
+  },
+  "lint-staged": {
+    "*.{js,jsx,ts,tsx}": "eslint --max-warnings=0 --fix"
   }
 }
