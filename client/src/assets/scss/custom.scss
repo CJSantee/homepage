@@ -1,0 +1,63 @@
+// Custom.scss
+// Option A: Include all of Bootstrap
+$body-bg: #445d7b;
+$body-color: #dcdcd2;
+
+// Fonts
+$font-family-sans-serif: Menlo, Monaco, "Courier New", monospace;
+$font-family-monospace: Menlo, Monaco, "Courier New", monospace;
+
+$font-size-lg: 1.5rem;
+$nav-link-font-size: 1.15rem;
+
+$primary: #e49e4c;
+$secondary: #5db490;
+
+// Navbar Colors
+$navbar-dark-color: $primary;
+$navbar-dark-hover-color: $secondary;
+$navbar-dark-active-color: $primary;
+// $navbar-dark-disabled-color: white;
+
+// Offcanvas Color
+$modal-content-bg: #dcdcd2;
+$modal-content-color: $secondary; // Offcanvas Title
+
+$toast-color: #343a40;
+
+@import "../../../../node_modules/bootstrap/scss/bootstrap";
+
+.social {
+  justify-content: flex-start;
+  flex-direction: row;
+}
+
+// Custom CSS
+.section {
+  height: 100vh;
+  align-items: center;
+}
+
+$dark-bg: #37455a;
+
+.graphic {
+  background-image: url("../img/Desk.svg"); /* The image used */
+  background-color: $body-bg; /* Used if the image is unavailable */
+  width: 100%; /* You must set a specified height */
+  height: 0;
+  padding-top: 70%;
+  background-position: center; /* Center the image */
+  background-repeat: no-repeat; /* Do not repeat the image */
+  background-size: contain; /* Resize the background image to cover the entire container */
+}
+
+.row {
+  --bs-gutter-x: 0;
+}
+
+.toast {
+  position: fixed;
+  top: 1rem;
+  left: 50%;
+  transform: translate(-50%, 0);
+}
