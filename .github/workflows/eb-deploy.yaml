@@ -11,6 +11,11 @@ jobs:
       AWS_DEFAULT_REGION: ${{ secrets.AWS_DEFAULT_REGION }}
     steps:
       - uses: actions/checkout@v2
+      - name: Build React App
+        run: |
+          cd client
+          npm run build
+          cd ..
       - name: Install Python 3.9
         uses: actions/setup-python@v2
         with:
@@ -21,7 +26,7 @@ jobs:
           pip install awsebcli
       - name: Init EB CLI
         run: |
-           eb init
+           eb init --region ${{secrets.AWS_DEFAULT_REGION }}
       - name: Deploy to Elastic Beanstalk
         run: |
           eb deploy
