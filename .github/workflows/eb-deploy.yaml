@@ -19,7 +19,6 @@ jobs:
           npm run build
       - name: Build Server
         run: |
-          cd ..
           npm install
           npm run build
       - name: Install Python 3.9
