@@ -1,15 +1,15 @@
-Marko Widgets: UI Components Playground w/ Webpack
-==================================
+# Homepage
+![Deploy to Elastic Beanstalk](https://github.com/CJSantee/homepage/actions/workflows/eb-deploy.yaml/badge.svg)
 
-## Getting Started
-
-```bash
-npm install
-npm run dev
+## Development
+### Running React Frontend
+```
+$ cd client
+$ npm start
 ```
 
-## Production Build
-```bash
-npm run build
-npm start
+### Running NodeJS Backend*
 ```
+$ npm run dev
+```
+\*Must build Frontend to view changes when being served by express: `cd client; npm run build`

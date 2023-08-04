@@ -1,4 +1,4 @@
-name: EB deploy
+name: Deploy to AWS Elastic Beanstalk
 on:
   push:
     branches: [ main ]
@@ -11,8 +11,15 @@ jobs:
       AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
       AWS_DEFAULT_REGION: ${{ secrets.AWS_DEFAULT_REGION }}
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
+      - uses: dorny/paths-filter@v2
+      id: changes
+      with:
+        filters: |
+          client:
+            - 'client/**'
       - name: Build React App
+        if: steps.changes.outputs.client == 'true'
         run: |
           cd client
           npm install
