@@ -1,3 +1,5 @@
+import PropTypes from "prop-types";
+
 // Bootstrap Components
 import Container from "react-bootstrap/Container";
 import Nav from "react-bootstrap/Nav";
@@ -6,10 +8,10 @@ import Navbar from "react-bootstrap/Navbar";
 // Assets
 import GitHub from "../assets/img/GitHub.png";
 
-function Footer() {
+function Footer({sticky = false}:{sticky?:boolean}) {
   return (
     // .fixed-bottom for Sticky Footer
-    <Container>
+    <Container className={sticky ? "fixed-bottom" : ''}>
       <Navbar
         variant="dark"
         className="justify-content-center align-items-center"
@@ -25,5 +27,9 @@ function Footer() {
     </Container>
   );
 }
+
+Footer.propTypes = {
+  sticky: PropTypes.bool,
+};
 
 export default Footer;
