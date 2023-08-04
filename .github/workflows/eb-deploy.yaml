@@ -12,14 +12,14 @@ jobs:
       AWS_DEFAULT_REGION: ${{ secrets.AWS_DEFAULT_REGION }}
     steps:
     - uses: actions/checkout@v3
-    - uses: dorny/paths-filter@v2
-      id: changes
-      with:
-        filters: |
-          client:
-            - 'client/**'
+    # - uses: dorny/paths-filter@v2
+    #   id: changes
+    #   with:
+    #     filters: |
+    #       client:
+    #         - 'client/**'
     - name: Build React App
-      if: steps.changes.outputs.client == 'true'
+      # if: steps.changes.outputs.client == 'true'
       run: |
         cd client
         npm install
