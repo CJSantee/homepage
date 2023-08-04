@@ -3,6 +3,9 @@ import Container from "react-bootstrap/Container";
 import Nav from "react-bootstrap/Nav";
 import Navbar from "react-bootstrap/Navbar";
 
+// Components
+import { Link } from "react-router-dom";
+
 // Assets
 import GitHub from "../assets/img/GitHub.png";
 import LinkedIn from "../assets/img/LinkedIn.png";
@@ -11,18 +14,26 @@ function Header() {
   return (
     <Container>
       <Navbar collapseOnSelect variant='dark' expand='md'>
-        <Navbar.Brand className='text-secondary'>Colin Santee</Navbar.Brand>
+        <Navbar.Brand className='text-secondary'>
+          <Link to={'/'} className="nav-brand text-secondary text-decoration-none">Colin Santee</Link>
+        </Navbar.Brand>
         <Navbar.Toggle aria-controls='navbarScroll' />
         <Navbar.Collapse className='justify-content-between'>
           <Nav>
             <Nav.Item>
-              <Nav.Link href='#AboutMe'>About Me</Nav.Link>
+              <Link to={'/#AboutMe'} className="nav-link" reloadDocument>
+                About Me
+              </Link>
             </Nav.Item>
             <Nav.Item>
-              <Nav.Link href='#Projects'>Projects</Nav.Link>
+              <Link to={'/#Projects'} className="nav-link" reloadDocument>
+                Projects
+              </Link>
             </Nav.Item>
             <Nav.Item>
-              <Nav.Link href='#Contact'>Contact</Nav.Link>
+            <Link to={'/#Contact'} className="nav-link" reloadDocument>
+                Contact
+              </Link>
             </Nav.Item>
           </Nav>
           <Nav className='social'>
