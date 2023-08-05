@@ -9,13 +9,13 @@ const port = 8080;
 
 app.use(express.static(path.join(process.cwd(), "client", "build")));
 
-app.get('/', (req: Request, res: Response) => {
-  res.sendFile(path.join(process.cwd(), "client", "build", "index.html"));
-});
-
 app.get('/api', async (req: Request, res: Response) => {
   const {rows: [{now: time}]} = await db.query('SELECT NOW()');
   res.send(`current database time: ${time}`);
+});
+
+app.get('*', (req: Request, res: Response) => {
+  res.sendFile(path.join(process.cwd(), "client", "build", "index.html"));
 });
 
 app.listen(port, () => {
