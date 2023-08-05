@@ -13,3 +13,9 @@ $ npm start
 $ npm run dev
 ```
 \*Must build Frontend to view changes when being served by express: `cd client; npm run build`
+
+### Example .env
+```
+NODE_ENV=development # development | production | test
+DATABASE_URL=postgres://postgres:@localhost:5432/homepage-db
+```
