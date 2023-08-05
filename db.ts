@@ -28,7 +28,7 @@ async function upgrade() {
   /**
   * @description Execute SQL from a file or string
   */
-  async function executeSql(client, filename_or_sql: string, logMessage: string) {
+  async function executeSql(client, filename_or_sql: string, logMessage?: string) {
     let sql = filename_or_sql;
     if(filename_or_sql.toLowerCase().endsWith('.sql')) {
       if(!fs.existsSync(filename_or_sql)) {
@@ -83,7 +83,7 @@ async function upgrade() {
   }
 }
 
-async function query(text: string, params: any, callback: (err: Error, result: QueryResult<any[]>) => void) {
+async function query(text: string, params: any, callback: (err: Error, result) => void) {
   return pool.query(text, params, callback)
 }
 
