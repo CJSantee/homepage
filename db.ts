@@ -1,6 +1,7 @@
-const {Client, Pool} = require('pg');
-const fs = require('fs');
-const {parse} = require('pg-connection-string');
+import {Client, Pool} from 'pg';
+import fs from 'fs';
+import {parse} from 'pg-connection-string';
+import {secondsToReadable} from './utils';
 
 const PRODUCTION = process.env.NODE_ENV === 'production';
 const DATABASE_URL = process.env.DATABASE_URL || '';
@@ -96,7 +97,7 @@ async function end() {
   console.log('Database connections successfully shutdown.');
 }
 
-module.exports = {
+export = {
   upgrade,
   query,
   end,

@@ -1,18 +1,17 @@
 require('dotenv').config();
-import express, { Express, Request, Response } from 'express';
+import express, { Express, type Request, type Response } from 'express';
+
+import  api from './api';
 import path from 'path';
 
-const db = require('./db');
+import db from './db';
 
 const app: Express = express();
 const port = 8080;
 
 app.use(express.static(path.join(process.cwd(), "client", "build")));
 
-app.get('/api', async (req: Request, res: Response) => {
-  const {rows: [{now: time}]} = await db.query('SELECT NOW()');
-  res.send(`current database time: ${time}`);
-});
+app.use('/api', api);
 
 app.get('*', (req: Request, res: Response) => {
   res.sendFile(path.join(process.cwd(), "client", "build", "index.html"));
