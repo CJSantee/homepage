@@ -1,5 +1,6 @@
 require('dotenv').config();
-import express, { Express, type Request, type Response } from 'express';
+import express, { type Express, type Request, type Response } from 'express';
+import bodyParser from 'body-parser';
 
 import  api from './api';
 import path from 'path';
@@ -8,6 +9,11 @@ import db from './db';
 
 const app: Express = express();
 const port = 8080;
+
+// parse application/x-www-form-urlencoded
+app.use(bodyParser.urlencoded({limit: '5mb', extended: false}));
+// parse application/json
+app.use(bodyParser.json({limit: '5mb'}));
 
 app.use(express.static(path.join(process.cwd(), "client", "build")));
 
