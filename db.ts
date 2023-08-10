@@ -110,8 +110,6 @@ async function file(path: string, params: object) {
       args.push(params[namedParam]);
     }
   }
-  console.log('sql', sql);
-  console.log('args', args);
   
   return pool.query(sql, args);
 } 

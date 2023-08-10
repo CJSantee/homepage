@@ -1,3 +1,3 @@
 SELECT *
 FROM users
-WHERE ${username}::TEXT IS NULL OR username = ${username};
+WHERE (${get_all}::BOOLEAN AND ${username}::TEXT IS NULL) OR username = ${username};
