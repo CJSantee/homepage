@@ -1,21 +1,26 @@
 require('dotenv').config();
-import express, { Express, Request, Response } from 'express';
+import express, { type Express, type Request, type Response } from 'express';
+import bodyParser from 'body-parser';
+
+import  api from './api';
 import path from 'path';
 
-const db = require('./db');
+import db from './db';
 
 const app: Express = express();
 const port = 8080;
 
+// parse application/x-www-form-urlencoded
+app.use(bodyParser.urlencoded({limit: '5mb', extended: false}));
+// parse application/json
+app.use(bodyParser.json({limit: '5mb'}));
+
 app.use(express.static(path.join(process.cwd(), "client", "build")));
 
-app.get('/', (req: Request, res: Response) => {
-  res.sendFile(path.join(process.cwd(), "client", "build", "index.html"));
-});
+app.use('/api', api);
 
-app.get('/api', async (req: Request, res: Response) => {
-  const {rows: [{now: time}]} = await db.query('SELECT NOW()');
-  res.send(`current database time: ${time}`);
+app.get('*', (req: Request, res: Response) => {
+  res.sendFile(path.join(process.cwd(), "client", "build", "index.html"));
 });
 
 app.listen(port, () => {

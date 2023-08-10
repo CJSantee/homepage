@@ -1,6 +1,7 @@
-const {Client, Pool} = require('pg');
-const fs = require('fs');
-const {parse} = require('pg-connection-string');
+import {Client, Pool} from 'pg';
+import fs from 'fs';
+import {parse} from 'pg-connection-string';
+import {secondsToReadable} from './utils';
 
 const PRODUCTION = process.env.NODE_ENV === 'production';
 const DATABASE_URL = process.env.DATABASE_URL || '';
@@ -83,9 +84,35 @@ async function upgrade() {
   }
 }
 
-async function query(text: string, params: any, callback: (err: Error, result) => void) {
-  return pool.query(text, params, callback)
+async function query(text: string, params?: any) {
+  return pool.query(text, params)
 }
+
+async function file(path: string, params: object) {
+  let sql: string;
+  let namedParams: string[] = [];
+  sql = fs.readFileSync(path).toString();
+  const replacer = (match) => {
+    const param = match.slice(2, -1); // remove '${' and '}'
+    const idx = namedParams.indexOf(param);
+    if(idx >= 0) {
+      return `$${idx + 1}`;
+    } else {
+      namedParams.push(param);
+      return `$${namedParams.length}`;
+    }
+  };
+  sql = sql.replace(/\$\{[^{}]+\}/g, replacer);
+
+  const args: string[] = [];
+  if(namedParams) {
+    for(const namedParam of namedParams) {
+      args.push(params[namedParam]);
+    }
+  }
+  
+  return pool.query(sql, args);
+} 
 
 /**
  * @description Close the database pool
@@ -96,8 +123,9 @@ async function end() {
   console.log('Database connections successfully shutdown.');
 }
 
-module.exports = {
+export = {
   upgrade,
   query,
+  file,
   end,
 };

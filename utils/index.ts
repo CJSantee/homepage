@@ -1,4 +1,4 @@
-const secondsToReadable = (seconds: number) => {
+export const secondsToReadable = (seconds: number) => {
   let time_remaining_str: string;
   let hrs: number = seconds / 3600;
   let hrStr: string = '';
@@ -25,8 +25,4 @@ const secondsToReadable = (seconds: number) => {
     time_remaining_str = hrStr === '00' ? `${minStr}:${secStr}` : `${hrStr}:${minStr}:${secStr}`;
   }
   return time_remaining_str;
-};
-
-module.exports = {
-  secondsToReadable,
 };
