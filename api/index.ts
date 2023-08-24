@@ -30,12 +30,11 @@ router.post('/login', async (req, res) => {
     const user = await auth.login(req.body);
     res.status(201).json(user);
   } catch(err) {
-    console.log('err', err);
     if(err instanceof ApplicationError && err.statusCode) {
       res.status(err.statusCode).send(err.message);
     } else {
       console.error(err);
-      res.status(auth.AUTHENTICATION_ERRORS.REGISTER_ERROR.statusCode).send(auth.AUTHENTICATION_ERRORS.REGISTER_ERROR.message);
+      res.status(auth.AUTHENTICATION_ERRORS.UNAUTHORIZED.statusCode).send(auth.AUTHENTICATION_ERRORS.UNAUTHORIZED.message);
     }
   }
 });

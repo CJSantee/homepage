@@ -18,4 +18,9 @@ $ npm run dev
 ```
 NODE_ENV=development # development | production | test
 DATABASE_URL=postgres://postgres:@localhost:5432/homepage-db
+SECURITY_KEY=anyvalue
 ```
+
+### Troubleshooting
+Connection to Prod DB timeout:
+- Check security groups -> Inbound Rules includes Current IP Address
