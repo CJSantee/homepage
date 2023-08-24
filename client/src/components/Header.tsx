@@ -1,56 +1,53 @@
+import { useState } from "react";
 // Bootstrap Components
 import Container from "react-bootstrap/Container";
 import Nav from "react-bootstrap/Nav";
 import Navbar from "react-bootstrap/Navbar";
+import Button from "react-bootstrap/Button";
 
 // Components
 import { Link } from "react-router-dom";
-
-// Assets
-import GitHub from "../assets/img/GitHub.png";
-import LinkedIn from "../assets/img/LinkedIn.png";
+import LoginModal from "./LoginModal";
 
 function Header() {
+  const [showLogin, setShowLogin] = useState(false);
+  
   return (
-    <Container>
-      <Navbar collapseOnSelect variant='dark' expand='md'>
-        <Navbar.Brand className='text-secondary'>
-          <Link to={'/'} className="nav-brand text-secondary text-decoration-none">Colin Santee</Link>
-        </Navbar.Brand>
-        <Navbar.Toggle aria-controls='navbarScroll' />
-        <Navbar.Collapse className='justify-content-between'>
-          <Nav>
-            <Nav.Item>
-              <Link to={'/#AboutMe'} className="nav-link" reloadDocument>
-                About Me
-              </Link>
-            </Nav.Item>
-            <Nav.Item>
-              <Link to={'/#Projects'} className="nav-link" reloadDocument>
-                Projects
-              </Link>
-            </Nav.Item>
-            <Nav.Item>
-            <Link to={'/#Contact'} className="nav-link" reloadDocument>
-                Contact
-              </Link>
-            </Nav.Item>
-          </Nav>
-          <Nav className='social'>
-            <Nav.Item className='m-2'>
-              <Nav.Link href='https://github.com/CJSantee'>
-                <img src={GitHub} alt='GitHub' width={24} />
-              </Nav.Link>
-            </Nav.Item>
-            <Nav.Item className='m-2'>
-              <Nav.Link href='https://www.linkedin.com/in/colin-santee/'>
-                <img src={LinkedIn} alt='GitHub' width={24} />
-              </Nav.Link>
-            </Nav.Item>
-          </Nav>
-        </Navbar.Collapse>
-      </Navbar>
-    </Container>
+    <>
+      <Container>
+        <Navbar collapseOnSelect variant='dark' expand='md'>
+          <Navbar.Brand>
+            <Link to={'/'} className="nav-brand text-decoration-none">Colin Santee</Link>
+          </Navbar.Brand>
+          <Navbar.Toggle aria-controls='navbarScroll' />
+          <Navbar.Collapse className='justify-content-between'>
+            <Nav>
+              <Nav.Item>
+                <Link to={'/#AboutMe'} className="nav-link text-secondary" reloadDocument>
+                  About Me
+                </Link>
+              </Nav.Item>
+              <Nav.Item>
+                <Link to={'/#Projects'} className="nav-link text-secondary" reloadDocument>
+                  Projects
+                </Link>
+              </Nav.Item>
+              <Nav.Item>
+              <Link to={'/#Contact'} className="nav-link text-secondary" reloadDocument>
+                  Contact
+                </Link>
+              </Nav.Item>
+            </Nav>
+            <Nav>
+              <Nav.Item>
+                <Button onClick={() => setShowLogin(true)} variant='outline-secondary'>Login</Button>
+              </Nav.Item>
+            </Nav>
+          </Navbar.Collapse>
+        </Navbar>
+      </Container>
+      <LoginModal show={showLogin} onHide={() => setShowLogin(false)}/>
+    </>
   );
 }
 

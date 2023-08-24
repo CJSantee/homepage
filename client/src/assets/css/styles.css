@@ -18,4 +18,9 @@
     1px 22px 10px rgba(16,16,16,0.2),
     1px 25px 35px rgba(16,16,16,0.2),
     1px 30px 60px rgba(16,16,16,0.4);
-}   
+}
+
+.form-control {
+  box-shadow: inset 0px 1px 8px rgba(0, 0, 0, 0.2);
+  border: 0;
+}
