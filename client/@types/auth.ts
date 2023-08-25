@@ -1,8 +1,17 @@
-export interface Auth {
+export interface LoginProps {
+  username: string,
+  password: string,
+  rememberMe: boolean,
+};
 
+export interface User {
+  user_id: string,
+  username: string,
 };
 
 export type AuthContextType = {
-  auth: Auth,
+  token: string | null,
+  user: User | null,
+  login: (prop:LoginProps) => Promise<void>
 };
 

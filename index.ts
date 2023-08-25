@@ -1,11 +1,14 @@
 require('dotenv').config();
 import express, { type Express, type Request, type Response } from 'express';
+import cors from 'cors';
 import bodyParser from 'body-parser';
-
-import  api from './api';
 import path from 'path';
 
+import  api from './api';
 import db from './db';
+
+const {NODE_ENV} = process.env;
+const isDevelopment = NODE_ENV === 'development';
 
 const app: Express = express();
 const port = 8080;
@@ -16,6 +19,11 @@ app.use(bodyParser.urlencoded({limit: '5mb', extended: false}));
 app.use(bodyParser.json({limit: '5mb'}));
 
 app.use(express.static(path.join(process.cwd(), "client", "build")));
+
+app.use(cors({
+  credentials: true,
+  origin: isDevelopment ? 'http://localhost:3000' : 'https://colinjsantee.com',
+}));
 
 app.use('/api', api);
 

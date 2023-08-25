@@ -12,7 +12,7 @@ router.get('/', async (req, res) => {
   res.send(`current database time: ${time}`);
 });
 
-router.post('/register', async (req, res) => {
+router.post('/users', async (req, res) => {
   try {
     const user = await auth.register(req.body);
     res.status(201).json(user);
@@ -25,7 +25,7 @@ router.post('/register', async (req, res) => {
   }
 });
 
-router.post('/login', async (req, res) => {
+router.post('/auth', async (req, res) => {
   try {
     const user = await auth.login(req.body);
     res.status(201).json(user);

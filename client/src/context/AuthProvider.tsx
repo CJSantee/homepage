@@ -1,15 +1,15 @@
 import React, { createContext, useEffect, useState } from "react";
-import {AuthContextType} from "../../@types/auth";
+import {AuthContextType, User} from "../../@types/auth";
+import api from "../utils/api";
 
-export const AuthContext = createContext<AuthContextType |  null>(null);
+export const AuthContext = createContext<AuthContextType | null>(null);
 
 interface Props {
   children: React.ReactNode,
 };
 const AuthProvider: React.FC<Props> = ({ children }) => {
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const [auth, setAuth] = useState({});
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const [user, setUser] = useState<User | null>(null);
+  const [token, setToken] = useState(null);
   const [persist, setPersist] = useState(
     JSON.parse(localStorage.getItem("persist") || 'false')
   );
@@ -22,10 +22,30 @@ const AuthProvider: React.FC<Props> = ({ children }) => {
     }
   }, [persist]);
 
+  const login: AuthContextType["login"] = async ({ username, password, rememberMe }) => {
+    console.log('auth.login');
+    const body = {
+      username,
+      password,
+    };
+
+    const {data, success} = await api.post('/auth', body);
+    if(success) {
+      const {token, username, user_id} = data;
+      setToken(token);
+      setUser({user_id, username});
+      setPersist(rememberMe);
+    } else {
+      setPersist(false);
+    }
+  }
+  
   return (
     <AuthContext.Provider 
       value={{
-        auth,
+        token,
+        user,
+        login,
       }}
     >
       {children}

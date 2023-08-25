@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useAuth } from "../hooks/useAuth";
 // Bootstrap Components
 import Container from "react-bootstrap/Container";
 import Nav from "react-bootstrap/Nav";
@@ -11,6 +12,8 @@ import LoginModal from "./LoginModal";
 
 function Header() {
   const [showLogin, setShowLogin] = useState(false);
+
+  const auth = useAuth();
   
   return (
     <>
@@ -39,9 +42,15 @@ function Header() {
               </Nav.Item>
             </Nav>
             <Nav>
-              <Nav.Item>
-                <Button onClick={() => setShowLogin(true)} variant='outline-secondary'>Login</Button>
-              </Nav.Item>
+              {auth?.user ? (
+                <Nav.Item>
+                  <Button variant='outline-secondary'>Logout</Button>
+                </Nav.Item>
+              ) : (
+                <Nav.Item>
+                  <Button onClick={() => setShowLogin(true)} variant='outline-secondary'>Login</Button>
+                </Nav.Item>
+              )}
             </Nav>
           </Navbar.Collapse>
         </Navbar>
