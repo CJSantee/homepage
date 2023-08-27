@@ -2,6 +2,7 @@ require('dotenv').config();
 import express, { type Express, type Request, type Response } from 'express';
 import cors from 'cors';
 import bodyParser from 'body-parser';
+import cookieParser from 'cookie-parser';
 import path from 'path';
 
 import  api from './api';
@@ -17,6 +18,7 @@ const port = 8080;
 app.use(bodyParser.urlencoded({limit: '5mb', extended: false}));
 // parse application/json
 app.use(bodyParser.json({limit: '5mb'}));
+app.use(cookieParser());
 
 app.use(express.static(path.join(process.cwd(), "client", "build")));
 
