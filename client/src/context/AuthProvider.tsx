@@ -2,7 +2,7 @@ import React, { createContext, useEffect, useState } from "react";
 import {AuthContextType, User} from "../../@types/auth";
 import api from "../utils/api";
 
-export const AuthContext = createContext<AuthContextType | null>(null);
+export const AuthContext = createContext<AuthContextType>({token: null, user: null});
 
 interface Props {
   children: React.ReactNode,
@@ -22,8 +22,7 @@ const AuthProvider: React.FC<Props> = ({ children }) => {
     }
   }, [persist]);
 
-  const login: AuthContextType["login"] = async ({ username, password, rememberMe }) => {
-    console.log('auth.login');
+  const signIn: AuthContextType["signIn"] = async ({ username, password, rememberMe }) => {
     const body = {
       username,
       password,
@@ -45,7 +44,7 @@ const AuthProvider: React.FC<Props> = ({ children }) => {
       value={{
         token,
         user,
-        login,
+        signIn,
       }}
     >
       {children}

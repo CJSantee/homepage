@@ -5,19 +5,15 @@ import Button from 'react-bootstrap/Button';
 import { useAuth } from '../hooks/useAuth';
 import { useState } from 'react';
 
-function LoginModal({show, onHide}:{show: boolean, onHide: any}) {
+function SignInModal({show, onHide}:{show: boolean, onHide: any}) {
   const auth = useAuth();
 
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
 
-  const login = async () => {
-    console.log('login()');
-    if(auth) {
-      console.log('auth');
-      await auth.login({username, password, rememberMe: true});
-      onHide();
-    }
+  const signIn = async () => {
+    if(auth.signIn) await auth.signIn({username, password, rememberMe: true});
+    onHide();
   };
 
   return (
@@ -40,7 +36,7 @@ function LoginModal({show, onHide}:{show: boolean, onHide: any}) {
               onChange={(e) => setPassword(e.target.value)} />
           </Form.Group>
           <Form.Group className='d-flex justify-content-end'>
-            <Button onClick={login}>Login</Button>
+            <Button onClick={signIn}>Login</Button>
           </Form.Group>
         </Form>
       </Modal.Body>
@@ -48,4 +44,4 @@ function LoginModal({show, onHide}:{show: boolean, onHide: any}) {
   );
 }
 
-export default LoginModal;
+export default SignInModal;

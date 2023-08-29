@@ -8,10 +8,10 @@ import Button from "react-bootstrap/Button";
 
 // Components
 import { Link } from "react-router-dom";
-import LoginModal from "./LoginModal";
+import SignInModal from "./SignInModal";
 
 function Header() {
-  const [showLogin, setShowLogin] = useState(false);
+  const [showSignIn, setShowSignIn] = useState(false);
 
   const auth = useAuth();
   
@@ -48,14 +48,14 @@ function Header() {
                 </Nav.Item>
               ) : (
                 <Nav.Item>
-                  <Button onClick={() => setShowLogin(true)} variant='outline-secondary'>Login</Button>
+                  <Button onClick={() => setShowSignIn(true)} variant='outline-secondary'>Sign In</Button>
                 </Nav.Item>
               )}
             </Nav>
           </Navbar.Collapse>
         </Navbar>
       </Container>
-      <LoginModal show={showLogin} onHide={() => setShowLogin(false)}/>
+      <SignInModal show={showSignIn} onHide={() => setShowSignIn(false)}/>
     </>
   );
 }

@@ -1,5 +1,14 @@
 const API_URL = 'http://localhost:8080/api';
 
+const NETWORK_ERROR = {
+  data: null,
+  error: {
+    code: "ERR_CONNECTION_REFUSED",
+    message: "Server connection failed.",
+  },
+  success: false,
+};
+
 interface FetchOptions {
   method: string
   body?: object,
@@ -20,7 +29,7 @@ async function callFetch(url: string, options: FetchOptions = {method: "GET"}) {
       },
     });
   } catch(err) {
-    throw Error("Server connection failed.");
+    return NETWORK_ERROR;
   }
 
   const contentType = response.headers.get('Content-Type') || '';

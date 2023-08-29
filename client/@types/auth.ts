@@ -1,4 +1,4 @@
-export interface LoginProps {
+export interface SignInProps {
   username: string,
   password: string,
   rememberMe: boolean,
@@ -12,6 +12,6 @@ export interface User {
 export type AuthContextType = {
   token: string | null,
   user: User | null,
-  login: (prop:LoginProps) => Promise<void>
+  signIn?: (prop:SignInProps) => Promise<void>
 };
 
