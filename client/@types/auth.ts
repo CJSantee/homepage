@@ -12,6 +12,7 @@ export interface User {
 export type AuthContextType = {
   token: string | null,
   user: User | null,
-  signIn?: (prop:SignInProps) => Promise<void>
+  signIn?: (prop:SignInProps) => Promise<void>,
+  signOut?: () => Promise<void>,
 };
 

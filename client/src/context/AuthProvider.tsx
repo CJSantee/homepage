@@ -38,6 +38,15 @@ const AuthProvider: React.FC<Props> = ({ children }) => {
       setPersist(false);
     }
   }
+
+  const signOut: AuthContextType["signOut"] = async () => {
+    const {success} = await api.delete('/auth');
+    if(success) {
+      setToken(null);
+      setUser(null);
+      setPersist(null);
+    }
+  }
   
   return (
     <AuthContext.Provider 
@@ -45,6 +54,7 @@ const AuthProvider: React.FC<Props> = ({ children }) => {
         token,
         user,
         signIn,
+        signOut,
       }}
     >
       {children}

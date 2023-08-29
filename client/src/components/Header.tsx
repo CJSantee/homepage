@@ -14,6 +14,10 @@ function Header() {
   const [showSignIn, setShowSignIn] = useState(false);
 
   const auth = useAuth();
+
+  const signOut = () => {
+    if(auth.signOut) auth.signOut();
+  }
   
   return (
     <>
@@ -44,7 +48,7 @@ function Header() {
             <Nav>
               {auth?.user ? (
                 <Nav.Item>
-                  <Button variant='outline-secondary'>Logout</Button>
+                  <Button onClick={signOut} variant='outline-secondary'>Sign Out</Button>
                 </Nav.Item>
               ) : (
                 <Nav.Item>
