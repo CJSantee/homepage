@@ -34,7 +34,7 @@ interface User {
 };
 
 async function register({username, password}: {username: string, password: string}): Promise<{user: User, token: string}>{
-  const {rows: [existingUser]} = await db.file('db/users/get_all.sql', {username});
+  const {rows: [existingUser]} = await db.file('db/users/get_all_fields.sql', {username});
   if(existingUser) {
     throw new ApplicationError(AUTHENTICATION_ERRORS.USERNAME_IN_USE);
   }
@@ -49,7 +49,7 @@ async function register({username, password}: {username: string, password: strin
 }
 
 async function login({username, password}: {username: string, password: string}): Promise<{user: User, token: string}> {
-  const {rows: [user]} = await db.file('db/users/get_all.sql', {username});
+  const {rows: [user]} = await db.file('db/users/get_all_fields.sql', {username});
 
   let token;
   if(user && (await bcrypt.compare(password, user.password))) {
@@ -67,13 +67,23 @@ async function login({username, password}: {username: string, password: string})
   };
 }
 
-async function refresh(token) {
-  const decoded = jwt.verify(token, SECRET_KEY);
-  console.log('decoded', decoded);
+async function refresh(user_id) {
+  const {rows: [user]} = await db.file('db/users/get_all_fields.sql', {user_id});
+
+  if(user) {
+    const token = jwt.sign({user_id: user.user_id, username: user.username}, SECRET_KEY)
+    return {
+      user: {
+        user_id: user.user_id,
+        username: user.username,
+      }, // don't return encrypted passwords
+      token,
+    }
+  }
 
   return {
-    user: {},
-    token: '',
+    user: null,
+    token: null,
   }
 }
 
