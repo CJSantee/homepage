@@ -12,6 +12,9 @@ export interface User {
 export type AuthContextType = {
   token: string | null,
   user: User | null,
+  setUser?: React.Dispatch<any>,
+  persist: boolean,
+  setPersist?: React.Dispatch<any>,
   signIn?: (prop:SignInProps) => Promise<void>,
   signOut?: () => Promise<void>,
 };

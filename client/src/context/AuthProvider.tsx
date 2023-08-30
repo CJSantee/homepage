@@ -2,7 +2,7 @@ import React, { createContext, useEffect, useState } from "react";
 import {AuthContextType, User} from "../../@types/auth";
 import api from "../utils/api";
 
-export const AuthContext = createContext<AuthContextType>({token: null, user: null});
+export const AuthContext = createContext<AuthContextType>({token: null, user: null, persist: false});
 
 interface Props {
   children: React.ReactNode,
@@ -53,6 +53,9 @@ const AuthProvider: React.FC<Props> = ({ children }) => {
       value={{
         token,
         user,
+        setUser,
+        persist,
+        setPersist,
         signIn,
         signOut,
       }}

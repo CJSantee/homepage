@@ -6,6 +6,7 @@ import Header from './components/Header';
 // Pages
 import Home from "./pages/home";
 import NotFound from './pages/not-found';
+import PersistLogin from "./components/PersistLogin";
 
 function App() {
   useEffect(() => {
@@ -20,7 +21,9 @@ function App() {
     <Routes>
       <Route>
         <Route element={<Layout />} >
-          <Route path='/' element={<Home />} />
+          <Route element={<PersistLogin />}>
+            <Route path='/' element={<Home />} />
+          </Route>
           <Route path='*' element={<NotFound />} />
         </Route>
       </Route>
