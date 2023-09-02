@@ -9,17 +9,10 @@ const isDevelopment = process.env.NODE_ENV === 'development';
 
 const router = express.Router();
 
-interface User {
-  user_id: string,
-  username: string,
-};
-interface AuthenticatedRequest extends Request {
-  user: User,
-};
-
 router.get('/', async (req, res) => {
   const {rows: [{now: time}]} = await db.query('SELECT NOW()');
-  res.send(`current database time: ${time}`);
+  const {rows: [sys_params]} = await db.file('db/sys_params/get.sql');
+  res.status(200).json({time, sys_params});
 });
 
 router.post('/users', async (req, res) => {

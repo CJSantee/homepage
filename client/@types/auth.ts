@@ -15,7 +15,7 @@ export type AuthContextType = {
   setUser?: React.Dispatch<any>,
   persist: boolean,
   setPersist?: React.Dispatch<any>,
-  signIn?: (prop:SignInProps) => Promise<void>,
+  signIn?: (prop:SignInProps) => Promise<boolean>,
   signOut?: () => Promise<void>,
 };
 

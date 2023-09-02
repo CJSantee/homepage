@@ -37,6 +37,7 @@ const AuthProvider: React.FC<Props> = ({ children }) => {
     } else {
       setPersist(false);
     }
+    return success;
   }
 
   const signOut: AuthContextType["signOut"] = async () => {

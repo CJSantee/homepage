@@ -14,8 +14,11 @@ function SignInModal({show, onHide}:{show: boolean, onHide: any}) {
   const [showPassword, setShowPassword] = useState(false);
 
   const signIn = async () => {
-    if(auth.signIn) await auth.signIn({username, password, rememberMe: true});
-    onHide();
+    if(!auth.signIn) return; // make TypeScript happy
+    const signedIn = await auth.signIn({username, password, rememberMe: true});
+    if(signedIn) {
+      onHide();
+    }
   };
 
   return (
@@ -24,7 +27,7 @@ function SignInModal({show, onHide}:{show: boolean, onHide: any}) {
         <h4 className='text-primary m-0'>Sign In</h4>
       </Modal.Header>
       <Modal.Body>
-        <Form>
+        <Form noValidate>
           <Form.Group className='mb-2'>
             <Form.Label>Username</Form.Label>
             <Form.Control type='text' 

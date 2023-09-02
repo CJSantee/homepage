@@ -10,6 +10,7 @@ import {
 } from "react-router-dom";
 import App from './App';
 import AuthProvider from './context/AuthProvider';
+import SystemProvider from './context/SystemProvider';
 import reportWebVitals from './reportWebVitals';
 
 const root = ReactDOM.createRoot(
@@ -18,11 +19,13 @@ const root = ReactDOM.createRoot(
 root.render(
   <React.StrictMode>
     <BrowserRouter>
-      <AuthProvider>
-        <Routes>
-          <Route path='/*' element={<App />} />
-        </Routes>
-      </AuthProvider>
+      <SystemProvider>
+        <AuthProvider>
+          <Routes>
+            <Route path='/*' element={<App />} />
+          </Routes>
+        </AuthProvider>
+      </SystemProvider>
     </BrowserRouter>
   </React.StrictMode>
 );

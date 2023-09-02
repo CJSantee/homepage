@@ -5,6 +5,8 @@ import Container from "react-bootstrap/Container";
 import Nav from "react-bootstrap/Nav";
 import Navbar from "react-bootstrap/Navbar";
 import Button from "react-bootstrap/Button";
+import ButtonGroup from 'react-bootstrap/ButtonGroup';
+import Dropdown from 'react-bootstrap/Dropdown';
 
 // Components
 import { Link } from "react-router-dom";
@@ -39,16 +41,19 @@ function Header() {
                   Projects
                 </Link>
               </Nav.Item>
-              <Nav.Item>
-              <Link to={'/#Contact'} className="nav-link text-secondary" reloadDocument>
-                  Contact
-                </Link>
-              </Nav.Item>
             </Nav>
             <Nav>
               {auth?.user ? (
                 <Nav.Item>
-                  <Button onClick={signOut} variant='outline-secondary'>Sign Out</Button>
+                  <Dropdown as={ButtonGroup}>
+                    <Button variant="secondary">{auth.user.username}</Button>
+
+                    <Dropdown.Toggle split variant="secondary" id="dropdown-split-basic" />
+
+                    <Dropdown.Menu>
+                      <Dropdown.Item onClick={signOut}>Sign Out</Dropdown.Item>
+                    </Dropdown.Menu>
+                  </Dropdown>
                 </Nav.Item>
               ) : (
                 <Nav.Item>

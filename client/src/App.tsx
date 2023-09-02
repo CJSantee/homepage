@@ -1,6 +1,4 @@
-import { useEffect } from "react";
 import { Routes, Route, Outlet } from "react-router-dom";
-import api from "./utils/api";
 // Custom Components
 import Header from './components/Header';
 // Pages
@@ -9,14 +7,6 @@ import NotFound from './pages/not-found';
 import PersistLogin from "./components/PersistLogin";
 
 function App() {
-  useEffect(() => {
-    async function getData() {
-      const {data} = await api.get('/');
-      console.log('data', data);
-    }
-    getData();
-  }, []);
-
   return (
     <Routes>
       <Route>
