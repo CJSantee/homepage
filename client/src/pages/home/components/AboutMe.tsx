@@ -3,6 +3,8 @@ import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
 import Button from "react-bootstrap/Button";
 
+import {ReactComponent as DeskImg} from "../../../assets/img/Desk.svg";
+
 import { useSystem } from "../../../hooks/useSystem";
 
 function AboutMe() {
@@ -27,7 +29,7 @@ function AboutMe() {
       </Col>
       <Col md>
         <Row className='justify-content-center'>
-          <div className='graphic' />
+          <DeskImg />
         </Row>
       </Col>
     </Row>

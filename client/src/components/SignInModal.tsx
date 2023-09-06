@@ -3,6 +3,8 @@ import Form from 'react-bootstrap/Form';
 import InputGroup from 'react-bootstrap/InputGroup';
 import Button from 'react-bootstrap/Button';
 
+import {ReactComponent as Desk} from "../assets/img/DeskCropped.svg";
+
 import { useAuth } from '../hooks/useAuth';
 import { useState } from 'react';
 
@@ -27,6 +29,9 @@ function SignInModal({show, onHide}:{show: boolean, onHide: any}) {
         <h4 className='text-primary m-0'>Sign In</h4>
       </Modal.Header>
       <Modal.Body>
+        <div className='d-flex px-5 py-3'>
+          <Desk />
+        </div>
         <Form noValidate>
           <Form.Group className='mb-2'>
             <Form.Label>Username</Form.Label>
@@ -40,9 +45,13 @@ function SignInModal({show, onHide}:{show: boolean, onHide: any}) {
               <Form.Control type={showPassword ? 'text' : 'password'} 
                 value={password} 
                 onChange={(e) => setPassword(e.target.value)} 
+                isInvalid={true}
               />
               {!!password.length && (<Button onClick={() => setShowPassword(!showPassword)} className="view-password-btn">{showPassword ? 'Hide' : 'Show'}</Button>)}
             </InputGroup>
+            <Form.Control.Feedback type="invalid">
+              Username or password is incorrect.
+            </Form.Control.Feedback>
           </Form.Group>
           <Form.Group className='d-flex justify-content-end'>
             <Button onClick={signIn}>Sign In</Button>
