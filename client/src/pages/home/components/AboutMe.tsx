@@ -1,14 +1,22 @@
 // Bootstrap Components
 import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
-// import Button from "react-bootstrap/Button";
+import Button from "react-bootstrap/Button";
+
+import {ReactComponent as DeskImg} from "../../../assets/img/Desk.svg";
+
+import { useSystem } from "../../../hooks/useSystem";
 
 function AboutMe() {
+  const system = useSystem();
+
   return (
     <Row className='section justify-content-center' id='AboutMe'>
       <Col md>
         <h2 className='text-primary'>About Me</h2>
-        <p>Hi! I'm Colin.</p>
+        <p>Hi! {system.show_create_admin ? (
+          <Button variant="link" className="text-seocndary p-0">I'm Colin</Button>
+        ) : 'I\'m Colin'}.</p>
         <p>
           I'm a creative and technically minded software developer inspired by
           software solutions with significant societal impact. I'm passionate
@@ -21,7 +29,7 @@ function AboutMe() {
       </Col>
       <Col md>
         <Row className='justify-content-center'>
-          <div className='graphic' />
+          <DeskImg />
         </Row>
       </Col>
     </Row>

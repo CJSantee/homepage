@@ -31,44 +31,65 @@ const ROUNDS = 10;
 interface User {
   user_id: number,
   username: string,
-  token: string,
 };
 
-async function register({username, password}: {username: string, password: string}): Promise<User>{
-  const {rows: [existingUser]} = await db.file('db/users/get.sql', {username});
+async function register({username, password}: {username: string, password: string}): Promise<{user: User, token: string}>{
+  const {rows: [existingUser]} = await db.file('db/users/get_all_fields.sql', {username});
   if(existingUser) {
     throw new ApplicationError(AUTHENTICATION_ERRORS.USERNAME_IN_USE);
   }
 
   const hashedPasword = await bcrypt.hash(password, ROUNDS);
 
-  const {rows: [newUser]} = await db.file('db/users/put.sql', {username, password: hashedPasword});
+  const {rows: [user]} = await db.file('db/users/put.sql', {username, password: hashedPasword});
 
-  const token = jwt.sign({username}, SECRET_KEY);
-  newUser.token = token;
+  const token = jwt.sign({user_id: user.user_id, username: user.username}, SECRET_KEY);
 
-  return newUser;
+  return {user, token};
 }
 
-async function login({username, password}: {username: string, password: string}): Promise<User> {
-  const {rows: [user]} = await db.file('db/users/get.sql', {username});
+async function login({username, password}: {username: string, password: string}): Promise<{user: User, token: string}> {
+  const {rows: [user]} = await db.file('db/users/get_all_fields.sql', {username});
 
+  let token;
   if(user && (await bcrypt.compare(password, user.password))) {
-    const token = jwt.sign({username}, SECRET_KEY);
-    user.token = token;
+    token = jwt.sign({user_id: user.user_id, username: user.username}, SECRET_KEY);
   } else {
     throw new ApplicationError(AUTHENTICATION_ERRORS.UNAUTHORIZED);
   }
   
   return {
-    user_id: user.user_id,
-    username: user.username,
-    token: user.token,
+    user: {
+      user_id: user.user_id,
+      username: user.username,
+    }, // don't return encrypted passwords
+    token,
   };
+}
+
+async function refresh(user_id) {
+  const {rows: [user]} = await db.file('db/users/get_all_fields.sql', {user_id});
+
+  if(user) {
+    const token = jwt.sign({user_id: user.user_id, username: user.username}, SECRET_KEY)
+    return {
+      user: {
+        user_id: user.user_id,
+        username: user.username,
+      }, // don't return encrypted passwords
+      token,
+    }
+  }
+
+  return {
+    user: null,
+    token: null,
+  }
 }
 
 export = {
   AUTHENTICATION_ERRORS,
   register,
-  login
+  login,
+  refresh,
 };
