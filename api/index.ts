@@ -1,9 +1,10 @@
-import express, { Request } from 'express';
-
+import express from 'express';
 import db from '../db';
 import auth from '../controllers/authentication';
 import { ApplicationError } from '../lib/applicationError';
 import { verifyToken } from '../middleware/auth';
+
+import wordleApi from './wordle';
 
 const isDevelopment = process.env.NODE_ENV === 'development';
 
@@ -75,5 +76,7 @@ router.get('/refresh', verifyToken, async (req, res) => {
 router.post('/welcome', verifyToken, (req, res) => {
   res.status(200).send('Welcome 🙌 ');
 });
+
+router.use('/wordle', wordleApi);
 
 export = router;
