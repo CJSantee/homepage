@@ -5,6 +5,7 @@ import Header from './components/Header';
 import Home from "./pages/home";
 import NotFound from './pages/not-found';
 import PersistLogin from "./components/PersistLogin";
+import Admin from "./pages/admin";
 
 function App() {
   return (
@@ -13,6 +14,7 @@ function App() {
         <Route element={<Layout />} >
           <Route element={<PersistLogin />}>
             <Route path='/' element={<Home />} />
+            <Route path='/admin' element={<Admin />} />
           </Route>
           <Route path='*' element={<NotFound />} />
         </Route>

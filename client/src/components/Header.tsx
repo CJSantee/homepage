@@ -1,5 +1,8 @@
+// Hooks
 import { useState } from "react";
 import { useAuth } from "../hooks/useAuth";
+import { useNavigate } from "react-router-dom";
+
 // Bootstrap Components
 import Container from "react-bootstrap/Container";
 import Nav from "react-bootstrap/Nav";
@@ -16,6 +19,7 @@ function Header() {
   const [showSignIn, setShowSignIn] = useState(false);
 
   const auth = useAuth();
+  const navigate = useNavigate();
 
   const signOut = () => {
     if(auth.signOut) auth.signOut();
@@ -51,6 +55,7 @@ function Header() {
                     <Dropdown.Toggle split variant="secondary" id="dropdown-split-basic" />
 
                     <Dropdown.Menu>
+                      <Dropdown.Item onClick={() => navigate('/admin')}>Admin Console</Dropdown.Item>
                       <Dropdown.Item onClick={signOut}>Sign Out</Dropdown.Item>
                     </Dropdown.Menu>
                   </Dropdown>

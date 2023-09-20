@@ -28,3 +28,8 @@ Connection to Prod DB timeout:
 Rendering SVG:
 [Using SVGR Via Create React App](https://blog.logrocket.com/how-to-use-svgs-react/#using-svg-component)
 [Note from Stack Overflow](https://stackoverflow.com/questions/59820954/syntaxerror-unknown-namespace-tags-are-not-supported-by-default)
+
+### Future Ideas
+Wordle Score Analyzer
+Chess.com + LiChess API integration
+Site viewers / analytics

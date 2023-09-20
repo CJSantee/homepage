@@ -10,10 +10,8 @@ interface Props {
 const SystemProvider: React.FC<Props> = ({ children }) => {
   const [showCreateAdmin, setShowCreateAdmin] = useState(false);
   useEffect(() => {
-    console.log('SystemProvider')
     const getSystemParams = async () => {
       const {data, success} = await api.get('/');
-      console.log('data', data);
       if(success) {
         const {sys_params} = data;
         setShowCreateAdmin(sys_params.show_create_admin);

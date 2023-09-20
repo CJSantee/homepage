@@ -88,7 +88,7 @@ async function query(text: string, params?: any) {
   return pool.query(text, params)
 }
 
-async function file(path: string, params?: object) {
+async function file(path: string, params: object = {}) {
   let sql: string;
   let namedParams: string[] = [];
   sql = fs.readFileSync(path).toString();
