@@ -1,3 +1,5 @@
+// Useful reference for Emoji parsing in JS: https://thekevinscott.com/emojis-in-javascript/
+
 import db from '../db';
 import { ApplicationError } from '../lib/applicationError';
 
@@ -41,7 +43,7 @@ function parseGuessRows(rows: string) {
 }
 
 function parseWordleResults(results) {
-  const wordleRegex = /Wordle (\d+) (\d{1})\/\d(\**)[\n\r\s]+((?:(?:[\u2b1b-\u2b1c]|(?:\ud83d[\udfe6-\udfe9])){5}[\n\r\s]*){1,6})/;
+  const wordleRegex = /Wordle (\d+) (\d{1}|X)\/6(\**)[\n\r\s]+((?:(?:[\u2b1b-\u2b1c]|(?:\ud83d[\udfe6-\udfe9])){5}[\n\r\s]*){1,6})/;
   const [wordleNumber, numGuesses, hardMode, guessRows] = results.match(wordleRegex).slice(1);
   const guess_rows = parseGuessRows(guessRows);
   if(!wordleNumber || !numGuesses || !guess_rows) {
@@ -49,7 +51,7 @@ function parseWordleResults(results) {
   }
   return {
     wordle_number: Number(wordleNumber), 
-    num_guesses: Number(numGuesses), 
+    num_guesses: numGuesses === 'X' ? -1 : Number(numGuesses), 
     hard_mode: !!hardMode, 
     guess_rows,
   };
@@ -66,4 +68,9 @@ export async function insertUserWordle(user_id, results) {
   });
 
   return userWordle;
+}
+
+export async function getUserWordleStats(user_id) {
+  const {rows: [stats]} = await db.file('db/user_wordles/get_stats.sql', {user_id});
+  return stats;
 }

@@ -1,12 +1,14 @@
 import express from 'express';
 import { ApplicationError } from '../lib/applicationError';
 import { verifyToken } from '../middleware/auth';
-import { insertUserWordle } from '../controllers/wordle';
+import { insertUserWordle, getUserWordleStats } from '../controllers/wordle';
 
 const router = express.Router();
 
-router.get('/', async (req, res) => {
-  res.status(200).send('WORDLE');
+router.get('/', verifyToken, async (req, res) => {
+  const {user_id} = req.user || {};
+  const stats = await getUserWordleStats(user_id);
+  res.status(200).json(stats);
 });
 
 router.post('/', verifyToken, async (req, res) => {
