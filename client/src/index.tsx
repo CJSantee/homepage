@@ -11,6 +11,7 @@ import {
 import App from './App';
 import AuthProvider from './context/AuthProvider';
 import SystemProvider from './context/SystemProvider';
+import AlertProvider from './context/AlertProvider';
 import reportWebVitals from './reportWebVitals';
 
 const root = ReactDOM.createRoot(
@@ -21,9 +22,11 @@ root.render(
     <BrowserRouter>
       <SystemProvider>
         <AuthProvider>
-          <Routes>
-            <Route path='/*' element={<App />} />
-          </Routes>
+          <AlertProvider>
+            <Routes>
+              <Route path='/*' element={<App />} />
+            </Routes>
+          </AlertProvider>
         </AuthProvider>
       </SystemProvider>
     </BrowserRouter>

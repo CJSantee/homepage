@@ -10,6 +10,12 @@ const WORDLE_ERRORS = {
     message: 'Invalid Wordle results.',
     statusCode: 400,
   },
+  DUPLICATE_WORDLE: {
+    type: ApplicationError.TYPES.CLIENT,
+    code: 'WORDLE_ALREADY_SUBMITTED',
+    message: 'You have already submit results for this Wordle.',
+    statusCode: 400,
+  },
 };
 
 // Unicode Variables
@@ -37,37 +43,44 @@ function parseGuessRows(rows: string) {
     } else if (green.includes(char)) {
       return 'g';
     } else {
-      throw new ApplicationError(WORDLE_ERRORS.PARSING_ERROR);
+      throw new Error('Unexpected Character');
     }
   }));
 }
 
 function parseWordleResults(results) {
   const wordleRegex = /Wordle (\d+) (\d{1}|X)\/6(\**)[\n\r\s]+((?:(?:[\u2b1b-\u2b1c]|(?:\ud83d[\udfe6-\udfe9])){5}[\n\r\s]*){1,6})/;
-  const [wordleNumber, numGuesses, hardMode, guessRows] = results.match(wordleRegex).slice(1);
-  const guess_rows = parseGuessRows(guessRows);
-  if(!wordleNumber || !numGuesses || !guess_rows) {
+  try {
+    const [wordleNumber, numGuesses, hardMode, guessRows] = results.match(wordleRegex).slice(1);
+    const guess_rows = parseGuessRows(guessRows);
+    return {
+      wordle_number: Number(wordleNumber), 
+      num_guesses: numGuesses === 'X' ? -1 : Number(numGuesses), 
+      hard_mode: !!hardMode, 
+      guess_rows,
+    };
+  } catch(err) {
     throw new ApplicationError(WORDLE_ERRORS.PARSING_ERROR);
   }
-  return {
-    wordle_number: Number(wordleNumber), 
-    num_guesses: numGuesses === 'X' ? -1 : Number(numGuesses), 
-    hard_mode: !!hardMode, 
-    guess_rows,
-  };
 }
 
 export async function insertUserWordle(user_id, results) {
   const {wordle_number, num_guesses, hard_mode, guess_rows} = parseWordleResults(results);
-  const {rows: [userWordle]} = await db.file('db/user_wordles/put.sql', {
-    user_id,
-    wordle_number,
-    num_guesses,
-    hard_mode,
-    guess_rows: JSON.stringify(guess_rows),
-  });
-
-  return userWordle;
+  try {
+    const {rows: [userWordle]} = await db.file('db/user_wordles/put.sql', {
+      user_id,
+      wordle_number,
+      num_guesses,
+      hard_mode,
+      guess_rows: JSON.stringify(guess_rows),
+    });
+    return userWordle;
+  } catch(err: any) {
+    if(err.constraint === 'user_id_wordle_number_idx') {
+      throw new ApplicationError(WORDLE_ERRORS.DUPLICATE_WORDLE);
+    } 
+    throw new Error(err);
+  }
 }
 
 export async function getUserWordleStats(user_id) {

@@ -4,6 +4,7 @@ import Button from "react-bootstrap/Button";
 import ProgressBar from "react-bootstrap/Progressbar";
 import { useEffect, useState } from "react";
 import api from "../../utils/api";
+import { useAlert } from "../../hooks/useAlert";
 
 function Wordle() {
   const [wordlesPlayed, setWordlesPlayed] = useState(0);
@@ -31,9 +32,20 @@ function Wordle() {
     }
     getStats();
   }, []);
+
+  const alertManager = useAlert();
   
   const submitWordle = async () => {
-    await api.post('/wordle', {results: wordleResults});
+    if(!wordleResults) return;
+    const {data, success} = await api.post('/wordle', {results: wordleResults});
+    if(success) {
+      const {played, win_percentage, guess_distribution} = data;
+      setWordlesPlayed(played);
+      setWinPercentage(win_percentage);
+      setGuessDistribution(guess_distribution);
+    } else {
+      if(alertManager.addAlert) alertManager.addAlert({type: 'danger', message: data, timeout: 3000});
+    }
   }
 
   return (
@@ -54,7 +66,7 @@ function Wordle() {
           <h3>Guess Distribution</h3>
           <div>
             {Object.entries(guessDistribution).map(([key, value]) => (
-              <div className="row align-items-center py-2">
+              <div key={key} className="row align-items-center py-2">
                 <div className="col-1">
                   <span>{key}</span>
                 </div>

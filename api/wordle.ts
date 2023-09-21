@@ -16,7 +16,8 @@ router.post('/', verifyToken, async (req, res) => {
   const {results} = req.body;
   try {
     await insertUserWordle(user_id, results);
-    res.status(201).send("Thanks for entering your wordle!");
+    const stats = await getUserWordleStats(user_id);
+    res.status(201).json(stats);
   } catch(err) {
     if(err instanceof ApplicationError && err.statusCode) {
       res.status(err.statusCode).send(err.message);

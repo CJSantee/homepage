@@ -63,3 +63,19 @@ $dark-bg: #37455a;
   left: 50%;
   transform: translate(-50%, 0);
 }
+
+.z-index-1 {
+  z-index: 1;
+}
+
+// SM
+@media (min-width: 576px) {
+}
+
+// MD
+@media (min-width: 768px) {
+}
+
+// LG
+@media (min-width: 992px) {
+}
