@@ -3,7 +3,8 @@ import express, { Request } from 'express';
 import db from '../db';
 import auth from '../controllers/authentication';
 import { ApplicationError } from '../lib/applicationError';
-import { verifyToken } from '../middleware/auth';
+import { confirmPermission, verifyToken } from '../middleware/auth';
+import { createUser, getAllUsers } from '../controllers/users';
 
 const isDevelopment = process.env.NODE_ENV === 'development';
 
@@ -15,25 +16,41 @@ router.get('/', async (req, res) => {
   res.status(200).json({time, sys_params});
 });
 
-router.post('/users', async (req, res) => {
-  try {
-    const {user, token} = await auth.register(req.body);
+router.route('/users')
+  .get(confirmPermission('admin'), async (req, res) => {
+    const users = await getAllUsers();
+    res.status(200).json({users});
+  })  
+  .post(async (req, res) => {
+    const {password} = req.body;
+    try {
+      let user;
+      if(password) {
+        // Register user
+        const {user: newUser, token} = await auth.register(req.body);
+  
+        res.cookie('jwt', token, {
+          secure: !isDevelopment,
+          httpOnly: true,
+          expires: new Date(Date.now() + 1000 * 60 * 60 * 60 * 24 * 7 * 2), // ms * sec * min * hr * day * wk * 2 (2 weeks)
+        });
 
-    res.cookie('jwt', token, {
-      secure: !isDevelopment,
-      httpOnly: true,
-      expires: new Date(Date.now() + 1000 * 60 * 60 * 60 * 24 * 7 * 2), // ms * sec * min * hr * day * wk * 2 (2 weeks)
-    });
+        user = newUser;
+      } else {
+        // TODO: Should either protect this with permissions or move to a different route
+        // Create new unverified user
+        user = await createUser(req.body);
+      }
 
-    res.status(201).json(user);
-  } catch(err) {
-    if(err instanceof ApplicationError && err.statusCode) {
-      res.status(err.statusCode).send(err.message);
-    } else {
-      res.status(500).send(auth.AUTHENTICATION_ERRORS.REGISTER_ERROR);
+      res.status(201).json(user);
+    } catch(err) {
+      if(err instanceof ApplicationError && err.statusCode) {
+        res.status(err.statusCode).send(err.message);
+      } else {
+        res.status(500).send(auth.AUTHENTICATION_ERRORS.REGISTER_ERROR);
+      }
     }
-  }
-});
+  });
 
 router.route('/auth')
   .post(async (req, res) => {

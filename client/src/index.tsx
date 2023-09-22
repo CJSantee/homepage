@@ -12,6 +12,7 @@ import App from './App';
 import AuthProvider from './context/AuthProvider';
 import SystemProvider from './context/SystemProvider';
 import reportWebVitals from './reportWebVitals';
+import ConfirmProvider from './context/ConfirmProvider';
 
 const root = ReactDOM.createRoot(
   document.getElementById('root') as HTMLElement
@@ -20,11 +21,13 @@ root.render(
   <React.StrictMode>
     <BrowserRouter>
       <SystemProvider>
-        <AuthProvider>
-          <Routes>
-            <Route path='/*' element={<App />} />
-          </Routes>
-        </AuthProvider>
+        <ConfirmProvider>
+          <AuthProvider>
+            <Routes>
+              <Route path='/*' element={<App />} />
+            </Routes>
+          </AuthProvider>
+        </ConfirmProvider>
       </SystemProvider>
     </BrowserRouter>
   </React.StrictMode>

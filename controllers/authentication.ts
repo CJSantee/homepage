@@ -24,6 +24,18 @@ const AUTHENTICATION_ERRORS = {
     message: 'Invalid login.',
     statusCode: 401,
   },
+  USERNAME_REQUIRED: {
+    type: ApplicationError.TYPES.CLIENT,
+    code: 'USERNAME_REQUIRED',
+    message: 'Username is required.',
+    statusCode: 400,
+  },
+  PASSWORD_REQUIRED: {
+    type: ApplicationError.TYPES.CLIENT,
+    code: 'PASSWORD_REQUIRED',
+    message: 'Password is required.',
+    statusCode: 400,
+  }
 };
 
 const ROUNDS = 10;
@@ -34,9 +46,16 @@ interface User {
 };
 
 async function register({username, password}: {username: string, password: string}): Promise<{user: User, token: string}>{
-  const {rows: [existingUser]} = await db.file('db/users/get_all_fields.sql', {username});
+  const {rows: [existingUser]} = await db.file('db/users/get.sql', {username});
   if(existingUser) {
     throw new ApplicationError(AUTHENTICATION_ERRORS.USERNAME_IN_USE);
+  }
+
+  if(!username) {
+    throw new ApplicationError(AUTHENTICATION_ERRORS.USERNAME_REQUIRED);
+  }
+  if(!password) {
+    throw new ApplicationError(AUTHENTICATION_ERRORS.PASSWORD_REQUIRED);
   }
 
   const hashedPasword = await bcrypt.hash(password, ROUNDS);
@@ -49,7 +68,7 @@ async function register({username, password}: {username: string, password: strin
 }
 
 async function login({username, password}: {username: string, password: string}): Promise<{user: User, token: string}> {
-  const {rows: [user]} = await db.file('db/users/get_all_fields.sql', {username});
+  const {rows: [user]} = await db.file('db/users/get.sql', {username});
 
   let token;
   if(user && (await bcrypt.compare(password, user.password))) {
@@ -68,7 +87,7 @@ async function login({username, password}: {username: string, password: string})
 }
 
 async function refresh(user_id) {
-  const {rows: [user]} = await db.file('db/users/get_all_fields.sql', {user_id});
+  const {rows: [user]} = await db.file('db/users/get.sql', {user_id});
 
   if(user) {
     const token = jwt.sign({user_id: user.user_id, username: user.username}, SECRET_KEY)
@@ -87,9 +106,27 @@ async function refresh(user_id) {
   }
 }
 
+/**
+ * @description Check if a user has an acl row with the provided permission
+ */
+async function hasPermission(user_id: number, permission: string) {
+  const {rows: [aclRow]} = await db.file('db/acls/get_by_user_id.sql', {user_id});
+  if(!aclRow) {
+    return false;
+  }
+  const {acl} = aclRow;
+  if(acl === '') {
+    // Unlimited Power
+    return true;
+  }
+  // TODO: Implement other ACLS here
+  return false;
+}
+
 export = {
   AUTHENTICATION_ERRORS,
   register,
   login,
   refresh,
+  hasPermission,
 };
