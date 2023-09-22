@@ -15,14 +15,17 @@ function Admin() {
 
   const confirm = useConfirm();
 
-  const deleteUser = async (user_id: string) => {
-    console.log('DELETE', user_id);
-  }
-
   const updateUsers = async () => {
     const {data, success} = await api.get('/users');
     if(success) {
       setUsers(data.users);
+    }
+  }
+  
+  const deleteUser = async (user_id: string) => {
+    const {success} = await api.post('/users/archive', {user_id});
+    if(success) {
+      updateUsers();
     }
   }
 

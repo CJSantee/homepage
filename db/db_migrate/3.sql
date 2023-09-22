@@ -4,5 +4,7 @@ CREATE TABLE IF NOT EXISTS acls (
   acl TEXT NOT NULL
 );
 
-ALTER TABLE users ALTER COLUMN password DROP NOT NULL;
-ALTER TABLE users ADD CONSTRAINT unique_username UNIQUE (username);
+ALTER TABLE users 
+  ALTER COLUMN password DROP NOT NULL,
+  ADD COLUMN archived TIMESTAMPTZ,
+  ADD CONSTRAINT unique_username UNIQUE (username);

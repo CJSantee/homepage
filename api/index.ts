@@ -4,7 +4,7 @@ import db from '../db';
 import auth from '../controllers/authentication';
 import { ApplicationError } from '../lib/applicationError';
 import { confirmPermission, verifyToken } from '../middleware/auth';
-import { createUser, getAllUsers } from '../controllers/users';
+import { archiveUser, createUser, getAllUsers } from '../controllers/users';
 
 const isDevelopment = process.env.NODE_ENV === 'development';
 
@@ -51,6 +51,20 @@ router.route('/users')
       }
     }
   });
+
+router.post('/users/archive', confirmPermission('admin'), async (req, res) => {
+  const {user_id} = req.body;
+  try {
+    await archiveUser(user_id);
+    res.status(200).send('User Archived.');
+  } catch(err) {
+    if(err instanceof ApplicationError && err.statusCode) {
+      res.status(err.statusCode).send(err.message);
+    } else {
+      res.status(500).send('An unexpected error occurred, unable to archive user.');
+    }
+  }
+});
 
 router.route('/auth')
   .post(async (req, res) => {
