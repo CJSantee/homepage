@@ -2,13 +2,12 @@ import Modal from 'react-bootstrap/Modal';
 import Form from 'react-bootstrap/Form';
 import InputGroup from 'react-bootstrap/InputGroup';
 import Button from 'react-bootstrap/Button';
-
-import {ReactComponent as Desk} from "../assets/img/DeskCropped.svg";
-
+import { ReactComponent as Desk } from "../assets/img/DeskCropped.svg";
+import { ModalProps } from '../../@types/modal';
 import { useAuth } from '../hooks/useAuth';
 import { useState } from 'react';
 
-function SignInModal({show, onHide}:{show: boolean, onHide: any}) {
+function SignInModal({show, onHide}:ModalProps) {
   const auth = useAuth();
 
   const [username, setUsername] = useState('');

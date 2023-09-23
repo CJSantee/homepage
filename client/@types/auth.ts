@@ -7,10 +7,10 @@ export interface SignInProps {
 export interface User {
   user_id: string,
   username: string,
+  acl: string,
 };
 
 export type AuthContextType = {
-  token: string | null,
   user: User | null,
   setUser?: React.Dispatch<any>,
   persist: boolean,

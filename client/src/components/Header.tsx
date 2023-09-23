@@ -14,6 +14,7 @@ import Dropdown from 'react-bootstrap/Dropdown';
 // Components
 import { Link } from "react-router-dom";
 import SignInModal from "./SignInModal";
+import { hasPermission } from "../utils";
 
 function Header() {
   const [showSignIn, setShowSignIn] = useState(false);
@@ -55,7 +56,8 @@ function Header() {
                     <Dropdown.Toggle split variant="secondary" id="dropdown-split-basic" />
 
                     <Dropdown.Menu>
-                      <Dropdown.Item onClick={() => navigate('/admin')}>Admin Console</Dropdown.Item>
+                      {hasPermission('admin', auth.user.acl) && 
+                        <Dropdown.Item onClick={() => navigate('/admin')}>Admin Console</Dropdown.Item>}
                       <Dropdown.Item onClick={signOut}>Sign Out</Dropdown.Item>
                     </Dropdown.Menu>
                   </Dropdown>

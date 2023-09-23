@@ -16,10 +16,10 @@ function App() {
         <Route element={<Layout />} >
           <Route element={<PersistLogin />}>
             <Route path='/' element={<Home />} />
-            <Route element={<AuthRoute />}>
+            <Route element={<AuthRoute permission='admin' />}>
               <Route path='/admin' element={<Admin />} />
-              <Route path='/wordle' element={<Wordle />} />
             </Route>
+            <Route path='/wordle' element={<Wordle />} />
           </Route>
           <Route path='*' element={<NotFound />} />
         </Route>
