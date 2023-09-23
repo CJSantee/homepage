@@ -20,6 +20,10 @@
     1px 30px 60px rgba(16,16,16,0.4);
 }
 
+.threed-sm {
+  font-size: 6em !important;
+}
+
 .form-control {
   border: 0;
   background-color: var(--bg-color);

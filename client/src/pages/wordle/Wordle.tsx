@@ -1,10 +1,9 @@
 import Container from "react-bootstrap/Container";
-import Form from "react-bootstrap/Form";
-import Button from "react-bootstrap/Button";
 import ProgressBar from "react-bootstrap/Progressbar";
 import { useEffect, useState } from "react";
 import api from "../../utils/api";
-import { useAlert } from "../../hooks/useAlert";
+import ResultsForm, { UserWordleStats } from "./components/ResultsForm";
+import Leaderboard from "./components/Leaderboard";
 
 function Wordle() {
   const [wordlesPlayed, setWordlesPlayed] = useState(0);
@@ -17,8 +16,6 @@ function Wordle() {
     '5': 0,
     '6': 0, 
   });
-
-  const [wordleResults, setWordleResults] = useState('');
 
   useEffect(() => {
     const getStats = async () => {
@@ -33,25 +30,17 @@ function Wordle() {
     getStats();
   }, []);
 
-  const alertManager = useAlert();
-  
-  const submitWordle = async () => {
-    if(!wordleResults) return;
-    const {data, success} = await api.post('/wordle', {results: wordleResults});
-    if(success) {
-      const {played, win_percentage, guess_distribution} = data;
-      setWordlesPlayed(played);
-      setWinPercentage(win_percentage);
-      setGuessDistribution(guess_distribution);
-    } else {
-      if(alertManager.addAlert) alertManager.addAlert({type: 'danger', message: data, timeout: 3000});
-    }
+  const updateStats = (stats: UserWordleStats) => {
+    const {played, win_percentage, guess_distribution} = stats;
+    setWordlesPlayed(played);
+    setWinPercentage(win_percentage);
+    setGuessDistribution(guess_distribution);
   }
 
   return (
     <Container>
       <div className="row justify-content-center">
-        <div className="col-7 mb-3">
+        <div className="col-12 col-lg-7 mb-3 p-0 pe-lg-2">
           <h3>Player Stats</h3>
           <div className="d-flex justify-content-between py-2 mb-2">
             <div className="d-flex flex-column align-items-center rounded border p-2">
@@ -77,22 +66,16 @@ function Wordle() {
             ))}
           </div>
         </div>
-        <div className="d-flex col-12 col-lg-5 justify-content-center justify-content-lg-end">
-          <Form>
-            <Form.Group className="mb-3">
-              <Form.Label>Enter your results for today's Wordle:</Form.Label>
-              <Form.Control 
-                className="no-scrollbar" 
-                as="textarea" 
-                rows={8} 
-                value={wordleResults} 
-                onChange={(e) => setWordleResults(e.target.value)} 
-              />
-            </Form.Group>
-            <Form.Group className="d-flex w-100 justify-content-center">
-              <Button onClick={submitWordle}>Submit</Button>
-            </Form.Group>
-          </Form>
+        <div className="d-flex col-12 col-lg-5 justify-content-center justify-content-lg-end p-0 ps-lg-2">
+          <div className="row">
+            <div className="col-12 mb-3">
+              <h3>Leaderboard</h3>
+              <Leaderboard />
+            </div>
+            <div className="col-12">
+              <ResultsForm updateStats={updateStats}/>
+            </div>
+          </div>
         </div>
       </div>
     </Container>

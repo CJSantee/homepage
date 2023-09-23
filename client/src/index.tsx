@@ -14,25 +14,28 @@ import SystemProvider from './context/SystemProvider';
 import AlertProvider from './context/AlertProvider';
 import reportWebVitals from './reportWebVitals';
 import ConfirmProvider from './context/ConfirmProvider';
+import ErrorBoundary from './components/ErrorBoundary';
 
 const root = ReactDOM.createRoot(
   document.getElementById('root') as HTMLElement
 );
 root.render(
   <React.StrictMode>
-    <BrowserRouter>
-      <SystemProvider>
-        <ConfirmProvider>
-          <AlertProvider>
-            <AuthProvider>
-              <Routes>
-                <Route path='/*' element={<App />} />
-              </Routes>
-            </AuthProvider>
-          </AlertProvider>
-        </ConfirmProvider>
-      </SystemProvider>
-    </BrowserRouter>
+    <ErrorBoundary>
+      <BrowserRouter>
+        <SystemProvider>
+          <ConfirmProvider>
+            <AlertProvider>
+              <AuthProvider>
+                <Routes>
+                  <Route path='/*' element={<App />} />
+                </Routes>
+              </AuthProvider>
+            </AlertProvider>
+          </ConfirmProvider>
+        </SystemProvider>
+      </BrowserRouter>
+    </ErrorBoundary>
   </React.StrictMode>
 );
 

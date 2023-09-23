@@ -1,5 +1,4 @@
 import express from 'express';
-import { ApplicationError } from '../lib/applicationError';
 import { verifyToken } from '../middleware/auth';
 import { insertUserWordle, getUserWordleStats, getWordleLeaderboard } from '../controllers/wordle';
 
@@ -23,8 +22,13 @@ router.post('/', verifyToken, async (req, res, next) => {
   }
 });
 
-router.get('/leaderboard', async (req, res) => {
-  const leaderboard = await getWordleLeaderboard();
+router.get('/leaderboard', async (req, res, next) => {
+  try {
+    const leaderboard = await getWordleLeaderboard();
+    res.status(200).json(leaderboard);
+  } catch(err) {
+    next(err);
+  }
 });
 
 export = router;
