@@ -2,14 +2,13 @@ import React, { createContext, useEffect, useState } from "react";
 import {AuthContextType, User} from "../../@types/auth";
 import api from "../utils/api";
 
-export const AuthContext = createContext<AuthContextType>({token: null, user: null, persist: false});
+export const AuthContext = createContext<AuthContextType>({user: null, persist: false});
 
 interface Props {
   children: React.ReactNode,
 };
 const AuthProvider: React.FC<Props> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
-  const [token, setToken] = useState(null);
   const [persist, setPersist] = useState(
     JSON.parse(localStorage.getItem("persist") || 'false')
   );
@@ -30,9 +29,8 @@ const AuthProvider: React.FC<Props> = ({ children }) => {
 
     const {data, success} = await api.post('/auth', body);
     if(success) {
-      const {token, username, user_id} = data;
-      setToken(token);
-      setUser({user_id, username});
+      const {username, user_id, acl} = data;
+      setUser({user_id, username, acl});
       setPersist(rememberMe);
     } else {
       setPersist(false);
@@ -43,7 +41,6 @@ const AuthProvider: React.FC<Props> = ({ children }) => {
   const signOut: AuthContextType["signOut"] = async () => {
     const {success} = await api.delete('/auth');
     if(success) {
-      setToken(null);
       setUser(null);
       setPersist(null);
     }
@@ -52,7 +49,6 @@ const AuthProvider: React.FC<Props> = ({ children }) => {
   return (
     <AuthContext.Provider 
       value={{
-        token,
         user,
         setUser,
         persist,

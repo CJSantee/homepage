@@ -43,6 +43,7 @@ const ROUNDS = 10;
 interface User {
   user_id: number,
   username: string,
+  acl: string,
 };
 
 async function register({username, password}: {username: string, password: string}): Promise<{user: User, token: string}>{
@@ -64,7 +65,14 @@ async function register({username, password}: {username: string, password: strin
 
   const token = jwt.sign({user_id: user.user_id, username: user.username}, SECRET_KEY);
 
-  return {user, token};
+  return {
+    user: {
+      user_id: user.user_id,
+      username: user.username,
+      acl: '',
+    }, 
+    token,
+  };
 }
 
 async function login({username, password}: {username: string, password: string}): Promise<{user: User, token: string}> {
@@ -81,12 +89,13 @@ async function login({username, password}: {username: string, password: string})
     user: {
       user_id: user.user_id,
       username: user.username,
+      acl: user.acl,
     }, // don't return encrypted passwords
     token,
   };
 }
 
-async function refresh(user_id) {
+async function refresh(user_id): Promise<{user: User | null, token: string | null}> {
   const {rows: [user]} = await db.file('db/users/get.sql', {user_id});
 
   if(user) {
@@ -95,6 +104,7 @@ async function refresh(user_id) {
       user: {
         user_id: user.user_id,
         username: user.username,
+        acl: user.acl,
       }, // don't return encrypted passwords
       token,
     }
@@ -109,18 +119,17 @@ async function refresh(user_id) {
 /**
  * @description Check if a user has an acl row with the provided permission
  */
-async function hasPermission(user_id: number, permission: string) {
+async function hasPermission(user_id: number, permission: string): Promise<boolean> {
   const {rows: [aclRow]} = await db.file('db/acls/get_by_user_id.sql', {user_id});
   if(!aclRow) {
     return false;
   }
   const {acl} = aclRow;
-  if(acl === '') {
-    // Unlimited Power
+  if(acl === 'colin') {
     return true;
   }
-  // TODO: Implement other ACLS here
-  return false;
+  const acls = acl?.split('|') || [];
+  return acls.includes(permission);
 }
 
 export = {

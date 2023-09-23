@@ -22,12 +22,16 @@ export const verifyToken = (req, res, next) => {
 
 export const confirmPermission = (permission) => {
   return async (req, res, next) => {
-    verifyToken(req, res, null);
+    await verifyToken(req, res, null);
+    // If verifyToken sent the headers, return
+    if(res.headersSent) {
+      return;
+    }
     const {user_id} = req.user;
     if(await auth.hasPermission(user_id, permission)) {
       next();
     } else {
-      return res.status(401).send('Invalid token.');
+      return res.status(401).send('You do not have permission for this action.');
     }
   };
 }

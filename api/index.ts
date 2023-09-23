@@ -100,7 +100,7 @@ router.get('/refresh', verifyToken, async (req, res) => {
     httpOnly: true,
     expires: new Date(Date.now() + 1000 * 60 * 60 * 60 * 24 * 7 * 2), // ms * sec * min * hr * day * wk * 2 (2 weeks)
   });
-  res.status(200).send(user);
+  res.status(200).json(user);
 });
 
 router.post('/welcome', verifyToken, (req, res) => {
