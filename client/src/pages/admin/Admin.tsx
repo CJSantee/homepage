@@ -8,12 +8,14 @@ import NewUserModal from "../../components/NewUserModal";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faTrash } from "@fortawesome/free-solid-svg-icons";
 import { useConfirm } from "../../hooks/useConfirm";
+import { useAuth } from "../../hooks/useAuth";
 
 function Admin() {
   const [users, setUsers] = useState<User[]>([]);
   const [showNewUserModal, setShowNewUserModal] = useState(false);
 
   const confirm = useConfirm();
+  const auth = useAuth();
 
   const updateUsers = async () => {
     const {data, success} = await api.get('/users');
@@ -41,8 +43,8 @@ function Admin() {
           {users.map(user => (
             // TODO: Convert to Accordions
             <ListGroup.Item key={user.user_id} className="d-flex justify-content-between align-items-center">
-              <span>{user.username}</span>
-              <Button onClick={() => {
+              <span className="my-1">{user.username}</span>
+              {user.user_id !== auth?.user?.user_id && <Button onClick={() => {
                 if(confirm) confirm(
                   () => deleteUser(user.user_id), // onConfirm
                   () => {},                       // onCancel
@@ -51,7 +53,7 @@ function Admin() {
                 );
               }}>
                 <FontAwesomeIcon icon={faTrash} />
-              </Button>
+              </Button>}
             </ListGroup.Item>
           ))}
         </ListGroup>

@@ -7,14 +7,16 @@ const WORDLE_ERRORS = {
   PARSING_ERROR: {
     type: ApplicationError.TYPES.CLIENT,
     code: 'INVALID_WORDLE_RESULTS',
-    message: 'Invalid Wordle results.',
+    message: 'Wordle Results Parsing Error',
     statusCode: 400,
+    statusMessage: 'Invalid Wordle results.',
   },
   DUPLICATE_WORDLE: {
     type: ApplicationError.TYPES.CLIENT,
     code: 'WORDLE_ALREADY_SUBMITTED',
-    message: 'You have already submit results for this Wordle.',
+    message: 'Duplicate User Wordle Submitted',
     statusCode: 400,
+    statusMessage: 'You have already submit results for this Wordle.',
   },
 };
 
@@ -86,4 +88,9 @@ export async function insertUserWordle(user_id, results) {
 export async function getUserWordleStats(user_id) {
   const {rows: [stats]} = await db.file('db/user_wordles/get_stats.sql', {user_id});
   return stats;
+}
+
+export async function getWordleLeaderboard() {
+  const {rows: leaderboard} = await db.file('db/user_wordles/get_leaderboard.sql');
+  return leaderboard;
 }

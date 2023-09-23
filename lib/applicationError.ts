@@ -3,6 +3,7 @@ interface ApplicationErrorOptions {
   code: string,
   message: string,
   statusCode?: number,
+  statusMessage?: string,
 }
 
 export class ApplicationError extends Error {
@@ -16,9 +17,10 @@ export class ApplicationError extends Error {
   code: string;
   message: string;
   statusCode: number | undefined;
+  statusMessage: string | undefined;
   constructor(options: ApplicationErrorOptions) {
     super();
-    const {type, code, message, statusCode} = options;
+    const {type, code, message, statusCode, statusMessage} = options;
     if(!ApplicationError.TYPES[type]) {
       throw new Error(`ApplicationError: ${type} is not a valid type. Must be one of ${Object.values(ApplicationError.TYPES)}`);
     }
@@ -36,5 +38,6 @@ export class ApplicationError extends Error {
     this.code = code;
     this.message = message;
     this.statusCode = statusCode;
+    this.statusMessage = statusMessage;
   }
 }

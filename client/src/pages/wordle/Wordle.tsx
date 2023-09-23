@@ -50,9 +50,9 @@ function Wordle() {
 
   return (
     <Container>
-      <div className="row">
-        <div className="col-7">
-          <h3>Statistics</h3>
+      <div className="row justify-content-center">
+        <div className="col-7 mb-3">
+          <h3>Player Stats</h3>
           <div className="d-flex justify-content-between py-2 mb-2">
             <div className="d-flex flex-column align-items-center rounded border p-2">
               <span>{wordlesPlayed}</span>
@@ -77,7 +77,7 @@ function Wordle() {
             ))}
           </div>
         </div>
-        <div className="d-flex col-5 justify-content-end">
+        <div className="d-flex col-12 col-lg-5 justify-content-center justify-content-lg-end">
           <Form>
             <Form.Group className="mb-3">
               <Form.Label>Enter your results for today's Wordle:</Form.Label>
