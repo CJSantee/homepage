@@ -39,7 +39,8 @@
     "express": "^4.18.2",
     "jsonwebtoken": "^9.0.1",
     "pg": "^8.11.2",
-    "pg-connection-string": "^2.6.2"
+    "pg-connection-string": "^2.6.2",
+    "twilio": "^4.18.0"
   },
   "lint-staged": {
     "*.{js,jsx,ts,tsx}": "eslint --max-warnings=0 --fix"
