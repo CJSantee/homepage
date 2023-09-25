@@ -3,6 +3,8 @@ import fs from 'fs';
 import {parse} from 'pg-connection-string';
 import {secondsToReadable} from './utils';
 
+const PREFIX = 'cs_'; // all types, functions, and triggers should start with prefix
+
 const PRODUCTION = process.env.NODE_ENV === 'production';
 const DATABASE_URL = process.env.DATABASE_URL || '';
 
@@ -51,30 +53,100 @@ async function upgrade() {
     return result;
   }
 
+  async function dropWrapper(client) {
+    const sqlLines: string[] = [];
+
+    // Construct a regex to match all routines that start with the prefix or start with a table name followed by an underscore
+    // The view pg_tables provides acess to useful information about each table in the database. Ref: https://www.postgresql.org/docs/current/view-pg-tables.html
+    const pronameMatch = `(SELECT '^(${PREFIX}' || '|' || STRING_AGG(t.tablename || '_', '|') || ')' AS table_names FROM pg_tables t WHERE t.schemaname = 'public')`
+
+    interface ResultRow {
+      sql: string,
+    }
+    interface QueryResult {
+      rows: ResultRow[],
+    }
+    // Drop functions
+    // The catalog pg_proc stores information about functions, aggregate functions, and window functions (collectively also known as routines). Ref: https://www.postgresql.org/docs/current/catalog-pg-proc.html
+    // The catalog pg_namespace stores namespaces. A namespace is the structure underlying SQL schemas: each namespace can have a separate colletion of relations, types, etc. without name conflicts. Ref: https://www.postgresql.org/docs/current/catalog-pg-namespace.html
+    let result: QueryResult = await client.query(`
+      SELECT 'DROP FUNCTION IF EXISTS ' || ns.nspname || '.' || proname || '(' || oidvectortypes(proargtypes) || ') CASCADE;' AS sql
+      FROM pg_proc 
+      INNER JOIN pg_namespace ns ON (pg_proc.pronamespace = ns.oid)
+      WHERE ns.nspname = 'public' AND pg_proc.prokind = 'f' AND proname ~ ${pronameMatch}
+    `);
+    for(const row of result.rows) {
+      sqlLines.push(row.sql);
+    }
+
+    await client.query(sqlLines.join(';'))
+  }
+
+  const dbFunctionPaths = ['./db/db_functions', './db/db_triggers'];
+
+  async function createWrapper(client) {
+    await client.query('BEGIN');
+    
+    await dropWrapper(client);
+
+    try {
+      for(const dbFunctionPath of dbFunctionPaths) {
+        for(const sqlFilename of fs.readdirSync(dbFunctionPath)) {
+          await executeSql(client, `${dbFunctionPath}/${sqlFilename}`);
+        }
+      }
+
+      await client.query('COMMIT');
+    } catch(e) {
+      console.log('Failed to execute database wrapper scripts.');
+      console.log('Database wrapper error:', e);
+      await client.query('ROLLBACK');
+      throw new Error('Database wrapper failed');
+    }
+  }
+
+  // Create Client
   const client = new Client(config);
   await client.connect();
 
   try {
+    // Get Postgres Version
     const {rows: [postgresVersion]} = await client.query('SELECT version();');
     console.log('Postgres version:', postgresVersion?.version);
+
+    // Begin Transaction
     await client.query('BEGIN');
+
+    // Get current db_version
     const latestVersion = await executeSql(client, 'SELECT MAX(db_version) as latest from db_versions');
     version = latestVersion?.rows?.[0]?.latest || 0;
     const maxVersion = process.env.DATABASE_VERSION || 999999;
-    const basePath = './db/db_migrate';
     console.log(`Current database version: ${version}`);
+
+    // Run db migrations
+    const basePath = './db/db_migrate';
     while(version < maxVersion && fs.existsSync(`${basePath}/${version + 1}.sql`)) {
       const startTime = new Date().valueOf();
       console.log(`Migrating the database to version: ${++version}`);
       const versionPath = `${basePath}/${version}`;
       /* eslint-disable no-await-in-loop */
+      await dropWrapper(client);
       await executeSql(client, `${versionPath}.sql`, `Migrated to version: ${version}.`);
       await executeSql(client, `INSERT INTO db_versions (db_version) VALUES (${version})`);
       const runtimeMS = new Date().valueOf() - startTime;
       console.log(`Migration to ${version} took ${secondsToReadable(runtimeMS / 1000)}`);
       /* eslint-enable no-await-in-loop */
     }
+
+    // Commit Transaction
     await client.query('COMMIT');
+
+    // Create updated functions
+    if(dbFunctionPaths.length) {
+      await createWrapper(client);
+    }
+
+    console.log('Database Upgrade Complete!');
   } catch(e) {
     console.log('Error while migrating the database:', e);
     await client.query('ROLLBACK');

@@ -15,6 +15,8 @@ interface GuessDistribution {
 export interface UserWordleStats {
   played: number,
   win_percentage: number,
+  current_streak: number, 
+  max_streak: number,
   guess_distribution: GuessDistribution,
 }
 

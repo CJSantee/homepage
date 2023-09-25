@@ -8,6 +8,8 @@ import Leaderboard from "./components/Leaderboard";
 function Wordle() {
   const [wordlesPlayed, setWordlesPlayed] = useState(0);
   const [winPercentage, setWinPercentage] = useState(0);
+  const [currentStreak, setCurrentStreak] = useState(0);
+  const [maxStreak, setMaxStreak] = useState(0);
   const [guessDistribution, setGuessDistribution] = useState({
     '1': 0,
     '2': 0,
@@ -21,9 +23,11 @@ function Wordle() {
     const getStats = async () => {
       const {data, success} = await api.get('/wordle');
       if(success) {
-        const {played, win_percentage, guess_distribution} = data;
+        const {played, win_percentage, current_streak, max_streak, guess_distribution} = data;
         setWordlesPlayed(played);
         setWinPercentage(win_percentage);
+        setCurrentStreak(current_streak);
+        setMaxStreak(max_streak);
         setGuessDistribution(guess_distribution);
       }
     }
@@ -31,9 +35,11 @@ function Wordle() {
   }, []);
 
   const updateStats = (stats: UserWordleStats) => {
-    const {played, win_percentage, guess_distribution} = stats;
+    const {played, win_percentage, current_streak, max_streak, guess_distribution} = stats;
     setWordlesPlayed(played);
     setWinPercentage(win_percentage);
+    setCurrentStreak(current_streak);
+    setMaxStreak(max_streak);
     setGuessDistribution(guess_distribution);
   }
 
@@ -50,6 +56,14 @@ function Wordle() {
             <div className="d-flex flex-column align-items-center rounded border p-2">
               <span>{winPercentage * 100}</span>
               <p className="m-0">Win %</p>
+            </div>
+            <div className="d-flex flex-column align-items-center rounded border p-2">
+              <span>{currentStreak}</span>
+              <p className="m-0">Current Streak</p>
+            </div>
+            <div className="d-flex flex-column align-items-center rounded border p-2">
+              <span>{maxStreak}</span>
+              <p className="m-0">Max Streak</p>
             </div>
           </div>
           <h3>Guess Distribution</h3>
