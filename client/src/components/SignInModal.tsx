@@ -6,6 +6,7 @@ import { ReactComponent as Desk } from "../assets/img/DeskCropped.svg";
 import { ModalProps } from '../../@types/modal';
 import { useAuth } from '../hooks/useAuth';
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 function SignInModal({show, onHide}:ModalProps) {
   const auth = useAuth();
@@ -16,6 +17,8 @@ function SignInModal({show, onHide}:ModalProps) {
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [invalidPassword, setInvalidPassword] = useState(false);
+
+  const navigate = useNavigate();
 
   // Validation
   const [errorMessage, setErrorMessage] = useState('');
@@ -31,6 +34,7 @@ function SignInModal({show, onHide}:ModalProps) {
     const signedIn = await auth.signIn({username, password, rememberMe: true});
     if(signedIn) {
       onHide();
+      navigate('/');
     } else {
       setInvalidUsername(true);
       setInvalidPassword(true);

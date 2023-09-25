@@ -24,6 +24,7 @@ function Header() {
 
   const signOut = () => {
     if(auth.signOut) auth.signOut();
+    navigate('/');
   }
   
   return (
