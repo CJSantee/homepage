@@ -38,9 +38,8 @@ function ResultsForm({updateStats}:ResultsFormProps) {
     }
   }
 
-
   return (
-    <Form>
+    <Form className="mb-3">
       <Form.Group className="mb-3">
         <Form.Label>Enter your results for today's Wordle:</Form.Label>
         <Form.Control 

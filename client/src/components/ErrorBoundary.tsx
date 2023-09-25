@@ -28,7 +28,7 @@ class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoundarySta
       return (
         <div className="d-flex flex-column justify-content-center vh-100">
           <div className="d-flex flex-column align-items-center justify-content-center">
-            <span className="threed threed-sm">well... sh*t.</span>
+            <span className="threed threed-sm text-center">well... sh*t.</span>
             <h3 className="text-uppercase">Something went wrong.</h3>
           </div>
         </div>

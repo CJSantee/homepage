@@ -19,16 +19,22 @@ function Leaderboard() {
   }, []);
 
   return (
-    <ListGroup as="ol" numbered>
-      {leaderboard.map(user => (
-        <ListGroup.Item as="li" className="d-flex justify-content-between align-items-center">
-          <div className="ms-2 me-auto">
-            <div className="fw-bold">{user.username}</div>
-          </div>
-          <Badge bg='secondary' pill>{Number(user.average_guesses).toFixed(2)}</Badge>
-        </ListGroup.Item>
-      ))}
-    </ListGroup>
+    <div>
+      <div className="d-flex justify-content-between mb-2 px-3">
+        <div className="fw-bold">Username</div>
+        <Badge bg='secondary' pill>Average Guess</Badge>
+      </div>
+      <ListGroup as="ol" numbered>
+        {leaderboard.map(user => (
+          <ListGroup.Item key={user.user_id} as="li" className="d-flex justify-content-between align-items-center">
+            <div className="ms-2 me-auto">
+              <div className="fw-bold">{user.username}</div>
+            </div>
+            <Badge bg='secondary' pill>{Number(user.average_guesses).toFixed(2)}</Badge>
+          </ListGroup.Item>
+        ))}
+      </ListGroup>
+    </div>
   )
 }
 

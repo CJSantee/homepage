@@ -11,7 +11,7 @@ WITH wordles AS (
 ), wordle_stats AS (
   SELECT 
     COUNT(user_wordle_id) AS played,
-    COUNT(user_wordle_id) FILTER (WHERE num_guesses <> -1) / COUNT(user_wordle_id)::NUMERIC AS win_percentage,
+    COALESCE(COUNT(user_wordle_id) FILTER (WHERE num_guesses <> -1) / NULLIF(COUNT(user_wordle_id)::NUMERIC, 0), 0) AS win_percentage,
     jsonb_build_object(
   	  '1', COUNT(user_wordle_id) FILTER (WHERE num_guesses = 1),
   	  '2', COUNT(user_wordle_id) FILTER (WHERE num_guesses = 2),
@@ -30,14 +30,19 @@ WITH wordles AS (
   GROUP BY streak_id
 ), max_streak AS (
   SELECT 
-   	max(streak_length) AS max_streak
+   	COALESCE(max(streak_length), 0) AS max_streak
   FROM streaks
 ), current_streak AS (
   SELECT 
   	streak_length AS current_streak
   FROM streaks
   WHERE last_submitted > (NOW() - INTERVAL '1 DAY')
-) SELECT played, win_percentage, current_streak, max_streak, guess_distribution
+) SELECT 
+  played, 
+  win_percentage, 
+  COALESCE(current_streak, 0) AS current_streak, 
+  max_streak, 
+  guess_distribution
 FROM wordle_stats
-CROSS JOIN current_streak
+LEFT JOIN current_streak ON TRUE
 CROSS JOIN max_streak;

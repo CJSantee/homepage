@@ -19,7 +19,9 @@ function App() {
             <Route element={<AuthRoute permission='admin' />}>
               <Route path='/admin' element={<Admin />} />
             </Route>
-            <Route path='/wordle' element={<Wordle />} />
+            <Route element={<AuthRoute />}>
+              <Route path='/wordle' element={<Wordle />} />
+            </Route>
           </Route>
           <Route path='*' element={<NotFound />} />
         </Route>

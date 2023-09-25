@@ -19,51 +19,64 @@ function Wordle() {
     '6': 0, 
   });
 
+  const updateStats = (stats: UserWordleStats) => {
+    const {played, win_percentage, current_streak, max_streak, guess_distribution} = stats;
+    if(played) {
+      setWordlesPlayed(played);
+    }
+    if(win_percentage) {
+      setWinPercentage(win_percentage);
+    }
+    if(current_streak) {
+      setCurrentStreak(current_streak);
+    }
+    if(max_streak) {
+      setMaxStreak(max_streak);
+    }
+    if(guess_distribution) {
+      setGuessDistribution(guess_distribution);
+    }
+  }
+
   useEffect(() => {
     const getStats = async () => {
       const {data, success} = await api.get('/wordle');
       if(success) {
-        const {played, win_percentage, current_streak, max_streak, guess_distribution} = data;
-        setWordlesPlayed(played);
-        setWinPercentage(win_percentage);
-        setCurrentStreak(current_streak);
-        setMaxStreak(max_streak);
-        setGuessDistribution(guess_distribution);
+        updateStats(data);
       }
     }
     getStats();
   }, []);
-
-  const updateStats = (stats: UserWordleStats) => {
-    const {played, win_percentage, current_streak, max_streak, guess_distribution} = stats;
-    setWordlesPlayed(played);
-    setWinPercentage(win_percentage);
-    setCurrentStreak(current_streak);
-    setMaxStreak(max_streak);
-    setGuessDistribution(guess_distribution);
-  }
 
   return (
     <Container>
       <div className="row justify-content-center">
         <div className="col-12 col-lg-7 mb-3 p-0 pe-lg-2">
           <h3>Player Stats</h3>
-          <div className="d-flex justify-content-between py-2 mb-2">
-            <div className="d-flex flex-column align-items-center rounded border p-2">
-              <span>{wordlesPlayed}</span>
-              <p className="m-0">Played</p>
+          <div className="row d-flex py-2 mb-2">
+            <div className="col-6 col-md-3 p-2">
+              <div className="d-flex flex-column justify-content-center align-items-center rounded border p-2 h-100">
+                <span className="fw-bold">{wordlesPlayed}</span>
+                <p className="m-0 text-center">Played</p>
+              </div>
             </div>
-            <div className="d-flex flex-column align-items-center rounded border p-2">
-              <span>{winPercentage * 100}</span>
-              <p className="m-0">Win %</p>
+            <div className="col-6 col-md-3 p-2">
+              <div className="d-flex flex-column justify-content-center align-items-center rounded border p-2 h-100">
+                <span className="fw-bold">{winPercentage * 100}</span>
+                <p className="m-0 text-center">Win %</p>
+              </div>
             </div>
-            <div className="d-flex flex-column align-items-center rounded border p-2">
-              <span>{currentStreak}</span>
-              <p className="m-0">Current Streak</p>
+            <div className="col-6 col-md-3 p-2">
+              <div className="d-flex flex-column justify-content-center align-items-center rounded border p-2 h-100">
+                <span className="fw-bold">{currentStreak}</span>
+                <p className="m-0 text-center">Current Streak</p>
+              </div>
             </div>
-            <div className="d-flex flex-column align-items-center rounded border p-2">
-              <span>{maxStreak}</span>
-              <p className="m-0">Max Streak</p>
+            <div className="col-6 col-md-3 p-2">
+              <div className="d-flex flex-column justify-content-center align-items-center rounded border p-2 h-100">
+                <span className="fw-bold">{maxStreak}</span>
+                <p className="m-0 text-center">Max Streak</p>
+              </div>
             </div>
           </div>
           <h3>Guess Distribution</h3>
