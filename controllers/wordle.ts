@@ -2,6 +2,8 @@
 
 import db from '../db';
 import { ApplicationError } from '../lib/applicationError';
+import UserWordle, { GuessRow } from '../types/models/user_wordle';
+import Wordle from '../types/models/wordle';
 
 const WORDLE_ERRORS = {
   PARSING_ERROR: {
@@ -36,7 +38,7 @@ const green = [greenSquare, orangeSquare];
 /**
  * @description Convert result rows into arrays of 'w'|'y'|'g' 
  */
-function parseGuessRows(rows: string) {
+function parseGuessRows(rows: string): GuessRow[] {
   return rows.split('\n').map(r => r.split(/(?:)/u).map(char => {
     if(white.includes(char)) {
       return 'w';
@@ -50,7 +52,7 @@ function parseGuessRows(rows: string) {
   }));
 }
 
-function parseWordleResults(results) {
+export function parseWordleResults(results) {
   const wordleRegex = /Wordle (\d+) (\d{1}|X)\/6(\**)[\n\r\s]+((?:(?:[\u2b1b-\u2b1c]|(?:\ud83d[\udfe6-\udfe9])){5}[\n\r\s]*){1,6})/;
   try {
     const [wordleNumber, numGuesses, hardMode, guessRows] = results.match(wordleRegex).slice(1);
@@ -66,7 +68,7 @@ function parseWordleResults(results) {
   }
 }
 
-export async function insertUserWordle(user_id, results) {
+export async function insertUserWordle(user_id: string, results: string): Promise<UserWordle> {
   const {wordle_number, num_guesses, hard_mode, guess_rows} = parseWordleResults(results);
   try {
     const {rows: [userWordle]} = await db.file('db/user_wordles/put.sql', {
@@ -85,7 +87,7 @@ export async function insertUserWordle(user_id, results) {
   }
 }
 
-export async function getUserWordleStats(user_id) {
+export async function getUserWordleStats(user_id:string) {
   const {rows: [stats]} = await db.file('db/user_wordles/get_stats.sql', {user_id});
   return stats;
 }
@@ -93,4 +95,9 @@ export async function getUserWordleStats(user_id) {
 export async function getWordleLeaderboard() {
   const {rows: leaderboard} = await db.file('db/user_wordles/get_leaderboard.sql');
   return leaderboard;
+}
+
+export async function insertWordle({wordle, wordle_number, wordle_date}:Wordle) {
+  const {rows: [wordleRow]} = await db.file('db/wordles/put.sql', {wordle, wordle_number, wordle_date});
+  return wordleRow;
 }

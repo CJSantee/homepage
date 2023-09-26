@@ -1,5 +1,6 @@
 import jwt from 'jsonwebtoken';
 import auth from '../controllers/authentication';
+import { getUserByHandle } from '../controllers/users';
 
 const {SECRET_KEY} = process.env;
 
@@ -34,4 +35,21 @@ export const confirmPermission = (permission) => {
       return res.status(401).send('You do not have permission for this action.');
     }
   };
+}
+
+export const verifySmsUser = async (req, res, next) => {
+  const {From: from_handle} = req.body;
+  if(!from_handle) {
+    console.log('Error: No from_handle provided for SMS request.');
+    return res.status(401).send('Not a SMS Request');
+  }
+  const user = await getUserByHandle(from_handle);
+  if(!user) {
+    console.log('Error: No user with handle: ', from_handle);
+    return res.status(401).send('User not verified for messaging.');
+  }
+  req.user = user;
+  if(next) {
+    next();
+  }
 }

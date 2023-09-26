@@ -3,12 +3,16 @@ import Container from "react-bootstrap/Container";
 import Button from "react-bootstrap/Button";
 import Accordion from "react-bootstrap/Accordion";
 import api from "../../utils/api";
-import { User } from "../../../@types/auth";
 import UserModal from "../../components/UserModal";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faTrash, faUserPen } from "@fortawesome/free-solid-svg-icons";
 import { useConfirm } from "../../hooks/useConfirm";
-import { useAuth } from "../../hooks/useAuth";
+import UserBody from "./components/UserBody";
+
+export interface User {
+  user_id: string,
+  username: string,
+  acl: string,
+  handle: string,
+}
 
 function Admin() {
   const [users, setUsers] = useState<User[]>([]);
@@ -16,7 +20,6 @@ function Admin() {
   const [showUserModal, setShowUserModal] = useState(false);
 
   const confirm = useConfirm();
-  const auth = useAuth();
 
   const updateUsers = async () => {
     const {data, success} = await api.get('/users');
@@ -47,25 +50,22 @@ function Admin() {
         <h2>Users</h2>
         <Accordion className="mb-2">
           {users.map(user => (
-            // TODO: Convert to Accordions
             <Accordion.Item key={user.user_id} eventKey={user.user_id}>
               <Accordion.Header>
                 <span className="my-1">{user.username}</span>
               </Accordion.Header>
-              <Accordion.Body className="d-flex justify-content-end"> 
-                <Button onClick={() => selectUser(user)} className="me-2">
-                  <FontAwesomeIcon icon={faUserPen} />
-                </Button>
-                {user.user_id !== auth?.user?.user_id && <Button onClick={() => {
-                  if(confirm) confirm(
-                    () => deleteUser(user.user_id), // onConfirm
-                    () => {},                       // onCancel
-                    'Are you sure?',                // header
-                    'Do you really want to delete this user? This process cannot be undone.' // body
-                  );
-                }}>
-                  <FontAwesomeIcon icon={faTrash} />
-                </Button>}
+              <Accordion.Body> 
+                <UserBody user={user} 
+                  updateUsers={updateUsers}
+                  onEdit={() => selectUser(user)} 
+                  onDelete={() => {
+                    if(confirm) confirm(
+                      () => deleteUser(user.user_id), // onConfirm
+                      () => {},                       // onCancel
+                      'Are you sure?',                // header
+                      'Do you really want to delete this user? This process cannot be undone.' // body
+                    );
+                  }}/>
               </Accordion.Body>
             </Accordion.Item>
           ))}

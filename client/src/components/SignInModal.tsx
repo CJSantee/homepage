@@ -44,7 +44,7 @@ function SignInModal({show, onHide}:ModalProps) {
 
   return (
     <Modal show={show} fullscreen={"md-down"} onHide={onHide}>
-      <Modal.Header closeButton={true} className='border-0 pb-0'>
+      <Modal.Header className='border-0 pb-0' closeButton>
         <h4 className='text-primary m-0'>Sign In</h4>
       </Modal.Header>
       <Modal.Body>
