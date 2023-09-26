@@ -6,6 +6,7 @@ import Home from "./pages/home";
 import NotFound from './pages/not-found';
 import PersistLogin from "./components/PersistLogin";
 import Admin from "./pages/admin";
+import Wordle from "./pages/wordle";
 import AuthRoute from "./components/AuthRoute";
 
 function App() {
@@ -17,6 +18,9 @@ function App() {
             <Route path='/' element={<Home />} />
             <Route element={<AuthRoute permission='admin' />}>
               <Route path='/admin' element={<Admin />} />
+            </Route>
+            <Route element={<AuthRoute />}>
+              <Route path='/wordle' element={<Wordle />} />
             </Route>
           </Route>
           <Route path='*' element={<NotFound />} />

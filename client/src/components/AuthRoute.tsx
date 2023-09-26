@@ -3,7 +3,7 @@ import { useAuth } from "../hooks/useAuth";
 import { hasPermission } from "../utils";
 
 interface AuthRouteProps {
-  permission: string,
+  permission?: string,
 }
 function AuthRoute({ permission }:AuthRouteProps) {
   const auth = useAuth();
@@ -14,7 +14,7 @@ function AuthRoute({ permission }:AuthRouteProps) {
     return <Navigate to='/' state={{ from: location }} />;
   }
   // Does not have the correct role
-  if (!hasPermission(permission, auth.user.acl)) {
+  if (permission && !hasPermission(permission, auth.user.acl)) {
     return <Navigate to='/not-found' />;
   }
 

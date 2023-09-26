@@ -1,10 +1,10 @@
-import express, { Request } from 'express';
-
+import express from 'express';
 import db from '../db';
 import auth from '../controllers/authentication';
-import { ApplicationError } from '../lib/applicationError';
 import { confirmPermission, verifyToken } from '../middleware/auth';
 import { archiveUser, createUser, getAllUsers } from '../controllers/users';
+
+import wordleApi from './wordle';
 
 const isDevelopment = process.env.NODE_ENV === 'development';
 
@@ -17,11 +17,15 @@ router.get('/', async (req, res) => {
 });
 
 router.route('/users')
-  .get(confirmPermission('admin'), async (req, res) => {
-    const users = await getAllUsers();
-    res.status(200).json({users});
+  .get(confirmPermission('admin'), async (req, res, next) => {
+    try {
+      const users = await getAllUsers();
+      res.status(200).json({users});
+    } catch(err) {
+      next(err);
+    }
   })  
-  .post(async (req, res) => {
+  .post(async (req, res, next) => {
     const {password} = req.body;
     try {
       let user;
@@ -44,30 +48,22 @@ router.route('/users')
 
       res.status(201).json(user);
     } catch(err) {
-      if(err instanceof ApplicationError && err.statusCode) {
-        res.status(err.statusCode).send(err.message);
-      } else {
-        res.status(500).send(auth.AUTHENTICATION_ERRORS.REGISTER_ERROR);
-      }
+      next(err);
     }
   });
 
-router.post('/users/archive', confirmPermission('admin'), async (req, res) => {
+router.post('/users/archive', confirmPermission('admin'), async (req, res, next) => {
   const {user_id} = req.body;
   try {
     await archiveUser(user_id);
     res.status(200).send('User Archived.');
   } catch(err) {
-    if(err instanceof ApplicationError && err.statusCode) {
-      res.status(err.statusCode).send(err.message);
-    } else {
-      res.status(500).send('An unexpected error occurred, unable to archive user.');
-    }
+    next(err);
   }
 });
 
 router.route('/auth')
-  .post(async (req, res) => {
+  .post(async (req, res, next) => {
     try {
       const {user, token} = await auth.login(req.body);
 
@@ -79,12 +75,7 @@ router.route('/auth')
   
       res.status(200).json(user);
     } catch(err) {
-      if(err instanceof ApplicationError && err.statusCode) {
-        res.status(err.statusCode).send(err.message);
-      } else {
-        console.error(err);
-        res.status(auth.AUTHENTICATION_ERRORS.UNAUTHORIZED.statusCode).send(auth.AUTHENTICATION_ERRORS.UNAUTHORIZED.message);
-      }
+      next(err);
     }
   })
   .delete(async (req, res) => {
@@ -106,5 +97,7 @@ router.get('/refresh', verifyToken, async (req, res) => {
 router.post('/welcome', verifyToken, (req, res) => {
   res.status(200).send('Welcome 🙌 ');
 });
+
+router.use('/wordle', wordleApi);
 
 export = router;

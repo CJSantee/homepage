@@ -24,6 +24,7 @@ function Header() {
 
   const signOut = () => {
     if(auth.signOut) auth.signOut();
+    navigate('/');
   }
   
   return (
@@ -58,6 +59,7 @@ function Header() {
                     <Dropdown.Menu>
                       {hasPermission('admin', auth.user.acl) && 
                         <Dropdown.Item onClick={() => navigate('/admin')}>Admin Console</Dropdown.Item>}
+                      <Dropdown.Item onClick={() => navigate('/wordle')}>Wordle</Dropdown.Item>
                       <Dropdown.Item onClick={signOut}>Sign Out</Dropdown.Item>
                     </Dropdown.Menu>
                   </Dropdown>
