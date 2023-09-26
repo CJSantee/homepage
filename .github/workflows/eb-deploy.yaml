@@ -22,11 +22,11 @@ jobs:
       # if: steps.changes.outputs.client == 'true'
       run: |
         cd client
-        npm install
+        npm ci
         npm run build
     - name: Build Server
       run: |
-        npm install
+        npm ci
         npm run build
     - name: Install Python 3.9
       uses: actions/setup-python@v2

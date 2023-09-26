@@ -1,5 +1,5 @@
 import Container from "react-bootstrap/Container";
-import ProgressBar from "react-bootstrap/Progressbar";
+import ProgressBar from "react-bootstrap/ProgressBar";
 import { useEffect, useState } from "react";
 import api from "../../utils/api";
 import ResultsForm, { UserWordleStats } from "./components/ResultsForm";
