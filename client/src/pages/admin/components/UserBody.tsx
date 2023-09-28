@@ -7,6 +7,7 @@ import { User } from "../Admin";
 import { useAuth } from "../../../hooks/useAuth";
 import api from "../../../utils/api";
 import { useState } from "react";
+import { useAlert } from "../../../hooks/useAlert";
 
 interface UserBodyProps {
   user: User,
@@ -19,6 +20,7 @@ function UserBody({user, updateUsers, onEdit, onDelete}: UserBodyProps) {
   const [handle, setHandle] = useState('');
 
   const auth = useAuth();
+  const alertManager = useAlert();
 
   const updateHandle = async () => {
     const {user_id} = user;
@@ -26,6 +28,14 @@ function UserBody({user, updateUsers, onEdit, onDelete}: UserBodyProps) {
     const {success} = await api.patch('/users', {user_id, handle, protocol: 's'});
     if(success) {
       updateUsers();
+    }
+  }
+
+  const inviteToTurdle = async () => {
+    const {user_id} = user;
+    const {success} = await api.post('/wordle/invite', {user_id});
+    if(success) {
+      if(alertManager.addAlert) alertManager.addAlert({type: 'success', message: `Sent Turdle invite to ${user.username}.`, timeout: 3000});
     }
   }
 
@@ -40,7 +50,7 @@ function UserBody({user, updateUsers, onEdit, onDelete}: UserBodyProps) {
             </div>
             <div className="d-flex align-items-center">
               <span className="fs-3 me-2">💩</span>
-              <Button>Invite</Button>
+              <Button onClick={inviteToTurdle}>Invite</Button>
             </div>
           </div>
         ) : (

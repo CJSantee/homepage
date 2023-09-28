@@ -30,7 +30,6 @@ router.post('/', verifyToken, async (req, res, next) => {
 
 router.post('/invite', verifyToken, async (req, res, next) => {
   // req.user will always be defined because of verifySmsUser
-  const {username: admin_username} = req.user || {username: 'Colin'};
   const {user_id} = req.body;
   try {
     const {username, handle} = await getUserById(user_id);
@@ -43,7 +42,7 @@ router.post('/invite', verifyToken, async (req, res, next) => {
         statusMessage: 'User does not have an associated phone number',
       });
     }
-    const message = turdle.inviteUser(username, admin_username);
+    const message = turdle.INVITE({username});
     await sendMessage({message, to_handle: handle, user_id});
     res.status(200).json('Invite sent!');
   } catch(err) {

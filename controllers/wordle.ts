@@ -53,9 +53,9 @@ function parseGuessRows(rows: string): GuessRow[] {
 }
 
 export function parseWordleResults(results) {
-  const wordleRegex = /Wordle (\d+) (\d{1}|X)\/6(\**)[\n\r\s]+((?:(?:[\u2b1b-\u2b1c]|(?:\ud83d[\udfe6-\udfe9])){5}[\n\r\s]*){1,6})/;
+  const wordleResultsRegex = /Wordle (\d+) (\d{1}|X)\/6(\**)[\n\r\s]+((?:(?:[\u2b1b-\u2b1c]|(?:\ud83d[\udfe6-\udfe9])){5}[\n\r\s]*){1,6})/;
   try {
-    const [wordleNumber, numGuesses, hardMode, guessRows] = results.match(wordleRegex).slice(1);
+    const [wordleNumber, numGuesses, hardMode, guessRows] = results.match(wordleResultsRegex).slice(1);
     const guess_rows = parseGuessRows(guessRows);
     return {
       wordle_number: Number(wordleNumber), 
@@ -97,7 +97,12 @@ export async function getWordleLeaderboard() {
   return leaderboard;
 }
 
-export async function insertWordle({wordle, wordle_number, wordle_date}:Wordle) {
-  const {rows: [wordleRow]} = await db.file('db/wordles/put.sql', {wordle, wordle_number, wordle_date});
+export async function insertWordle({wordle, wordle_number, wordle_date}:Wordle): Promise<Wordle> {
+  const {rows: [wordleRow]} = await db.file('db/wordles/put.sql', {wordle: wordle.toLowerCase(), wordle_number, wordle_date});
   return wordleRow;
+}
+
+export async function getWordle(wordle_number:number): Promise<Wordle> {
+  const {rows: [wordle]} = await db.file('db/wordles/get.sql', {wordle_number});
+  return wordle;
 }

@@ -1,10 +1,7 @@
 import express from 'express';
 import twilio from 'twilio';
-import { insertUserWordle, parseWordleResults } from '../controllers/wordle';
-import { receiveMessage } from '../lib/sms';
+import { receiveMessage, sendMessage } from '../lib/sms';
 import { verifySmsUser } from '../middleware/auth';
-import turdle from '../lib/turdle';
-import { insertMessage } from '../controllers/messages';
 import { MessageParams } from '../types/models/message';
 const { MessagingResponse } = twilio.twiml;
 
@@ -27,42 +24,8 @@ router.route('/incoming')
         user_id,
         x_message_id: MessageSid,
       };
-      const {message_id: parent_message_id} = await receiveMessage(incomingMessage);
 
-      let wordleResultsMsg;
-      try {
-        parseWordleResults(Body);
-        // If an error is not thrown Wordle Results have been sent
-        wordleResultsMsg = true;
-      } catch(err) {
-        wordleResultsMsg = false;
-      }
-
-      let response = '';
-      if(wordleResultsMsg) {
-        try {
-          const userWordle = await insertUserWordle(user_id, Body);
-          response = turdle.respondToUserWordle(userWordle);
-        } catch(err:any) {
-          if(err.code === 'WORDLE_ALREADY_SUBMITTED') {
-            response = turdle[err.code];
-          } else {
-            throw err;
-          }
-        }
-      } else {
-        response = turdle['INVALID_RESULTS'];
-      }
-
-      // Document outgoing message
-      await insertMessage({
-        message: response,
-        direction: 'OUTGOING',
-        to_handle: From,
-        from_handle: To,
-        user_id,
-        parent_message_id,
-      })
+      const {response, follow_up, outgoing_message_id} = await receiveMessage(incomingMessage);
 
       if(isDevelopment) {
         res.status(200).send(response);
@@ -70,6 +33,17 @@ router.route('/incoming')
         const twiml = new MessagingResponse();
         twiml.message(response);
         res.type('text/xml').send(twiml.toString());
+      }
+
+      if(follow_up) {
+        setTimeout(() => {
+          sendMessage({
+            message: follow_up,
+            to_handle: From,
+            user_id,
+            parent_message_id: outgoing_message_id,
+          });
+        }, 5000);
       }
     } catch(err) {
       next(err);
