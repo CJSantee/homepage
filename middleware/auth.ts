@@ -1,10 +1,10 @@
 import jwt from 'jsonwebtoken';
 import auth from '../controllers/authentication';
-import { getUserByHandle } from '../controllers/users';
+import { getUserByHandle, getUserById } from '../controllers/users';
 
 const {SECRET_KEY} = process.env;
 
-export const verifyToken = (req, res, next) => {
+export const verifyToken = async (req, res, next) => {
   const token = req.cookies.jwt;
   if(!token) {
     console.log('Missing token.');
@@ -12,7 +12,10 @@ export const verifyToken = (req, res, next) => {
   }
   try {
     const decoded = jwt.verify(token, SECRET_KEY);
-    req.user = decoded;
+    if(typeof decoded === 'object') {
+      const user = await getUserById(decoded.user_id);
+      req.user = user;
+    }
   } catch(err) {
     return res.status(401).send('Invalid token.');
   }

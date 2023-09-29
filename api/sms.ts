@@ -12,17 +12,26 @@ const isDevelopment = NODE_ENV === 'development';
 
 router.route('/incoming')
   .post(twilio.webhook({validate: !isDevelopment}), verifySmsUser, async (req, res, next) => {
-    const {MessageSid, From, To, Body} = req.body;
+    const {
+      MessageSid,
+      x_message_id = MessageSid, 
+      From,
+      from_handle = From, 
+      To,
+      to_handle = To, 
+      Body,
+      message = Body,
+    } = req.body;
     // req.user will always be defined because of verifySmsUser
     const {user_id} = req.user || {user_id: '-1'}; 
 
     try {
       const incomingMessage: MessageParams = {
-        message: Body,
-        to_handle: To,
-        from_handle: From,
+        message,
+        to_handle,
+        from_handle,
         user_id,
-        x_message_id: MessageSid,
+        x_message_id,
       };
 
       const {response, follow_up, outgoing_message_id} = await receiveMessage(incomingMessage);

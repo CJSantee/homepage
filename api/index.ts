@@ -5,6 +5,7 @@ import { confirmPermission, verifyToken } from '../middleware/auth';
 import { addUserHandle, archiveUser, createUser, getAllUsers, updateUser } from '../controllers/users';
 
 import wordleApi from './wordle';
+import messageApi from './message';
 import smsApi from './sms';
 
 const isDevelopment = process.env.NODE_ENV === 'development';
@@ -114,7 +115,7 @@ router.post('/welcome', verifyToken, (req, res) => {
 });
 
 router.use('/sms', smsApi);
-
+router.use('/message', messageApi);
 router.use('/wordle', wordleApi);
 
 export = router;

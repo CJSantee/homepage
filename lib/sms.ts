@@ -135,7 +135,5 @@ export async function receiveMessage(incomingMessage: MessageParams): Promise<{r
     parent_message_id: incoming_message_id,
   });
 
-
-
   return {response, follow_up, outgoing_message_id};
 }

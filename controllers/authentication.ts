@@ -44,7 +44,18 @@ interface User {
   user_id: number,
   username: string,
   acl: string,
+  handle: string,
 };
+
+// Used to ensure only these fields are returned for users
+const transformUser = (user: User) => {
+  return {
+    user_id: user.user_id,
+    username: user.username,
+    acl: user.acl,
+    handle: user.handle,
+  };
+}
 
 async function register({username, password}: {username: string, password: string}): Promise<{user: User, token: string}>{
   const {rows: [existingUser]} = await db.file('db/users/get.sql', {username});
@@ -66,11 +77,7 @@ async function register({username, password}: {username: string, password: strin
   const token = jwt.sign({user_id: user.user_id, username: user.username}, SECRET_KEY);
 
   return {
-    user: {
-      user_id: user.user_id,
-      username: user.username,
-      acl: '',
-    }, 
+    user: transformUser(user),
     token,
   };
 }
@@ -86,11 +93,7 @@ async function login({username, password}: {username: string, password: string})
   }
   
   return {
-    user: {
-      user_id: user.user_id,
-      username: user.username,
-      acl: user.acl,
-    }, // don't return encrypted passwords
+    user: transformUser(user),
     token,
   };
 }
@@ -101,11 +104,7 @@ async function refresh(user_id): Promise<{user: User | null, token: string | nul
   if(user) {
     const token = jwt.sign({user_id: user.user_id, username: user.username}, SECRET_KEY)
     return {
-      user: {
-        user_id: user.user_id,
-        username: user.username,
-        acl: user.acl,
-      }, // don't return encrypted passwords
+      user: transformUser(user),
       token,
     }
   }

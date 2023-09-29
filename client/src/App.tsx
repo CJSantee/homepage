@@ -8,6 +8,7 @@ import PersistLogin from "./components/PersistLogin";
 import Admin from "./pages/admin";
 import Wordle from "./pages/wordle";
 import AuthRoute from "./components/AuthRoute";
+import Message from "./pages/message";
 
 function App() {
   return (
@@ -21,6 +22,9 @@ function App() {
             </Route>
             <Route element={<AuthRoute />}>
               <Route path='/wordle' element={<Wordle />} />
+            </Route>
+            <Route element={<AuthRoute />}>
+              <Route path='/message' element={<Message />} />
             </Route>
           </Route>
           <Route path='*' element={<NotFound />} />

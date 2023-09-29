@@ -66,3 +66,7 @@
   -ms-overflow-style: none;  /* IE and Edge */
   scrollbar-width: none;  /* Firefox */
 }
+
+.no-shadow, .no-shadow:focus {
+  box-shadow: none;
+}
