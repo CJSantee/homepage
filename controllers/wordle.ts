@@ -68,8 +68,11 @@ export function parseWordleResults(results) {
   }
 }
 
-export async function insertUserWordle(user_id: string, results: string): Promise<UserWordle> {
-  const {wordle_number, num_guesses, hard_mode, guess_rows} = parseWordleResults(results);
+export async function insertUserWordle(user_id: string, results: string|ReturnType<typeof parseWordleResults>): Promise<UserWordle> {
+  const {wordle_number, num_guesses, hard_mode, guess_rows} = typeof results === 'string' 
+    ? parseWordleResults(results) 
+    : results;
+   
   try {
     const {rows: [userWordle]} = await db.file('db/user_wordles/put.sql', {
       user_id,

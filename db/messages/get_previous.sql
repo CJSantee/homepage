@@ -1,3 +1,4 @@
+-- TODO: Rework to check for handle / user_id to account for multiple users messaging intermittently
 SELECT
   message_id,
   x_message_id,

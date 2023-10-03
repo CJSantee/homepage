@@ -36,13 +36,13 @@ function Message() {
     getUserMessages();
   }, []);
 
-  function scrollToBottom(): void {
+  useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-  }
+  }, [messages]);
 
   useEffect(() => {
-    scrollToBottom();
-  }, [messages]);
+    messagesEndRef.current?.scrollIntoView();
+  }, [messageInput]);
 
   return (
     <Container className="d-flex flex-column h-100">

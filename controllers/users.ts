@@ -43,3 +43,7 @@ export async function getUserByHandle(handle:string) {
   const {rows: [user]} = await db.file('db/users/get_by_handle.sql', {handle});
   return user;
 }
+
+export async function blockUserHandle(handle:string) {
+  await db.file('db/user_handles/block.sql', {handle});
+}

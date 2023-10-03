@@ -1,5 +1,5 @@
 import { getPreviousMessage, insertMessage } from "../controllers/messages";
-import { getUserByHandle } from "../controllers/users";
+import { blockUserHandle, getUserByHandle } from "../controllers/users";
 import { getWordle, insertUserWordle, insertWordle, parseWordleResults } from "../controllers/wordle";
 import db from "../db";
 import Message, { MessageParams } from "../types/models/message";
@@ -52,7 +52,12 @@ export async function sendMessage(outgoingMessage: MessageParams) {
   });
 }
 
-export async function receiveMessage(incomingMessage: MessageParams): Promise<{response:string, follow_up: string, outgoing_message_id: string}> {
+type Response = {
+  response: string,
+  follow_up: string,
+  outgoing_message_id?: string
+};
+export async function receiveMessage(incomingMessage: MessageParams): Promise<Response> {
   const {
     message,
     to_handle = TWILIO_TOLL_FREE_NUMBER,
@@ -62,6 +67,9 @@ export async function receiveMessage(incomingMessage: MessageParams): Promise<{r
   } = incomingMessage;
   if(!message) {
     throw new Error('Missing message content');
+  }
+  if(!from_handle) {
+    throw new Error('Missing message handle');
   }
   if(!user_id) {
     throw new Error('Missing user_id');
@@ -77,52 +85,107 @@ export async function receiveMessage(incomingMessage: MessageParams): Promise<{r
   });
   console.log('Info: Received message from:', from_handle);
 
-  const promptRegex = /^([A-z]+)\s*$/
-  const [prompt]  = message.match(promptRegex)?.slice(1) || [false];
-  let promptMsg = '';
-  if(typeof prompt === 'string' && ['wordle', 'stop'].includes(prompt.toLowerCase())) {
-    console.log('prompt', prompt);
-  }
+  const getPromptResponse = async ():Promise<Response> => {
+    const promptRegex = /^([A-z]+)\s*$/
+    const [promptMsg]  = message.match(promptRegex)?.slice(1) || [false];
 
-  // Check if message is wordle results
-  let wordleResultsMsg;
-  try {
-    parseWordleResults(message);
-    // If an error is not thrown Wordle Results have been sent
-    wordleResultsMsg = true;
-  } catch(err) {
-    wordleResultsMsg = false;
-  }
-
-  // Check if message is a single Wordle
-  const wordleRegex = /^([A-z]{5})\s*$/;
-  const [wordleMsg]  = message.match(wordleRegex)?.slice(1) || [false];
-  
-  let response = '';
-  let follow_up = '';
-  if(typeof wordleMsg === 'string') {
-    const {message: previousMessage} = await getPreviousMessage(incoming_message_id);
-    const {wordle_number} = parseWordleResults(previousMessage);
-    await insertWordle({wordle: wordleMsg, wordle_number});
-  } else if(wordleResultsMsg) {
-    try {
-      const userWordle = await insertUserWordle(user_id, message);
-      response = turdle.respondToUserWordle(userWordle);
-
-      const {wordle_number} = userWordle;
-      const wordle = await getWordle(wordle_number);
-      if(!wordle) {
-        follow_up = turdle.REQUEST_WORDLE;
+    const prompts = ['WORDLE', 'STOP'];
+    if(typeof promptMsg === 'string' && prompts.includes(promptMsg.toUpperCase())) {
+      let promptResponse = '';
+      // Handle prompts
+      switch (promptMsg.toUpperCase()) {
+        case 'WORDLE':
+          promptResponse = turdle['OPT_IN'];
+          break;
+        case 'STOP':
+          await blockUserHandle(from_handle);
+          promptResponse = turdle['OPT_OUT'];
+          break;
       }
-    } catch(err:any) {
-      if(err.code === 'WORDLE_ALREADY_SUBMITTED') {
-        response = turdle[err.code];
-      } else {
-        throw err;
+      return {
+        response: promptResponse,
+        follow_up: '',
+      }
+    } else {
+      return {
+        response: '',
+        follow_up: '',  
       }
     }
-  } else {
-    response = turdle['INVALID_RESULTS'];
+  }
+
+  const getWordleResponse = async ():Promise<Response>  => {
+    const wordleRegex = /^([A-z]{5})\s*$/;
+    const [wordleMsg]  = message.match(wordleRegex)?.slice(1) || [false];
+    if(typeof wordleMsg === 'string') {
+      const {message: previousMessage} = await getPreviousMessage(incoming_message_id);
+      const {wordle_number} = parseWordleResults(previousMessage);
+      await insertWordle({wordle: wordleMsg, wordle_number});
+      return {
+        response: '',
+        follow_up: '',
+      }
+    } else {
+      return {
+        response: '',
+        follow_up: '',
+      }
+    }
+  }
+  
+  const getWordleResultsResponse = async ():Promise<Response> => {
+    // Check if message is wordle results
+    let wordleResultsMsg;
+    try {
+      parseWordleResults(message);
+      // If an error is not thrown Wordle Results have been sent
+      wordleResultsMsg = true;
+    } catch(err) {
+      wordleResultsMsg = false;
+    }
+
+    if(wordleResultsMsg) {
+      let wordleResultsResponse = '';
+      let wordleResultsFollowUp = '';
+
+      try {
+        const userWordle = await insertUserWordle(user_id, message);
+        wordleResultsResponse = turdle.respondToUserWordle(userWordle);
+  
+        const {wordle_number} = userWordle;
+        const wordle = await getWordle(wordle_number);
+        if(!wordle) {
+          wordleResultsFollowUp = turdle.REQUEST_WORDLE;
+        }
+      } catch(err:any) {
+        if(err.code === 'WORDLE_ALREADY_SUBMITTED') {
+          wordleResultsResponse = turdle[err.code];
+        } else {
+          throw err;
+        }
+      }
+
+      return {
+        response: wordleResultsResponse,
+        follow_up: wordleResultsFollowUp,
+      }
+    } else {
+      return {
+        response: turdle['INVALID_RESULTS'],
+        follow_up: '',
+      }
+    }
+  }
+
+  let response = '';
+  let follow_up = '';
+
+  ({response, follow_up} = await getPromptResponse());
+  if(!response && !follow_up) {
+    ({response, follow_up} = await getWordleResponse());
+  }
+  if(!response && !follow_up) {
+    ({response, follow_up} = await getWordleResultsResponse());
   }
 
   // Document outgoing message
