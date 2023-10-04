@@ -2,9 +2,11 @@ import express from 'express';
 import db from '../db';
 import auth from '../controllers/authentication';
 import { confirmPermission, verifyToken } from '../middleware/auth';
-import { archiveUser, createUser, getAllUsers } from '../controllers/users';
+import { addUserHandle, archiveUser, createUser, getAllUsers, updateUser } from '../controllers/users';
 
 import wordleApi from './wordle';
+import messageApi from './message';
+import smsApi from './sms';
 
 const isDevelopment = process.env.NODE_ENV === 'development';
 
@@ -47,6 +49,20 @@ router.route('/users')
       }
 
       res.status(201).json(user);
+    } catch(err) {
+      next(err);
+    }
+  })
+  .patch(async (req, res, next) => {
+    try {
+      const {handle} = req.body;
+      if(handle) {
+        await addUserHandle(req.body);
+        res.status(200).send('Added User Handle.');
+      } else {
+        const user = await updateUser(req.body);
+        res.status(200).json(user);
+      }
     } catch(err) {
       next(err);
     }
@@ -98,6 +114,8 @@ router.post('/welcome', verifyToken, (req, res) => {
   res.status(200).send('Welcome 🙌 ');
 });
 
+router.use('/sms', smsApi);
+router.use('/message', messageApi);
 router.use('/wordle', wordleApi);
 
 export = router;

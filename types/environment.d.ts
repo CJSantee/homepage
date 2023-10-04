@@ -6,6 +6,8 @@ declare global {
       NODE_ENV: 'development' | 'production' | 'test';
       DATABASE_URL: string;
       SECRET_KEY: string;
+      TWILIO_ACCOUNT_SID: string;
+      TWILIO_AUTH_TOKEN: string;
     }
   }
 }

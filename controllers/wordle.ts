@@ -2,6 +2,8 @@
 
 import db from '../db';
 import { ApplicationError } from '../lib/applicationError';
+import UserWordle, { GuessRow } from '../types/models/user_wordle';
+import Wordle from '../types/models/wordle';
 
 const WORDLE_ERRORS = {
   PARSING_ERROR: {
@@ -36,7 +38,7 @@ const green = [greenSquare, orangeSquare];
 /**
  * @description Convert result rows into arrays of 'w'|'y'|'g' 
  */
-function parseGuessRows(rows: string) {
+function parseGuessRows(rows: string): GuessRow[] {
   return rows.split('\n').map(r => r.split(/(?:)/u).map(char => {
     if(white.includes(char)) {
       return 'w';
@@ -50,10 +52,10 @@ function parseGuessRows(rows: string) {
   }));
 }
 
-function parseWordleResults(results) {
-  const wordleRegex = /Wordle (\d+) (\d{1}|X)\/6(\**)[\n\r\s]+((?:(?:[\u2b1b-\u2b1c]|(?:\ud83d[\udfe6-\udfe9])){5}[\n\r\s]*){1,6})/;
+export function parseWordleResults(results) {
+  const wordleResultsRegex = /Wordle (\d+) (\d{1}|X)\/6(\**)[\n\r\s]+((?:(?:[\u2b1b-\u2b1c]|(?:\ud83d[\udfe6-\udfe9])){5}[\n\r\s]*){1,6})/;
   try {
-    const [wordleNumber, numGuesses, hardMode, guessRows] = results.match(wordleRegex).slice(1);
+    const [wordleNumber, numGuesses, hardMode, guessRows] = results.match(wordleResultsRegex).slice(1);
     const guess_rows = parseGuessRows(guessRows);
     return {
       wordle_number: Number(wordleNumber), 
@@ -66,8 +68,11 @@ function parseWordleResults(results) {
   }
 }
 
-export async function insertUserWordle(user_id, results) {
-  const {wordle_number, num_guesses, hard_mode, guess_rows} = parseWordleResults(results);
+export async function insertUserWordle(user_id: string, results: string|ReturnType<typeof parseWordleResults>): Promise<UserWordle> {
+  const {wordle_number, num_guesses, hard_mode, guess_rows} = typeof results === 'string' 
+    ? parseWordleResults(results) 
+    : results;
+   
   try {
     const {rows: [userWordle]} = await db.file('db/user_wordles/put.sql', {
       user_id,
@@ -85,7 +90,7 @@ export async function insertUserWordle(user_id, results) {
   }
 }
 
-export async function getUserWordleStats(user_id) {
+export async function getUserWordleStats(user_id:string) {
   const {rows: [stats]} = await db.file('db/user_wordles/get_stats.sql', {user_id});
   return stats;
 }
@@ -93,4 +98,19 @@ export async function getUserWordleStats(user_id) {
 export async function getWordleLeaderboard() {
   const {rows: leaderboard} = await db.file('db/user_wordles/get_leaderboard.sql');
   return leaderboard;
+}
+
+export async function insertWordle({wordle, wordle_number, wordle_date}:Wordle): Promise<Wordle> {
+  const {rows: [wordleRow]} = await db.file('db/wordles/put.sql', {wordle: wordle.toLowerCase(), wordle_number, wordle_date});
+  return wordleRow;
+}
+
+export async function getWordle(wordle_number:number): Promise<Wordle> {
+  const {rows: [wordle]} = await db.file('db/wordles/get.sql', {wordle_number});
+  return wordle;
+}
+
+export async function getUserWordles(user_id:string): Promise<UserWordle[]> {
+  const {rows: userWordles} = await db.file('db/user_wordles/get_by_user_id.sql', {user_id});
+  return userWordles;
 }

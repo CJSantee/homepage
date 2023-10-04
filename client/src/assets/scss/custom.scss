@@ -29,6 +29,10 @@ $toast-color: #343a40;
 
 @import "../../../node_modules/bootstrap/scss/bootstrap";
 
+.navbar-nav .dropdown-menu {
+  position: absolute;
+}
+
 .social {
   justify-content: flex-start;
   flex-direction: row;

@@ -7,7 +7,7 @@ import path from 'path';
 
 import  api from './api';
 import db from './db';
-import { errorHeandler } from './middleware/error';
+import { errorHandler } from './middleware/error';
 
 const {NODE_ENV} = process.env;
 const isDevelopment = NODE_ENV === 'development';
@@ -34,7 +34,7 @@ app.get('*', (req: Request, res: Response) => {
   res.sendFile(path.join(process.cwd(), "client", "build", "index.html"));
 });
 
-app.use(errorHeandler);
+app.use(errorHandler);
 
 app.listen(port, () => {
   console.log(`⚡️[server]: Server is running at http://localhost:${port}`);

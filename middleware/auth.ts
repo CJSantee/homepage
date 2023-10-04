@@ -1,9 +1,10 @@
 import jwt from 'jsonwebtoken';
 import auth from '../controllers/authentication';
+import { getUserByHandle, getUserById } from '../controllers/users';
 
 const {SECRET_KEY} = process.env;
 
-export const verifyToken = (req, res, next) => {
+export const verifyToken = async (req, res, next) => {
   const token = req.cookies.jwt;
   if(!token) {
     console.log('Missing token.');
@@ -11,7 +12,10 @@ export const verifyToken = (req, res, next) => {
   }
   try {
     const decoded = jwt.verify(token, SECRET_KEY);
-    req.user = decoded;
+    if(typeof decoded === 'object') {
+      const user = await getUserById(decoded.user_id);
+      req.user = user;
+    }
   } catch(err) {
     return res.status(401).send('Invalid token.');
   }
@@ -34,4 +38,21 @@ export const confirmPermission = (permission) => {
       return res.status(401).send('You do not have permission for this action.');
     }
   };
+}
+
+export const verifySmsUser = async (req, res, next) => {
+  const {From: from_handle} = req.body;
+  if(!from_handle) {
+    console.log('Error: No from_handle provided for SMS request.');
+    return res.status(401).send('Not a SMS Request');
+  }
+  const user = await getUserByHandle(from_handle);
+  if(!user) {
+    console.log('Error: No user with handle: ', from_handle);
+    return res.status(401).send('User not verified for messaging.');
+  }
+  req.user = user;
+  if(next) {
+    next();
+  }
 }

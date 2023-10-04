@@ -2,11 +2,23 @@ import Modal from 'react-bootstrap/Modal';
 import Form from 'react-bootstrap/Form';
 import Button from 'react-bootstrap/Button';
 import { ModalProps } from '../../@types/modal';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import api from '../utils/api';
+import { User } from '../../@types/auth';
 
-function NewUserModal({show, onHide}:ModalProps) {
+interface UserModalProps extends ModalProps {
+  user: User|null,
+}
+function UserModal({user, show, onHide}:UserModalProps) {
   const [username, setUsername] = useState('');
+
+  useEffect(() => {
+    if(user) {
+      setUsername(user.username);
+    } else {
+      setUsername('');
+    }
+  }, [user]);
 
   const createUser = async () => {
     const {success} = await api.post('/users', {username});
@@ -15,10 +27,19 @@ function NewUserModal({show, onHide}:ModalProps) {
     }
   }
 
+  const updateUser = async () => {
+    if(!user) return;
+    const {user_id} = user;
+    const {success} = await api.patch('/users', {user_id, username});
+    if(success) {
+      onHide();
+    }
+  }
+
   return (
     <Modal show={show} fullscreen={"md-down"} onHide={onHide}>
-      <Modal.Header className='border-0 pb-0'>
-        <h4 className='text-primary m-0'>New User</h4>
+      <Modal.Header className='border-0 pb-0' closeButton>
+        <h4 className='text-primary m-0'>{user ? 'Update' : 'New'} User</h4>
       </Modal.Header>
       <Modal.Body>
         <Form noValidate>
@@ -31,7 +52,7 @@ function NewUserModal({show, onHide}:ModalProps) {
             />
           </Form.Group>
           <Form.Group className='d-flex justify-content-end'>
-            <Button onClick={createUser}>Create</Button>
+            <Button onClick={user ? updateUser : createUser}>{user ? 'Update' : 'Create'}</Button>
           </Form.Group>
         </Form>
       </Modal.Body>
@@ -39,4 +60,4 @@ function NewUserModal({show, onHide}:ModalProps) {
   );
 }
 
-export default NewUserModal;
+export default UserModal;

@@ -19,6 +19,8 @@ $ npm run dev
 NODE_ENV=development # development | production | test
 DATABASE_URL=postgres://postgres:@localhost:5432/homepage-db
 SECURITY_KEY=anyvalue
+TWILIO_ACCOUNT_SID=xxxx
+TWILIO_AUTH_TOKEN=xxxx
 ```
 
 ### Troubleshooting
@@ -33,3 +35,8 @@ Rendering SVG:
 Wordle Score Analyzer
 Chess.com + LiChess API integration
 Site viewers / analytics
+
+
+| test |
+| ---- |
+| -- |
