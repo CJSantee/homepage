@@ -6,9 +6,14 @@ export async function insertMessage(message:MessageParams): Promise<Message> {
   return dbMessage;
 }
 
-export async function getPreviousMessage(message_id:string): Promise<Message> {
-  const {rows: [message]} = await db.file('db/messages/get_previous.sql', {message_id});
-  return message;
+type GetPreviousMessageParams = {
+  user_id: string,
+  from_handle: string,
+  lookback_interval?: string,
+}
+export async function getPreviousMessages({user_id, from_handle, lookback_interval}:GetPreviousMessageParams): Promise<Message[]> {
+  const {rows: messages} = await db.file('db/messages/get_previous.sql', {user_id, from_handle, lookback_interval});
+  return messages;
 }
 
 export async function getMessagesByUserId(user_id:string): Promise<Message[]> {

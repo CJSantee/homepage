@@ -109,3 +109,8 @@ export async function getWordle(wordle_number:number): Promise<Wordle> {
   const {rows: [wordle]} = await db.file('db/wordles/get.sql', {wordle_number});
   return wordle;
 }
+
+export async function getUserWordles(user_id:string): Promise<UserWordle[]> {
+  const {rows: userWordles} = await db.file('db/user_wordles/get_by_user_id.sql', {user_id});
+  return userWordles;
+}

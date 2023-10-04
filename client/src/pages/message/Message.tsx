@@ -57,7 +57,7 @@ function Message() {
             className={`row ${userMessage.direction === 'OUTGOING' ? 'justify-content-start' : 'justify-content-end'}`}
           >
             <div className={`col-7 col-md-5 bg-${userMessage.direction === 'OUTGOING' ? 'dark' : 'secondary'} rounded my-1 py-2 px-3 text-break`}>
-              <p className="m-0">{userMessage.message}</p>
+              <p className="m-0" style={{whiteSpace: "pre-wrap"}}>{userMessage.message}</p>
             </div>
           </div>
         ))}

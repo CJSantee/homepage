@@ -1,4 +1,3 @@
--- TODO: Rework to check for handle / user_id to account for multiple users messaging intermittently
 SELECT
   message_id,
   x_message_id,
@@ -11,6 +10,7 @@ SELECT
   created
 FROM messages
 WHERE direction = 'INCOMING'
-  AND message_id < ${message_id}
-ORDER BY message_id DESC
-LIMIT 1;
+  AND (${user_id}::BIGINT IS NULL OR user_id = ${user_id})
+  AND (${from_handle}::TEXT IS NULL OR from_handle = ${from_handle})
+  AND (${lookback_interval}::INTERVAL IS NULL OR created > NOW() - ${lookback_interval}::INTERVAL)
+ORDER BY message_id DESC;

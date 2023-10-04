@@ -69,6 +69,7 @@ const RESPONSES = {
   INVALID_RESULTS: "Huh, that doesn\'t look like Wordle results to me.\nTo get your results for today\'s Wordle click on the podium icon at the top of your screen and then click Share." + SIGNATURE,
   WORDLE_ALREADY_SUBMITTED: "Oops! It looks like you've already submit results for this Wordle." + SIGNATURE,
   REQUEST_WORDLE: "By the way, I haven't figured out the today's Wordle myself yet, do you mind sharing it with me so I can make sure everyone else isn't cheating?" + SIGNATURE,
+  WORDLE_RECEIVED: "Thanks for sharing today's Wordle!" + SIGNATURE,
 };
 
 function respondToUserWordle(userWordle: UserWordle): string {

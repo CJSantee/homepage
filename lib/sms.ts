@@ -1,8 +1,8 @@
-import { getPreviousMessage, insertMessage } from "../controllers/messages";
+import { getPreviousMessages, insertMessage } from "../controllers/messages";
 import { blockUserHandle, getUserByHandle } from "../controllers/users";
 import { getWordle, insertUserWordle, insertWordle, parseWordleResults } from "../controllers/wordle";
 import db from "../db";
-import Message, { MessageParams } from "../types/models/message";
+import { MessageParams } from "../types/models/message";
 import twilio from "twilio";
 import turdle from "./turdle";
 
@@ -118,18 +118,29 @@ export async function receiveMessage(incomingMessage: MessageParams): Promise<Re
     const wordleRegex = /^([A-z]{5})\s*$/;
     const [wordleMsg]  = message.match(wordleRegex)?.slice(1) || [false];
     if(typeof wordleMsg === 'string') {
-      const {message: previousMessage} = await getPreviousMessage(incoming_message_id);
-      const {wordle_number} = parseWordleResults(previousMessage);
-      await insertWordle({wordle: wordleMsg, wordle_number});
-      return {
-        response: '',
-        follow_up: '',
+      const sessionMessages = await getPreviousMessages({user_id, from_handle, lookback_interval: '1 hour'});
+      let wordleNumber;
+      // Look for previous wordle results message to find the wordle_number
+      sessionMessages.every(m => {
+        try {
+          const {wordle_number} = parseWordleResults(m);
+          wordleNumber = wordle_number;
+          return false;
+        } catch(err) {
+          return true;
+        }
+      });
+      if(wordleNumber) {
+        await insertWordle({wordle: wordleMsg, wordle_number: wordleNumber});
+        return {
+          response: turdle['WORDLE_RECEIVED'],
+          follow_up: '',
+        }
       }
-    } else {
-      return {
-        response: '',
-        follow_up: '',
-      }
+    }
+    return {
+      response: '',
+      follow_up: '',
     }
   }
   

@@ -183,7 +183,11 @@ async function file(path: string, params: object = {}) {
     }
   }
   
-  return pool.query(sql, args);
+  return pool.query(sql, args).catch((err:any) => {
+    const msg = `SQL error: ${path} (line: ${(sql.substring(0, err.position).match(/\n/g) || []).length})`;
+    console.log(msg);
+    throw err;
+  });
 } 
 
 /**
