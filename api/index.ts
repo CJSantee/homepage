@@ -1,121 +1,74 @@
-import express from 'express';
+require('dotenv').config();
+import express, { type Express, type Request, type Response } from 'express';
+import cors from 'cors';
+import bodyParser from 'body-parser';
+import cookieParser from 'cookie-parser';
+import path from 'path';
+
+import  api from './api';
 import db from '../db';
-import auth from '../controllers/authentication';
-import { confirmPermission, verifyToken } from '../middleware/auth';
-import { addUserHandle, archiveUser, createUser, getAllUsers, updateUser } from '../controllers/users';
+import { errorHandler } from '../middleware/error';
 
-import wordleApi from './wordle';
-import messageApi from './message';
-import smsApi from './sms';
+const {NODE_ENV} = process.env;
+const isDevelopment = NODE_ENV === 'development';
 
-const isDevelopment = process.env.NODE_ENV === 'development';
+const app: Express = express();
+const port = 8080;
 
-const router = express.Router();
+// parse application/x-www-form-urlencoded
+app.use(bodyParser.urlencoded({limit: '5mb', extended: false}));
+// parse application/json
+app.use(bodyParser.json({limit: '5mb'}));
+app.use(cookieParser());
 
-router.get('/', async (req, res) => {
-  const {rows: [{now: time}]} = await db.query('SELECT NOW()');
-  const {rows: [sys_params]} = await db.file('db/sys_params/get.sql');
-  res.status(200).json({time, sys_params});
+app.use(express.static(path.join(process.cwd(), "client", "build")));
+
+app.use(cors({
+  credentials: true,
+  origin: isDevelopment ? 'http://localhost:3000' : 'https://colinjsantee.com',
+}));
+
+app.use('/api', api);
+
+app.get('*', (req: Request, res: Response) => {
+  res.sendFile(path.join(process.cwd(), "client", "build", "index.html"));
 });
 
-router.route('/users')
-  .get(confirmPermission('admin'), async (req, res, next) => {
-    try {
-      const users = await getAllUsers();
-      res.status(200).json({users});
-    } catch(err) {
-      next(err);
-    }
-  })  
-  .post(async (req, res, next) => {
-    const {password} = req.body;
-    try {
-      let user;
-      if(password) {
-        // Register user
-        const {user: newUser, token} = await auth.register(req.body);
-  
-        res.cookie('jwt', token, {
-          secure: !isDevelopment,
-          httpOnly: true,
-          expires: new Date(Date.now() + 1000 * 60 * 60 * 60 * 24 * 7 * 2), // ms * sec * min * hr * day * wk * 2 (2 weeks)
-        });
+app.use(errorHandler);
 
-        user = newUser;
-      } else {
-        // TODO: Should either protect this with permissions or move to a different route
-        // Create new unverified user
-        user = await createUser(req.body);
-      }
+app.listen(port, () => {
+  console.log(`⚡️[server]: Server is running at http://localhost:${port}`);
+});
 
-      res.status(201).json(user);
-    } catch(err) {
-      next(err);
-    }
-  })
-  .patch(async (req, res, next) => {
-    try {
-      const {handle} = req.body;
-      if(handle) {
-        await addUserHandle(req.body);
-        res.status(200).send('Added User Handle.');
-      } else {
-        const user = await updateUser(req.body);
-        res.status(200).json(user);
-      }
-    } catch(err) {
-      next(err);
-    }
-  });
-
-router.post('/users/archive', confirmPermission('admin'), async (req, res, next) => {
-  const {user_id} = req.body;
+async function migrate() {
+  console.log('Running migration script');
   try {
-    await archiveUser(user_id);
-    res.status(200).send('User Archived.');
+    await db.upgrade();
   } catch(err) {
-    next(err);
+    console.log('error', err);
+    await db.end();
+    console.log('Shutting down with error.');
+    process.exit(1);
   }
-});
+}
 
-router.route('/auth')
-  .post(async (req, res, next) => {
+async function init() {
+  await migrate();
+}
+
+/**
+ * Shut down node app
+ */
+['SIGINT', 'SIGTERM'].forEach(signal => {
+  process.on(signal, async () => {
     try {
-      const {user, token} = await auth.login(req.body);
-
-      res.cookie('jwt', token, {
-        secure: !isDevelopment,
-        httpOnly: true,
-        expires: new Date(Date.now() + 1000 * 60 * 60 * 60 * 24 * 7 * 2), // ms * sec * min * hr * day * wk * 2 (2 weeks)
-      });
-  
-      res.status(200).json(user);
+      await db.end();
     } catch(err) {
-      next(err);
+      console.log('was there an error', err);
+    } finally {
+      process.exit(0);
     }
-  })
-  .delete(async (req, res) => {
-    res.clearCookie('jwt');
-    res.end();
   });
-
-router.get('/refresh', verifyToken, async (req, res) => {
-  const {user_id} = req.user || {};
-  const {user, token: newToken} = await auth.refresh(user_id);
-  res.cookie('jwt', newToken, {
-    secure: !isDevelopment,
-    httpOnly: true,
-    expires: new Date(Date.now() + 1000 * 60 * 60 * 60 * 24 * 7 * 2), // ms * sec * min * hr * day * wk * 2 (2 weeks)
-  });
-  res.status(200).json(user);
 });
 
-router.post('/welcome', verifyToken, (req, res) => {
-  res.status(200).send('Welcome 🙌 ');
-});
-
-router.use('/sms', smsApi);
-router.use('/message', messageApi);
-router.use('/wordle', wordleApi);
-
-export = router;
+init();
