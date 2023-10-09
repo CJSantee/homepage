@@ -22,7 +22,7 @@ app.use(bodyParser.urlencoded({limit: '5mb', extended: false}));
 app.use(bodyParser.json({limit: '5mb'}));
 app.use(cookieParser());
 
-app.use(express.static(path.join(process.cwd(), "client", "build")));
+// app.use(express.static(path.join(process.cwd(), "client", "build")));
 
 app.use(cors({
   credentials: true,
