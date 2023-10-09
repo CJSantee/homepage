@@ -1,5 +1,6 @@
 import {Client, Pool} from 'pg';
 import fs from 'fs';
+import path from 'path';
 import {parse} from 'pg-connection-string';
 import {secondsToReadable} from './utils';
 
@@ -34,10 +35,10 @@ async function upgrade() {
   async function executeSql(client, filename_or_sql: string, logMessage?: string) {
     let sql = filename_or_sql;
     if(filename_or_sql.toLowerCase().endsWith('.sql')) {
-      if(!fs.existsSync(filename_or_sql)) {
+      if(!fs.existsSync(path.join(process.cwd(), filename_or_sql))) {
         return undefined;
       }
-      sql = fs.readFileSync(filename_or_sql).toString();
+      sql = fs.readFileSync(path.join(process.cwd(), filename_or_sql)).toString();
     }
     let result;
     try {
@@ -82,7 +83,7 @@ async function upgrade() {
     await client.query(sqlLines.join(';'))
   }
 
-  const dbFunctionPaths = ['./db/db_functions', './db/db_triggers'];
+  const dbFunctionPaths = ['./db/db_functions', './db/db_triggers'].map(filepath => path.join(process.cwd(), filepath));
 
   async function createWrapper(client) {
     await client.query('BEGIN');
@@ -124,7 +125,7 @@ async function upgrade() {
     console.log(`Current database version: ${version}`);
 
     // Run db migrations
-    const basePath = './db/db_migrate';
+    const basePath = path.join(process.cwd(), 'db/db_migrate');
     while(version < maxVersion && fs.existsSync(`${basePath}/${version + 1}.sql`)) {
       const startTime = new Date().valueOf();
       console.log(`Migrating the database to version: ${++version}`);
@@ -160,10 +161,10 @@ async function query(text: string, params?: any) {
   return pool.query(text, params)
 }
 
-async function file(path: string, params: object = {}) {
+async function file(filepath: string, params: object = {}) {
   let sql: string;
   let namedParams: string[] = [];
-  sql = fs.readFileSync(path).toString();
+  sql = fs.readFileSync(path.join(process.cwd(), filepath)).toString();
   const replacer = (match) => {
     const param = match.slice(2, -1); // remove '${' and '}'
     const idx = namedParams.indexOf(param);
