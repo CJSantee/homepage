@@ -59,7 +59,7 @@ async function migrate() {
       });
     });
 
-    // await db.upgrade();
+    await db.upgrade();
   } catch(err) {
     console.log('error', err);
     await db.end();

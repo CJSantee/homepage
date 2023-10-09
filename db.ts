@@ -83,7 +83,8 @@ async function upgrade() {
     await client.query(sqlLines.join(';'))
   }
 
-  const dbFunctionPaths = ['./db/db_functions', './db/db_triggers'].map(filepath => path.join(process.cwd(), filepath));
+  const dbFunctionPaths = ['db/db_functions', 'db/db_triggers'].map(filepath => path.join(process.cwd(), filepath));
+  console.log('dbFunctionPaths', dbFunctionPaths);
 
   async function createWrapper(client) {
     await client.query('BEGIN');
