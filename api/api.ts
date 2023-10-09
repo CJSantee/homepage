@@ -13,9 +13,9 @@ const isDevelopment = process.env.NODE_ENV === 'development';
 const router = express.Router();
 
 router.get('/', async (req, res) => {
-  const {rows: [{now: time}]} = await db.query('SELECT NOW()');
-  const {rows: [sys_params]} = await db.file('db/sys_params/get.sql');
-  res.status(200).json({time, sys_params});
+  // const {rows: [{now: time}]} = await db.query('SELECT NOW()');
+  // const {rows: [sys_params]} = await db.file('db/sys_params/get.sql');
+  res.status(200).send('THE API WORKS!');
 });
 
 router.route('/users')

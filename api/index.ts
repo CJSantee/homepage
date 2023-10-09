@@ -43,7 +43,8 @@ app.listen(port, () => {
 async function migrate() {
   console.log('Running migration script');
   try {
-    await db.upgrade();
+    console.log('cwd', process.cwd());
+    // await db.upgrade();
   } catch(err) {
     console.log('error', err);
     await db.end();
