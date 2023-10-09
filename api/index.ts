@@ -44,22 +44,22 @@ app.listen(port, () => {
 async function migrate() {
   console.log('Running migration script');
   try {
-    console.log('cwd', process.cwd());
-    const directory = process.cwd();
-    fs.readdir(directory, (err, files) => {
-      files.forEach(file => {
-        // get the details of the file 
-        let fileDetails = fs.lstatSync(path.resolve(directory, file));
-        // check if the file is directory 
-        if (fileDetails.isDirectory()) {
-          console.log('Directory: ' + file);
-        } else {
-          console.log('File: ' + file);
-        }
-      });
-    });
+    // console.log('cwd', process.cwd());
+    // const directory = process.cwd();
+    // fs.readdir(directory, (err, files) => {
+    //   files.forEach(file => {
+    //     // get the details of the file 
+    //     let fileDetails = fs.lstatSync(path.resolve(directory, file));
+    //     // check if the file is directory 
+    //     if (fileDetails.isDirectory()) {
+    //       console.log('Directory: ' + file);
+    //     } else {
+    //       console.log('File: ' + file);
+    //     }
+    //   });
+    // });
 
-    await db.upgrade();
+    // await db.upgrade();
   } catch(err) {
     console.log('error', err);
     await db.end();
