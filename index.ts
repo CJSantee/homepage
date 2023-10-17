@@ -9,11 +9,11 @@ import  api from './api';
 import db from './db';
 import { errorHandler } from './middleware/error';
 
-const {NODE_ENV} = process.env;
+const {NODE_ENV, PORT} = process.env;
 const isDevelopment = NODE_ENV === 'development';
 
 const app: Express = express();
-const port = 8080;
+const port = PORT || 8080;
 
 // parse application/x-www-form-urlencoded
 app.use(bodyParser.urlencoded({limit: '5mb', extended: false}));
