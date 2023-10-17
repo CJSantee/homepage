@@ -118,8 +118,14 @@ async function upgrade() {
     await client.query('BEGIN');
 
     // Get current db_version
-    const latestVersion = await executeSql(client, 'SELECT MAX(db_version) as latest from db_versions');
-    version = latestVersion?.rows?.[0]?.latest || 0;
+    const {rows: [{exists}]} = await executeSql(client, "SELECT EXISTS (SELECT FROM information_schema.tables WHERE table_schema = 'public' AND table_name = 'db_versions')");
+    if(!exists) {
+      version = 0;
+    } else {
+      const {rows: [{latest}]} = await executeSql(client, 'SELECT MAX(db_version) as latest from db_versions');
+      version = latest;
+    }
+
     const maxVersion = process.env.DATABASE_VERSION || 999999;
     console.log(`Current database version: ${version}`);
 
