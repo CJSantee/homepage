@@ -18,19 +18,24 @@ function Projects() {
           Personal project developing mobile app for coffee brewing. Designed to
           capture and improve your coffee brewing experiences.
         </p>
-        <Button variant='outline-secondary' href='http://brewableapp.com'>
+        <Button 
+          variant='outline-secondary'
+          href='http://brewableapp.com'
+          className='mb-2'
+        >
           Homepage
         </Button>
         <Button
           variant='outline-secondary'
           href='https://apps.apple.com/us/app/brewable/id1592801332'
-          className='mx-2'
+          className='mx-2 mb-2'
         >
           App Store
         </Button>
         <Button
           variant='outline-secondary'
           href='https://github.com/cjsantee/brewable'
+          className='mb-2'
         >
           Source Code
         </Button>

@@ -8,6 +8,10 @@ import {ReactComponent as Cloud1} from "../../../assets/img/Cloud1.svg";
 import {ReactComponent as Cloud2} from "../../../assets/img/Cloud2.svg";
 import {ReactComponent as Cloud3} from "../../../assets/img/Cloud3.svg";
 
+import Button from "react-bootstrap/Button";
+
+import { useSystem } from "../../../hooks/useSystem";
+
 function getRandomInt(min: number, max: number) {
   min = Math.ceil(min);
   max = Math.floor(max);
@@ -110,11 +114,15 @@ function AboutMe() {
     
   }, []);
 
+  const system = useSystem();
+
   return (
     <Row className='section justify-content-center' id='AboutMe'>
       <Col md style={{zIndex: 1}}>
         <h2 className='text-primary'>About Me</h2>
-        <p>Hi! I'm Colin.</p>
+        <p>Hi! {system.show_create_admin ? (
+          <Button variant="link" className="text-seocndary p-0">I'm Colin</Button>
+        ) : 'I\'m Colin'}.</p>
         <p>
           I'm a creative and technically minded software developer inspired by
           software solutions with significant societal impact. I'm passionate

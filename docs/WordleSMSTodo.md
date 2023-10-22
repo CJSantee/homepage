@@ -1,0 +1,3 @@
+- add user_handles table (handle: string, user_id, protocol: 's', created: timestamp, unsubscribed: timestamp | null)
+- write a series of responses for each of the 7 wordle results as well as wether or not the user is play with hard mode
+- add a messages table (message: string, direction: 'outgoing|incoming', from: phone, to: phone, sent: timestamp)

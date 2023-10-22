@@ -1,3 +1,9 @@
+CREATE TABLE db_versions (
+  id SERIAL PRIMARY KEY,
+  db_version INTEGER NOT NULL UNIQUE,
+  created TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
 CREATE TABLE IF NOT EXISTS users (
   user_id  SERIAL PRIMARY KEY,
   username VARCHAR(32) NOT NULL,

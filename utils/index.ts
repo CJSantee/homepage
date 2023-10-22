@@ -26,3 +26,12 @@ export const secondsToReadable = (seconds: number) => {
   }
   return time_remaining_str;
 };
+
+/**
+ * @description Exclusive max and Inclusive min
+ */
+export const getRandomInt = (max:number, min?:number) => {
+  min = Math.ceil(min || 0);
+  max = Math.floor(max);
+  return Math.floor(Math.random() * (max - min) + min);
+}

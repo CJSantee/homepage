@@ -1,7 +1,5 @@
 name: Deploy to AWS Elastic Beanstalk
 on:
-  push:
-    branches: [ main ]
   workflow_dispatch:
 jobs:
   deploy:
@@ -22,11 +20,11 @@ jobs:
       # if: steps.changes.outputs.client == 'true'
       run: |
         cd client
-        npm install
+        npm ci
         npm run build
     - name: Build Server
       run: |
-        npm install
+        npm ci
         npm run build
     - name: Install Python 3.9
       uses: actions/setup-python@v2
@@ -38,7 +36,7 @@ jobs:
         pip install awsebcli
     - name: Init EB CLI
       run: |
-          eb init homepage --platform "${{secrets.AWS_PLATFORM}}" --region ${{secrets.AWS_DEFAULT_REGION }}
+        eb init homepage --platform "${{secrets.AWS_PLATFORM}}" --region "${{secrets.AWS_DEFAULT_REGION}}"
     - name: Deploy to Elastic Beanstalk
       run: |
         eb deploy

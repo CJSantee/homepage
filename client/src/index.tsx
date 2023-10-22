@@ -4,32 +4,38 @@ import './assets/css/styles.css';
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import {
-  createBrowserRouter,
-  RouterProvider,
+  BrowserRouter,
+  Routes,
+  Route,
 } from "react-router-dom";
 import App from './App';
+import AuthProvider from './context/AuthProvider';
+import SystemProvider from './context/SystemProvider';
+import AlertProvider from './context/AlertProvider';
 import reportWebVitals from './reportWebVitals';
-import Chess from './pages/chess';
-import NotFound from './pages/not-found';
-
-const router = createBrowserRouter([
-  {
-    path: "/",
-    element: <App />,
-    errorElement: <NotFound />
-  },
-  {
-    path: "/chess",
-    element: <Chess />,
-  },
-]);
+import ConfirmProvider from './context/ConfirmProvider';
+import ErrorBoundary from './components/ErrorBoundary';
 
 const root = ReactDOM.createRoot(
   document.getElementById('root') as HTMLElement
 );
 root.render(
   <React.StrictMode>
-    <RouterProvider router={router} />
+    <ErrorBoundary>
+      <BrowserRouter>
+        <SystemProvider>
+          <ConfirmProvider>
+            <AlertProvider>
+              <AuthProvider>
+                <Routes>
+                  <Route path='/*' element={<App />} />
+                </Routes>
+              </AuthProvider>
+            </AlertProvider>
+          </ConfirmProvider>
+        </SystemProvider>
+      </BrowserRouter>
+    </ErrorBoundary>
   </React.StrictMode>
 );
 
