@@ -1,5 +1,4 @@
 // Hooks
-import { useState } from "react";
 import { useAuth } from "../hooks/useAuth";
 import { useNavigate } from "react-router-dom";
 
@@ -13,12 +12,9 @@ import SplitButton from "react-bootstrap/SplitButton";
 
 // Components
 import { Link } from "react-router-dom";
-import SignInModal from "./SignInModal";
 import { hasPermission } from "../utils";
 
 function Header() {
-  const [showSignIn, setShowSignIn] = useState(false);
-
   const auth = useAuth();
   const navigate = useNavigate();
 
@@ -61,14 +57,13 @@ function Header() {
                 </Nav.Item>
               ) : (
                 <Nav.Item>
-                  <Button onClick={() => setShowSignIn(true)} variant='outline-secondary'>Sign In</Button>
+                  <Button onClick={() => navigate('/signin')} variant='outline-secondary'>Sign In</Button>
                 </Nav.Item>
               )}
             </Nav>
           </Navbar.Collapse>
         </Navbar>
       </Container>
-      <SignInModal show={showSignIn} onHide={() => setShowSignIn(false)}/>
     </>
   );
 }

@@ -9,6 +9,7 @@ import Admin from "./pages/admin";
 import Wordle from "./pages/wordle";
 import AuthRoute from "./components/AuthRoute";
 import Message from "./pages/message";
+import SignIn from "./pages/sign-in";
 
 function App() {
   return (
@@ -16,6 +17,7 @@ function App() {
       <Route>
         <Route element={<Layout />} >
           <Route element={<PersistLogin />}>
+            <Route path='/signin' element={<SignIn />} />
             <Route path='/' element={<Home />} />
             <Route element={<AuthRoute permission='admin' />}>
               <Route path='/admin' element={<Admin />} />

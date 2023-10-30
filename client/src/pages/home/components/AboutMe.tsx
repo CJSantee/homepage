@@ -1,18 +1,21 @@
+import { useSystem } from "../../../hooks/useSystem";
 // Bootstrap Components
 import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
 import Button from "react-bootstrap/Button";
+import {ReactComponent as DeskImg} from "../../../assets/img/ColinAtDesk.svg";
+import {ReactComponent as Cloud1} from "../../../assets/img/Cloud1.svg";
+import {ReactComponent as Cloud2} from "../../../assets/img/Cloud2.svg";
+import {ReactComponent as Cloud3} from "../../../assets/img/Cloud3.svg";
 
-import {ReactComponent as DeskImg} from "../../../assets/img/Desk.svg";
 
-import { useSystem } from "../../../hooks/useSystem";
 
 function AboutMe() {
   const system = useSystem();
 
   return (
     <Row className='section justify-content-center' id='AboutMe'>
-      <Col md>
+      <Col md style={{zIndex: 1}}>
         <h2 className='text-primary'>About Me</h2>
         <p>Hi! {system.show_create_admin ? (
           <Button variant="link" className="text-seocndary p-0">I'm Colin</Button>
@@ -28,8 +31,19 @@ function AboutMe() {
         </Button> */}
       </Col>
       <Col md>
-        <Row className='justify-content-center'>
-          <DeskImg />
+        <Row className='justify-content-center position-relative' id='clouds'>
+          <div style={{zIndex: 1}}>
+            <DeskImg />
+          </div>
+          <div className='position-absolute cloud' id='cloud1' style={{width: "45%", top: "28%", left: "29%"}}>
+            <Cloud1 />
+          </div>
+          <div className='position-absolute cloud' id='cloud2' style={{width: "23%", top: "57%", left: "13%"}}>
+            <Cloud2 />
+          </div>
+          <div className='position-absolute cloud' id='cloud3' style={{width: "23%", top: "55%", left: "63.5%"}}>
+            <Cloud3 />
+          </div>
         </Row>
       </Col>
     </Row>

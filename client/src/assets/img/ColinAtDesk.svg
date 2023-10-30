@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
 <!-- Created with Vectornator (http://vectornator.io/) -->
-<svg height="100%" stroke-miterlimit="10" style="fill-rule:nonzero;clip-rule:evenodd;stroke-linecap:round;stroke-linejoin:round;" version="1.1" viewBox="0 0 1400 980" width="100%" xmlSpace="preserve" xmlns="http://www.w3.org/2000/svg" xmlnsvectornator="http://vectornator.io" xmlnXlink="http://www.w3.org/1999/xlink">
+<svg height="100%" stroke-miterlimit="10" style="fill-rule:nonzero;clip-rule:evenodd;stroke-linecap:round;stroke-linejoin:round;" version="1.1" viewBox="0 0 1400 980" width="100%" xmlSpace="preserve" xmlns="http://www.w3.org/2000/svg" xmlnsvectornator="http://vectornator.io" xmlnsXlink="http://www.w3.org/1999/xlink">
 <defs>
 <filter color-interpolation-filters="sRGB" filterUnits="userSpaceOnUse" height="15.5187" id="Filter" width="8.05706" x="302.057" y="312.257">
 <feDropShadow dx="0.269593" dy="-3.91182" flood-color="#cecece" flood-opacity="0.80428" in="SourceGraphic" result="Shadow" stdDeviation="1"/>
@@ -129,7 +129,7 @@
 <path d="M308.755 264.111C308.755 262.057 310.42 260.392 312.474 260.392C314.528 260.392 316.193 262.057 316.193 264.111C316.193 266.165 314.528 267.83 312.474 267.83C310.42 267.83 308.755 266.165 308.755 264.111Z" fill="#bdbbb5" fill-rule="nonzero" opacity="1" stroke="#0d0e1f" stroke-linecap="butt" stroke-linejoin="bevel" stroke-width="1"/>
 <path d="M311.934 251.885C311.934 249.83 313.599 248.165 315.653 248.165C317.707 248.165 319.372 249.83 319.372 251.885C319.372 253.939 317.707 255.604 315.653 255.604C313.599 255.604 311.934 253.939 311.934 251.885Z" fill="#bdbbb5" fill-rule="nonzero" opacity="1" stroke="#0d0e1f" stroke-linecap="butt" stroke-linejoin="bevel" stroke-width="1"/>
 </g>
-<path d="M306.041 318.669C306.782 318.696 307.595 324.917 307.271 326.379C306.947 327.841 304.806 328.375 304.371 326.899C303.935 325.422 305.304 318.642 306.041 318.669Z" fill="#605a51" fill-rule="nonzero" filter="url(#Filter)" stroke="none" vectornatorShadowAngle="-1.50199" vectornatorShadowColor="#cecece" vectornatorShadowOffset="3.9211" vectornatorShadowOpacity="0.80428" vectornatorShadowRadius="2"/>
+<path d="M306.041 318.669C306.782 318.696 307.595 324.917 307.271 326.379C306.947 327.841 304.806 328.375 304.371 326.899C303.935 325.422 305.304 318.642 306.041 318.669Z" fill="#605a51" fill-rule="nonzero" filter="url(#Filter)" stroke="none" vectornatorshadowangle="-1.50199" vectornatorshadowcolor="#cecece" vectornatorshadowoffset="3.9211" vectornatorshadowopacity="0.80428" vectornatorshadowradius="2"/>
 <path d="M288.097 324.079C286.24 321.073 309.224 247.364 309.224 247.364C309.224 247.364 311.789 238.741 319.563 240.373C323.594 241.218 331.226 245.407 328.499 254.994C327.123 259.834 322.776 259.884 322.864 266.494C322.994 276.239 327.741 272.553 326.541 288.45C325.854 297.558 321.49 303.212 319.016 312.52C317.173 319.458 317.185 329.64 317.185 329.64L295.045 329.64C295.045 329.64 290.363 327.749 288.097 324.079Z" fill="none" opacity="1" stroke="#0d0e1f" stroke-linecap="butt" stroke-linejoin="bevel" stroke-width="7" vectornatorlayername="Rectan.gle 3"/>
 </g>
 </g>

@@ -70,3 +70,37 @@
 .no-shadow, .no-shadow:focus {
   box-shadow: none;
 }
+
+.cloud {
+  -webkit-filter: blur(1px);
+  -moz-filter: blur(1px);
+  -o-filter: blur(1px);
+  -ms-filter: blur(1px);
+  filter: blur(1px);
+}
+
+#cloud1 {
+  animation: bobble 2s infinite;
+}
+#cloud2 {
+  animation: bobble 3s infinite;
+}
+#cloud3 {
+  animation: bobble 2.5s infinite;
+}
+
+@keyframes bobble {
+  0% {
+    transform: translate3d(0px, 0px, 0px);
+    animation-timing-function: ease-in;
+  }
+
+  50% {
+    transform: translate3d(0px, 8px, 0px);
+    animation-timing-function: ease-out;
+  }
+
+  100% {
+    transform: translate3d(0px, 0px, 0px);
+  }
+}
