@@ -7,8 +7,8 @@ import Container from "react-bootstrap/Container";
 import Nav from "react-bootstrap/Nav";
 import Navbar from "react-bootstrap/Navbar";
 import Button from "react-bootstrap/Button";
+import ButtonGroup from "react-bootstrap/ButtonGroup";
 import Dropdown from 'react-bootstrap/Dropdown';
-import SplitButton from "react-bootstrap/SplitButton";
 
 // Components
 import { Link } from "react-router-dom";
@@ -28,7 +28,7 @@ function Header() {
       <Container>
         <Navbar collapseOnSelect variant='dark' expand='md'>
           <Navbar.Brand>
-            <Link to={'/'} className="nav-brand text-decoration-none">Colin Santee</Link>
+            <Link to={'/'} className="nav-brand text-decoration-none">Colin<span className="text-secondary">J</span>Santee</Link>
           </Navbar.Brand>
           <Navbar.Toggle aria-controls='navbarScroll' />
           <Navbar.Collapse className='justify-content-between'>
@@ -47,13 +47,17 @@ function Header() {
             <Nav className="align-items-end">
               {auth?.user ? (
                 <Nav.Item>
-                  <SplitButton drop={"down"} title={auth.user.username} align={"end"} flip>
-                    {hasPermission('admin', auth.user.acl) && 
-                      <Dropdown.Item onClick={() => navigate('/admin')}>Admin Console</Dropdown.Item>}
-                    <Dropdown.Item onClick={() => navigate('/message')}>Message</Dropdown.Item>
-                    <Dropdown.Item onClick={() => navigate('/wordle')}>Wordle</Dropdown.Item>
-                    <Dropdown.Item onClick={signOut}>Sign Out</Dropdown.Item>
-                  </SplitButton>
+                  <Dropdown as={ButtonGroup}>
+                    <Button>{auth.user.username}</Button>
+                    <Dropdown.Toggle split />
+                    <Dropdown.Menu className="bg-card" align={"end"}>
+                      {hasPermission('admin', auth.user.acl) && 
+                        <Dropdown.Item onClick={() => navigate('/admin')}>Admin Console</Dropdown.Item>}
+                      <Dropdown.Item onClick={() => navigate('/message')}>Message</Dropdown.Item>
+                      <Dropdown.Item onClick={() => navigate('/wordle')}>Wordle</Dropdown.Item>
+                      <Dropdown.Item onClick={signOut}>Sign Out</Dropdown.Item>
+                    </Dropdown.Menu>
+                  </Dropdown>
                 </Nav.Item>
               ) : (
                 <Nav.Item>

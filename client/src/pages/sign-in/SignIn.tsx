@@ -40,7 +40,7 @@ function SignIn() {
 
   return (
     <div className='row justify-content-center'>
-      <div className='col-4 p-3 border rounded'>
+      <div className='col-4 p-3 border rounded min-w-300px'>
         <Form noValidate>
           <Form.Group className='mb-3'>
             <Form.Label>Username</Form.Label>

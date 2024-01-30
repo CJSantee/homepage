@@ -4,6 +4,8 @@ $body-bg: #081D35;
 $border-color: #27354A;
 $body-color: #dcdcd2;
 
+$text-dark: #0C0C17;
+
 // Fonts
 $font-family-sans-serif: Menlo, Monaco, "Courier New", monospace;
 $font-family-monospace: Menlo, Monaco, "Courier New", monospace;
@@ -22,6 +24,8 @@ $navbar-dark-active-color: $primary;
 
 $dropdown-link-hover-bg: #738794;
 
+$input-bg: #273649;
+
 // Offcanvas Color
 // $modal-content-bg: $body-bg;
 // $modal-content-color: $secondary; // Offcanvas Title
@@ -29,6 +33,16 @@ $dropdown-link-hover-bg: #738794;
 $toast-color: #343a40;
 
 @import "../../../node_modules/bootstrap/scss/bootstrap";
+
+$theme-colors: (
+  "dark": #081D35,
+  "card": #273649,
+);
+@each $color, $value in $theme-colors {
+  .bg-#{$color} {
+    background-color: #{$value};
+  }
+}
 
 .navbar-nav .dropdown-menu {
   position: absolute;
@@ -71,6 +85,13 @@ $dark-bg: #37455a;
 
 .z-index-1 {
   z-index: 1;
+}
+
+$widths: 150, 300, 500; 
+@each $width in $widths {
+  .min-w-#{$width}px {
+    min-width: #{$width}px;
+  }
 }
 
 // SM

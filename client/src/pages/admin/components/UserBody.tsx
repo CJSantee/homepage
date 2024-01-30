@@ -2,7 +2,7 @@ import Button from "react-bootstrap/Button";
 import Form from "react-bootstrap/Form";
 import InputGroup from "react-bootstrap/InputGroup";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faTrash, faUserPen, faPhone, faCheck } from "@fortawesome/free-solid-svg-icons";
+import { faTrash, faUserPen, faPhone, faCheck, faLock } from "@fortawesome/free-solid-svg-icons";
 import { User } from "../Admin";
 import { useAuth } from "../../../hooks/useAuth";
 import api from "../../../utils/api";
@@ -63,6 +63,7 @@ function UserBody({user, updateUsers, onEdit, onDelete}: UserBodyProps) {
               placeholder="+16151234567"
               value={handle}
               onChange={(e) => setHandle(e.target.value)}
+              className="rounded"
             />
             <Button variant='primary' onClick={updateHandle}>
               <FontAwesomeIcon icon={faCheck} />
@@ -73,6 +74,9 @@ function UserBody({user, updateUsers, onEdit, onDelete}: UserBodyProps) {
       <div className="col-12 col-md-9 d-flex justify-content-end align-items-start">
         <Button onClick={onEdit}>
           <FontAwesomeIcon icon={faUserPen} />
+        </Button>
+        <Button className="ms-2">
+          <FontAwesomeIcon icon={faLock} />
         </Button>
         {user.user_id !== auth?.user?.user_id && <Button onClick={onDelete} className="ms-2">
           <FontAwesomeIcon icon={faTrash} />
