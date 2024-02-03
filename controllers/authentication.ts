@@ -2,6 +2,8 @@ import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import db from '../db';
 import { ApplicationError } from '../lib/applicationError';
+import User from '../types/models/user';
+import { getUser } from './users';
 
 const {SECRET_KEY} = process.env;
 
@@ -40,25 +42,18 @@ const AUTHENTICATION_ERRORS = {
 
 const ROUNDS = 10;
 
-interface User {
-  user_id: number,
-  username: string,
-  acl: string,
-  handle: string,
-};
-
 // Used to ensure only these fields are returned for users
 const transformUser = (user: User) => {
   return {
     user_id: user.user_id,
     username: user.username,
-    acl: user.acl,
-    handle: user.handle,
+    acl: user?.acl,
+    handle: user?.handle,
   };
 }
 
 async function register({username, password}: {username: string, password: string}): Promise<{user: User, token: string}>{
-  const {rows: [existingUser]} = await db.file('db/users/get.sql', {username});
+  const existingUser = await getUser({username});
   if(existingUser) {
     throw new ApplicationError(AUTHENTICATION_ERRORS.USERNAME_IN_USE);
   }
@@ -72,7 +67,7 @@ async function register({username, password}: {username: string, password: strin
 
   const hashedPasword = await bcrypt.hash(password, ROUNDS);
 
-  const {rows: [user]} = await db.file('db/users/put.sql', {username, password: hashedPasword});
+  const {rows: [user]} = await db.file<{user_id: string, username: string}>('db/users/put.sql', {username, password: hashedPasword});
 
   const token = jwt.sign({user_id: user.user_id, username: user.username}, SECRET_KEY);
 
@@ -83,7 +78,7 @@ async function register({username, password}: {username: string, password: strin
 }
 
 async function login({username, password}: {username: string, password: string}): Promise<{user: User, token: string}> {
-  const {rows: [user]} = await db.file('db/users/get.sql', {username});
+  const user = await getUser({username});
 
   let token;
   if(user && (await bcrypt.compare(password, user.password))) {
@@ -99,7 +94,7 @@ async function login({username, password}: {username: string, password: string})
 }
 
 async function refresh(user_id): Promise<{user: User | null, token: string | null}> {
-  const {rows: [user]} = await db.file('db/users/get.sql', {user_id});
+  const user = await getUser({user_id});
 
   if(user) {
     const token = jwt.sign({user_id: user.user_id, username: user.username}, SECRET_KEY)
@@ -118,8 +113,8 @@ async function refresh(user_id): Promise<{user: User | null, token: string | nul
 /**
  * @description Check if a user has an acl row with the provided permission
  */
-async function hasPermission(user_id: number, permission: string): Promise<boolean> {
-  const {rows: [aclRow]} = await db.file('db/acls/get_by_user_id.sql', {user_id});
+async function hasPermission(user_id: string, permission: string): Promise<boolean> {
+  const {rows: [aclRow]} = await db.file<{acl_id:string, user_id:string, acl:string}>('db/acls/get_by_user_id.sql', {user_id});
   if(!aclRow) {
     return false;
   }

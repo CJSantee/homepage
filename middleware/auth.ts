@@ -1,6 +1,6 @@
 import jwt from 'jsonwebtoken';
 import auth from '../controllers/authentication';
-import { getUserByHandle, getUserById } from '../controllers/users';
+import { getUser, getUserByHandle } from '../controllers/users';
 
 const {SECRET_KEY} = process.env;
 
@@ -13,7 +13,7 @@ export const verifyToken = async (req, res, next) => {
   try {
     const decoded = jwt.verify(token, SECRET_KEY);
     if(typeof decoded === 'object') {
-      const user = await getUserById(decoded.user_id);
+      const user = await getUser({user_id: decoded.user_id});
       req.user = user;
     }
   } catch(err) {

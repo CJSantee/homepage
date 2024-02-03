@@ -14,7 +14,7 @@ const router = express.Router();
 
 router.get('/', async (req, res) => {
   const {rows: [{now: time}]} = await db.query('SELECT NOW()');
-  const {rows: [sys_params]} = await db.file('db/sys_params/get.sql');
+  const {rows: [sys_params]} = await db.file<any>('db/sys_params/get.sql');
   res.status(200).json({time, sys_params});
 });
 

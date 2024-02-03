@@ -35,3 +35,16 @@ export const getRandomInt = (max:number, min?:number) => {
   max = Math.floor(max);
   return Math.floor(Math.random() * (max - min) + min);
 }
+
+export const once = (fxn, context = null) => {
+  let executed = false;
+  let result;
+  return (...args) => {
+    if(executed) {
+      return result;
+    }
+    executed = true;
+    result = fxn.call(context, ...args);
+    return result;
+  }
+}

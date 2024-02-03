@@ -1,7 +1,7 @@
 import express from 'express';
 import { verifyToken } from '../middleware/auth';
 import { insertUserWordle, getUserWordleStats, getWordleLeaderboard } from '../controllers/wordle';
-import { getUserById } from '../controllers/users';
+import { getUser } from '../controllers/users';
 import { ApplicationError } from '../lib/applicationError';
 import turdle from '../lib/turdle';
 import { sendMessage } from '../lib/sms';
@@ -32,7 +32,7 @@ router.post('/invite', verifyToken, async (req, res, next) => {
   // req.user will always be defined because of verifySmsUser
   const {user_id} = req.body;
   try {
-    const {username, handle} = await getUserById(user_id);
+    const {username, handle} = await getUser({user_id});
     if(!handle) {
       throw new ApplicationError({
         type: ApplicationError.TYPES.CLIENT,

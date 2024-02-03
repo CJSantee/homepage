@@ -74,7 +74,7 @@ export async function insertUserWordle(user_id: string, results: string|ReturnTy
     : results;
    
   try {
-    const {rows: [userWordle]} = await db.file('db/user_wordles/put.sql', {
+    const {rows: [userWordle]} = await db.file<UserWordle>('db/user_wordles/put.sql', {
       user_id,
       wordle_number,
       num_guesses,
@@ -101,16 +101,16 @@ export async function getWordleLeaderboard() {
 }
 
 export async function insertWordle({wordle, wordle_number, wordle_date}:Wordle): Promise<Wordle> {
-  const {rows: [wordleRow]} = await db.file('db/wordles/put.sql', {wordle: wordle.toLowerCase(), wordle_number, wordle_date});
+  const {rows: [wordleRow]} = await db.file<Wordle>('db/wordles/put.sql', {wordle: wordle.toLowerCase(), wordle_number, wordle_date});
   return wordleRow;
 }
 
 export async function getWordle(wordle_number:number): Promise<Wordle> {
-  const {rows: [wordle]} = await db.file('db/wordles/get.sql', {wordle_number});
+  const {rows: [wordle]} = await db.file<Wordle>('db/wordles/get.sql', {wordle_number});
   return wordle;
 }
 
 export async function getUserWordles(user_id:string): Promise<UserWordle[]> {
-  const {rows: userWordles} = await db.file('db/user_wordles/get_by_user_id.sql', {user_id});
+  const {rows: userWordles} = await db.file<UserWordle>('db/user_wordles/get_by_user_id.sql', {user_id});
   return userWordles;
 }

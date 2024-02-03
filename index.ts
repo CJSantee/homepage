@@ -44,6 +44,7 @@ async function migrate() {
   console.log('Running migration script');
   try {
     await db.upgrade();
+    await db.load();
   } catch(err) {
     console.log('error', err);
     await db.end();
