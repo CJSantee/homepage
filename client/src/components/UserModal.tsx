@@ -38,7 +38,7 @@ function UserModal({user, show, onHide}:UserModalProps) {
 
   return (
     <Modal show={show} fullscreen={"md-down"} onHide={onHide}>
-      <Modal.Header className='border-0 pb-0' closeButton>
+      <Modal.Header className='border-0 pb-0' closeButton closeVariant='white'>
         <h4 className='text-primary m-0'>{user ? 'Update' : 'New'} User</h4>
       </Modal.Header>
       <Modal.Body>

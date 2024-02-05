@@ -21,12 +21,11 @@
 }
 
 .threed-sm {
-  font-size: 6em !important;
+  font-size: 4em !important;
 }
 
 .form-control {
   border: 0;
-  background-color: var(--bg-color);
 }
 
 .input-group {

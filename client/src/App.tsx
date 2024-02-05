@@ -10,6 +10,7 @@ import Wordle from "./pages/wordle";
 import AuthRoute from "./components/AuthRoute";
 import Message from "./pages/message";
 import SignIn from "./pages/sign-in";
+import Pool from "./pages/pool";
 
 function App() {
   return (
@@ -27,6 +28,9 @@ function App() {
             </Route>
             <Route element={<AuthRoute />}>
               <Route path='/message' element={<Message />} />
+            </Route>
+            <Route element={<AuthRoute permission='pool' />}>
+              <Route path='/pool' element={<Pool />} />
             </Route>
           </Route>
           <Route path='*' element={<NotFound />} />

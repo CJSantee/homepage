@@ -6,8 +6,18 @@ export async function createNewPoolGame(players:Player[]): Promise<string> {
   return `${pool_game_id}`;
 }
 
-export async function addPlayerScore({pool_game_id, user_id}:{pool_game_id: string, user_id: string}): Promise<number> {
+interface ScoreInput {
+  pool_game_id: string,
+  user_id: string,
+};
+
+export async function addPlayerScore({pool_game_id, user_id}:ScoreInput): Promise<number> {
   const {rows: [{cs_add_pool_player_score: score}]} = await db.call<{cs_add_pool_player_score: number}>('cs_add_pool_player_score', {pool_game_id, user_id});
+  return Number(score);
+}
+
+export async function subtractPlayerScore({pool_game_id, user_id}:ScoreInput): Promise<number> {
+  const {rows: [{cs_subtract_pool_player_score: score}]} = await db.call<{cs_subtract_pool_player_score: number}>('cs_subtract_pool_player_score', {pool_game_id, user_id});
   return Number(score);
 }
 

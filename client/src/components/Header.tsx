@@ -53,6 +53,9 @@ function Header() {
                     <Dropdown.Menu className="bg-card" align={"end"}>
                       {hasPermission('admin', auth.user.acl) && 
                         <Dropdown.Item onClick={() => navigate('/admin')}>Admin Console</Dropdown.Item>}
+                      {hasPermission('pool', auth.user.acl) &&
+                        <Dropdown.Item onClick={() => navigate('/pool')}>Pool</Dropdown.Item>
+                      }
                       <Dropdown.Item onClick={() => navigate('/message')}>Message</Dropdown.Item>
                       <Dropdown.Item onClick={() => navigate('/wordle')}>Wordle</Dropdown.Item>
                       <Dropdown.Item onClick={signOut}>Sign Out</Dropdown.Item>
