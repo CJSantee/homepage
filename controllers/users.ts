@@ -1,6 +1,8 @@
+import { search } from '../api';
 import db from '../db';
 import { ApplicationError } from '../lib/applicationError';
 import User from '../types/models/user';
+import { aclHasPermission } from '../utils';
 import auth from './authentication';
 
 export async function createUser({username}:{username:string}) {
@@ -34,9 +36,13 @@ export async function archiveUser(user_id:string) {
   await db.file<null>('db/users/archive.sql', {user_id});
 }
 
-export async function getAllUsers() {
+export async function getAllUsers(searchParams: {acl?: string} = {}) {
   const {rows: users} = await db.file<User>('db/users/get.sql');
-  return users;
+  let filteredUsers = users;
+  if(searchParams.acl) {
+    filteredUsers = users.filter(user => aclHasPermission(`${user.acl}`, `${searchParams.acl}`))
+  }
+  return filteredUsers;
 }
 
 export async function getUserByHandle(handle:string) {
@@ -46,4 +52,25 @@ export async function getUserByHandle(handle:string) {
 
 export async function blockUserHandle(handle:string) {
   await db.file('db/user_handles/block.sql', {handle});
+}
+
+/**
+ * @description Filters the fields to include depending on the requesting user's acl
+ */
+export function filterUserFieldsByAcl(users:User[], acl:string) {
+  const fieldPermissions = {
+    acl: 'admin',
+    handle: 'admin',
+    password: 'none',
+  };
+  return users.reduce<any>((filteredUsers, user) => {
+    const filteredUser = {};
+    Object.keys(user).forEach((field) => {
+      if(!fieldPermissions[field] || aclHasPermission(acl, fieldPermissions[field])) {
+        filteredUser[field] = user[field];
+      }
+    });
+    filteredUsers.push(filteredUser);
+    return filteredUsers;
+  }, []);
 }

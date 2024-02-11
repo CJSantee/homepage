@@ -10,7 +10,10 @@ import Wordle from "./pages/wordle";
 import AuthRoute from "./components/AuthRoute";
 import Message from "./pages/message";
 import SignIn from "./pages/sign-in";
+import SignUp from "./pages/sign-up";
 import Pool from "./pages/pool";
+import PoolGame from "./pages/pool/PoolGame";
+import PoolGameUsers from "./pages/pool/PoolGameUsers";
 
 function App() {
   return (
@@ -19,6 +22,7 @@ function App() {
         <Route element={<Layout />} >
           <Route element={<PersistLogin />}>
             <Route path='/signin' element={<SignIn />} />
+            <Route path='/signup' element={<SignUp />} />
             <Route path='/' element={<Home />} />
             <Route element={<AuthRoute permission='admin' />}>
               <Route path='/admin' element={<Admin />} />
@@ -31,6 +35,8 @@ function App() {
             </Route>
             <Route element={<AuthRoute permission='pool' />}>
               <Route path='/pool' element={<Pool />} />
+              <Route path='/pool/new' element={<PoolGameUsers />} />
+              <Route path='/pool/:pool_game_id' element={<PoolGame />}/>
             </Route>
           </Route>
           <Route path='*' element={<NotFound />} />

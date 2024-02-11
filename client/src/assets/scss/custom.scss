@@ -1,8 +1,15 @@
 // Custom.scss
-// Option A: Include all of Bootstrap
 $body-bg: #081D35;
-$border-color: #27354A;
 $body-color: #dcdcd2;
+
+$body-secondary-bg: #273649;
+
+$body-tertiary-bg: #738794;
+$body-tertiary-color: #fdfdfd;
+
+$body-emphasis-color: #fdfdfd;
+
+$border-color: #27354A;
 
 $text-dark: #0C0C17;
 
@@ -23,9 +30,12 @@ $navbar-dark-active-color: $primary;
 // $navbar-dark-disabled-color: white;
 
 $dropdown-link-hover-bg: #738794;
+$list-group-active-bg: $body-tertiary-bg;
+
 
 $input-bg: #273649;
 
+$enable-negative-margins: true;
 
 // Offcanvas Color
 // $modal-content-bg: $body-bg;

@@ -3,4 +3,5 @@ export default interface User {
   username: string,
   acl?: string,
   handle?: string,
+  password?: string,
 };

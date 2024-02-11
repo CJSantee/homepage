@@ -24,7 +24,6 @@ class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoundarySta
 
   render() {
     if(this.state.hasError) {
-      console.log('here');
       return (
         <div className="d-flex flex-column justify-content-center vh-100">
           <div className="d-flex flex-column align-items-center justify-content-center">

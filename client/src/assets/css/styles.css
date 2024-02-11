@@ -1,3 +1,5 @@
+/* THREE-DIMENSIONAL LETTERS */
+
 .threed {
   text-transform: uppercase;
   font-family: verdana;
@@ -23,6 +25,8 @@
 .threed-sm {
   font-size: 4em !important;
 }
+
+/* FORM STYLES */
 
 .form-control {
   border: 0;
@@ -55,6 +59,8 @@
   color: var(--bs-secondary);
 }
 
+/* UTILS */
+
 /* Hide scrollbar for Chrome, Safari and Opera */
 .no-scrollbar::-webkit-scrollbar {
   display: none;
@@ -69,6 +75,12 @@
 .no-shadow, .no-shadow:focus {
   box-shadow: none;
 }
+
+.cursor-pointer {
+  cursor: pointer;
+}
+
+/* CLOUD ANIMATIONS */
 
 .cloud {
   -webkit-filter: blur(1px);
