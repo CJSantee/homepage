@@ -14,7 +14,7 @@ SELECT
   p.username,
   p.user_id, 
   jsonb_agg(COALESCE(prs.score, 0) ORDER BY prs.pool_rack_id) AS racks,
-  SUM(prs.score) AS total,
+  SUM(prs.score)::INTEGER AS total,
   p.handicap - p.score AS remaining
 FROM players p
 LEFT JOIN pool_racks pr USING(pool_game_id)

@@ -6,13 +6,14 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 // Assets
 import { faChevronLeft, faGear, faUsers, faMinus, faPlus, faMinusCircle } from "@fortawesome/free-solid-svg-icons";
 // Hooks
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
+import api from "../../utils/api";
 
 interface Player{
   username: string,
   user_id: string|null,
-  score: number,
+  total: number,
 }
 interface PlayerRowProps {
   player: Player,
@@ -33,7 +34,7 @@ function PlayerRow({player, active, editing, deadballs = false}:PlayerRowProps) 
         <Button>
           <FontAwesomeIcon icon={faMinus} />
         </Button>
-        <Text size={4}>{player.score}</Text>
+        <Text size={4}>{player.total}</Text>
         <Button>
           <FontAwesomeIcon icon={faPlus} />
         </Button>
@@ -53,12 +54,17 @@ function PoolGame() {
   const [title] = useState(new Date().toLocaleDateString());
   const [editing, setEditing] = useState(pool_game_id === 'new');
 
-  const [players] = useState<Player[]>([
-    {username: "Colin", user_id: "1", score: 7},
-    {username: "Thomas", user_id: "24", score: 12},
-    {username: "Luke", user_id: "2", score: 8},
-    {username: "Maddy", user_id: "34", score: 14},
-  ]);
+  const [players, setPlayers] = useState<Player[]>([]);
+
+  useEffect(() => {
+    const getGameData = async () => {
+      const {data, success} = await api.get(`/pool/${pool_game_id}`);
+      if(success) {
+        setPlayers(data);
+      }
+    };
+    getGameData();
+  }, [pool_game_id]);
 
 
   return (
@@ -75,12 +81,8 @@ function PoolGame() {
       </div>
 
       {players.map((player) => (
-        <PlayerRow key={`player-${player.user_id}`} player={player} editing={editing} active={player.username==='Thomas'} />
+        <PlayerRow key={`player-${player.user_id}`} player={player} editing={editing} active={player.username==='Thomas'} deadballs={!player.user_id}/>
       ))}
-
-      {editing ? 
-        ((players.length < 4) && <Button className="my-2">New Player</Button>)
-      : <PlayerRow player={{username: 'Dead Balls', user_id: null, score: 5}} editing={false} active={false} deadballs/>}
         
       <div className="flex-fill d-flex flex-column justify-content-end">
 
@@ -102,8 +104,8 @@ function PoolGame() {
             </div>
           </div>
 
-          {players.map((player, idx) => (
-            <div key={`score-${player.user_id}`} className={`row py-1 ${idx !== players.length - 1 ? 'border-bottom' : ''}`}>
+          {players.filter(u => u.user_id).map((player, idx) => (
+            <div key={`score-${player.user_id}`} className={`row py-1 ${idx !== players.length - 2 ? 'border-bottom' : ''}`}>
               <div className="col-3">
                 <Text size={5}>{player.username}</Text>
               </div>

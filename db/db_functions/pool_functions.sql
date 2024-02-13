@@ -11,6 +11,9 @@ BEGIN
   
   -- Add users
   FOR _user_id, _handicap IN (SELECT user_id, handicap FROM jsonb_to_recordset(_users) AS users(user_id BIGINT, handicap INTEGER)) LOOP
+    IF _handicap IS NULL THEN
+      _handicap := 25;
+    END IF;
     INSERT INTO pool_game_users (pool_game_id, user_id, handicap)
     VALUES (_pool_game_id, _user_id, _handicap);
   END LOOP;

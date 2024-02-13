@@ -38,8 +38,13 @@ function PoolGameUsers() {
   }
 
   const startGame = async () => {
-    const pool_game_id = 1;
-    navigate(`/pool/${pool_game_id}`);
+    const players = selectedUsers.map(u => ({user_id: u}));
+    const {data, success} = await api.post('/pool', {players});
+
+    if(success) {
+      const {pool_game_id} = data;
+      navigate(`/pool/${pool_game_id}`);
+    }
   }
 
   return (

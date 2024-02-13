@@ -259,7 +259,7 @@ async function call<Type>(functionName: string, params?: {[id: string]: any}): P
     sql = `SELECT * FROM ${functionName}();`;
   }
   
-  return pool.query<Type extends QueryResultRow ? any : any>(sql, args);
+  return pool.query<Type extends QueryResultRow ? any : any>(sql, call_args);
 }
 
 /**
