@@ -13,6 +13,7 @@ import Dropdown from 'react-bootstrap/Dropdown';
 // Components
 import { Link } from "react-router-dom";
 import { hasPermission } from "../utils";
+import AuthContainer from "./AuthContainer";
 
 function Header() {
   const auth = useAuth();
@@ -51,13 +52,16 @@ function Header() {
                     <Button>{auth.user.username}</Button>
                     <Dropdown.Toggle split />
                     <Dropdown.Menu className="bg-card" align={"end"}>
-                      {hasPermission('admin', auth.user.acl) && 
-                        <Dropdown.Item onClick={() => navigate('/admin')}>Admin Console</Dropdown.Item>}
-                      {hasPermission('pool', auth.user.acl) &&
+                      <AuthContainer permission="admin">
+                        <Dropdown.Item onClick={() => navigate('/admin')}>Admin Console</Dropdown.Item>
+                      </AuthContainer>
+                      <AuthContainer permission="pool">
                         <Dropdown.Item onClick={() => navigate('/pool')}>Pool</Dropdown.Item>
-                      }
-                      <Dropdown.Item onClick={() => navigate('/message')}>Message</Dropdown.Item>
-                      <Dropdown.Item onClick={() => navigate('/wordle')}>Wordle</Dropdown.Item>
+                      </AuthContainer>
+                      <AuthContainer permission="admin">
+                        <Dropdown.Item onClick={() => navigate('/message')}>Message</Dropdown.Item>
+                        <Dropdown.Item onClick={() => navigate('/wordle')}>Wordle</Dropdown.Item>
+                      </AuthContainer>
                       <Dropdown.Item onClick={signOut}>Sign Out</Dropdown.Item>
                     </Dropdown.Menu>
                   </Dropdown>

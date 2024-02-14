@@ -32,20 +32,29 @@ CREATE OR REPLACE FUNCTION cs_add_pool_player_score(_pool_game_id BIGINT, _user_
 DECLARE
   _pool_rack_id BIGINT;
   _player_game_score INTEGER;
+  _player_handicap INTEGER;
   _player_rack_score INTEGER; 
   _pool_rack_score INTEGER;
 BEGIN
   IF _user_id IS NOT NULL THEN
     -- Confirm user is playing in the game
-    SELECT user_id, score
+    SELECT 
+      user_id, 
+      score, 
+      handicap
     FROM pool_game_users
     WHERE pool_game_id = _pool_game_id
       AND user_id = _user_id
     INTO _user_id,
-      _player_game_score;
+      _player_game_score,
+      _player_handicap;
     
     IF _user_id IS NULL THEN
       RAISE EXCEPTION 'User is not playing in this game.';
+    END IF;
+
+    IF _player_game_score = _player_handicap THEN
+      RETURN _player_game_score;
     END IF;
   END IF;
 
@@ -90,8 +99,8 @@ DECLARE
   _player_game_score INTEGER;
   _player_rack_score INTEGER; 
   _pool_rack_score INTEGER;
+  _pool_game_winner INTEGER;
 BEGIN
-  
   SELECT score
   FROM pool_game_users
   WHERE pool_game_id = _pool_game_id
@@ -157,6 +166,18 @@ BEGIN
   WHERE pool_rack_id = _pool_rack_id
     AND (user_id = _user_id 
      OR (user_id IS NULL AND _user_id IS NULL));
+
+  -- Check if player was the winner
+  SELECT winner_user_id
+  FROM pool_games
+  WHERE pool_game_id = _pool_game_id
+  INTO _pool_game_winner;
+  -- Update if the player was the winner
+  IF _user_id IS NOT NULL AND _pool_game_winner = _user_id THEN
+    UPDATE pool_games
+    SET winner_user_id = NULL
+    WHERE pool_game_id = _pool_game_id;
+  END IF;
   
   RETURN (_player_game_score - 1);
 END;

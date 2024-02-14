@@ -1,6 +1,7 @@
 import express from 'express';
-import { Player } from '../types/models/pool';
-import { createNewPoolGame, getGameData } from '../controllers/pool';
+import { Player, PlayerGameData } from '../types/models/pool';
+import { addPlayerScore, createNewPoolGame, getGameData, subtractPlayerScore } from '../controllers/pool';
+import { ApplicationError } from '../lib/applicationError';
 
 const router = express.Router();
 
@@ -8,6 +9,7 @@ const router = express.Router();
 router.get('/');
 
 // Create new game
+// <P = ParamsDictionary, ResBody = any, ReqBody = any, ReqQuery = QueryString.ParsedQs>
 router.post<any, {players: Player[]}, any, any>('/', async (req, res, next) => {
   const {players} = req.body;
   try {
@@ -28,6 +30,32 @@ router.get('/:pool_game_id', async (req, res, next) => {
   }
 });
 
-router.post('/:pool_game_id/scores');
+router.post<{pool_game_id: string, action: string}, PlayerGameData[], {user_id: string|null}, any>('/:pool_game_id/scores/:action', 
+  async (req, res, next) => {
+    const {pool_game_id, action} = req.params;
+    const {user_id} = req.body;
+
+    try {
+      if(action === 'add') {
+        await addPlayerScore({pool_game_id, user_id});
+      } else if(action === 'subtract') {
+        await subtractPlayerScore({pool_game_id, user_id});
+      } else {
+        throw new ApplicationError({
+          type: ApplicationError.TYPES.CLIENT,
+          code: 'INVALID_POOL_ACTION',
+          message: 'Scores update action is not add or subtrack.',
+          statusCode: 400,
+          statusMessage: 'Sorry, something went wrong.',
+        });
+      }
+    } catch(err) {
+      next(err);
+      return;
+    }
+
+    const game_data = await getGameData(pool_game_id);
+    res.status(200).json(game_data);
+  });
 
 export = router;

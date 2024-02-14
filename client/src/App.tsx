@@ -27,10 +27,10 @@ function App() {
             <Route element={<AuthRoute permission='admin' />}>
               <Route path='/admin' element={<Admin />} />
             </Route>
-            <Route element={<AuthRoute />}>
+            <Route element={<AuthRoute permission='admin' />}>
               <Route path='/wordle' element={<Wordle />} />
             </Route>
-            <Route element={<AuthRoute />}>
+            <Route element={<AuthRoute permission='admin' />}>
               <Route path='/message' element={<Message />} />
             </Route>
             <Route element={<AuthRoute permission='pool' />}>

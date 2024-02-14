@@ -8,7 +8,7 @@ export async function createNewPoolGame(players:Player[]): Promise<string> {
 
 interface ScoreInput {
   pool_game_id: string,
-  user_id: string,
+  user_id: string|null,
 };
 
 export async function addPlayerScore({pool_game_id, user_id}:ScoreInput): Promise<number> {
