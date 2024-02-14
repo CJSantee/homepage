@@ -1,6 +1,25 @@
 # Homepage
 ![Deploy to Elastic Beanstalk](https://github.com/CJSantee/homepage/actions/workflows/eb-deploy.yaml/badge.svg)
 
+## Getting Started
+### Install node_modules
+```
+$ npm i 
+```
+### Install ts-node
+```
+$ npm i -g ts-node
+```
+### Install postgresql
+[Postgres.app](https://postgresapp.com/downloads.html)
+Create new db within app: homepage-db
+
+### Install node_modules for client
+```
+$ cd client 
+$ npm i
+```
+
 ## Development
 ### Running React Frontend
 ```
