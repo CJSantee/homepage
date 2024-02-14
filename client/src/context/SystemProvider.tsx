@@ -14,7 +14,7 @@ const SystemProvider: React.FC<Props> = ({ children }) => {
       const {data, success} = await api.get('/');
       if(success) {
         const {sys_params} = data;
-        setShowCreateAdmin(sys_params.show_create_admin);
+        setShowCreateAdmin(sys_params?.show_create_admin);
       }
     }
     getSystemParams();
