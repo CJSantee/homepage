@@ -37,14 +37,14 @@ function Header() {
             <Link to={'/'} className="nav-brand text-decoration-none">Colin<span className="text-secondary">J</span>Santee</Link>
           </Navbar.Brand>
           <Navbar.Toggle aria-controls='navbarScroll' />
-          <Navbar.Collapse className='justify-content-between'>
-            <Nav className="align-items-end">
-              <Nav.Item>
+          <Navbar.Collapse className='d-flex-ui my-2 justify-content-between'>
+            <Nav className="d-flex flex-row align-items-end">
+              <Nav.Item className="me-2">
                 <Link to={'/#AboutMe'} className="nav-link text-secondary" reloadDocument>
                   About Me
                 </Link>
               </Nav.Item>
-              <Nav.Item>
+              <Nav.Item className="me-2">
                 <Link to={'/#Projects'} className="nav-link text-secondary" reloadDocument>
                   Projects
                 </Link>
