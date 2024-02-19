@@ -1,9 +1,9 @@
-import {Client, Pool} from 'pg';
+import {Client, Pool, Query, QueryResultRow} from 'pg';
 import fs from 'fs';
 import {parse} from 'pg-connection-string';
-import {secondsToReadable} from './utils';
+import {once, secondsToReadable} from './utils';
 
-const PREFIX = 'cs_'; // all types, functions, and triggers should start with prefix
+const PREFIX = 'cs\\_'; // all types, functions, and triggers should start with prefix
 
 const PRODUCTION = process.env.NODE_ENV === 'production';
 const DATABASE_URL = process.env.DATABASE_URL || '';
@@ -17,6 +17,10 @@ const config = {
   port: parseInt(connectionOptions.port || '5432'),
   ssl: PRODUCTION ? {rejectUnauthorized: false} : undefined,
 }
+
+type QueryResult<T> = {
+  rows: T[],
+};
 
 /*
   Defaults to .env variables:
@@ -162,11 +166,47 @@ async function upgrade() {
   }
 }
 
+type FunctionSignatures = {
+  [function_name: string]: string[]
+}
+let functionSignatures: FunctionSignatures|undefined;
+const load = once(async () => {
+  if(functionSignatures) {
+    return;
+  }
+  console.log('Loading database');
+  // Query for all the function signatures with the appropriate prefix
+  const {rows: functionParams} = await pool.query(`
+    SELECT proname AS name,
+      pg_get_function_arguments(pg_proc.oid) AS args
+    FROM pg_proc
+    INNER JOIN pg_namespace ns ON pg_proc.pronamespace = ns.oid
+    WHERE proname LIKE '${PREFIX}%'; 
+  `);
+
+  // Build the function signatures map 
+  functionSignatures = functionParams.reduce((signatures, fxn) => {
+    const signatureArgs = fxn.args.split(', ').reduce((args, arg) => {
+      const argList = arg.split(' ');
+      args.push(argList[0].slice(1));
+      return args;
+    }, []);
+
+    if(signatureArgs[0] === '') {
+      signatures[fxn.name] = [];
+    } else {
+      signatures[fxn.name] = signatureArgs;
+    }
+
+    return signatures;
+  }, {});
+});
+
 async function query(text: string, params?: any) {
   return pool.query(text, params)
 }
 
-async function file(path: string, params: object = {}) {
+async function file<Type>(path: string, params: object = {}): Promise<QueryResult<Type>> {
   let sql: string;
   let namedParams: string[] = [];
   sql = fs.readFileSync(path).toString();
@@ -189,12 +229,38 @@ async function file(path: string, params: object = {}) {
     }
   }
   
-  return pool.query(sql, args).catch((err:any) => {
+  return pool.query<Type extends QueryResultRow ? any : any>(sql, args).catch((err:any) => {
     const msg = `SQL error: ${path} (line: ${(sql.substring(0, err.position).match(/\n/g) || []).length})`;
     console.log(msg);
     throw err;
   });
-} 
+}
+
+/**
+ * @description Call a database function
+ */
+async function call<Type>(functionName: string, params?: {[id: string]: any}): Promise<QueryResult<Type>> {
+  if(!functionSignatures) throw new Error('Function Signatures Not Loaded.');
+  const args = functionSignatures[functionName];
+
+  let sql: string;
+  const call_args: any[] = [];
+  if(args.length > 0) {
+    if(!params) throw new Error(`${functionName} called without parameters.`);
+    const numbers = args.map((arg, i) => {
+      if(!(arg in params)) {
+        throw new Error(`${functionName} called without parameter: ${arg}`);
+      }
+      call_args.push(params[arg]);
+      return i + 1;
+    });
+    sql = `SELECT * FROM ${functionName}($${numbers.join(',$')})`;
+  } else {
+    sql = `SELECT * FROM ${functionName}();`;
+  }
+  
+  return pool.query<Type extends QueryResultRow ? any : any>(sql, call_args);
+}
 
 /**
  * @description Close the database pool
@@ -207,7 +273,9 @@ async function end() {
 
 export = {
   upgrade,
+  load,
   query,
   file,
+  call,
   end,
 };

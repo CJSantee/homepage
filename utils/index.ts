@@ -30,8 +30,29 @@ export const secondsToReadable = (seconds: number) => {
 /**
  * @description Exclusive max and Inclusive min
  */
-export const getRandomInt = (max:number, min?:number) => {
+export const getRandomInt = (max:number, min?:number): number => {
   min = Math.ceil(min || 0);
   max = Math.floor(max);
   return Math.floor(Math.random() * (max - min) + min);
+}
+
+export const once = (fxn, context = null) => {
+  let executed = false;
+  let result;
+  return (...args) => {
+    if(executed) {
+      return result;
+    }
+    executed = true;
+    result = fxn.call(context, ...args);
+    return result;
+  }
+}
+
+export const aclHasPermission = (acl: string, permission: string): boolean => {
+  if(acl === 'colin') {
+    return true;
+  }
+  const acls = acl?.split('|') || [];
+  return acls.includes(permission);
 }

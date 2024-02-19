@@ -38,6 +38,6 @@ export class ApplicationError extends Error {
     this.code = code;
     this.message = message;
     this.statusCode = statusCode;
-    this.statusMessage = statusMessage;
+    this.statusMessage = statusMessage || 'An unexpected error occurred.';
   }
 }

@@ -44,8 +44,12 @@ async function migrate() {
   console.log('Running migration script');
   try {
     await db.upgrade();
+    await db.load();
   } catch(err) {
     console.log('error', err);
+    if(isDevelopment) {
+      console.log('REMEMBER: Start Postgres server!');
+    }
     await db.end();
     console.log('Shutting down with error.');
     process.exit(1);

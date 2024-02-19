@@ -27,7 +27,7 @@ const AuthProvider: React.FC<Props> = ({ children }) => {
       password,
     };
 
-    const {data, success} = await api.post('/auth', body);
+    const {data, success, error} = await api.post('/auth', body);
     if(success) {
       const {username, user_id, acl} = data;
       setUser({user_id, username, acl});
@@ -35,7 +35,19 @@ const AuthProvider: React.FC<Props> = ({ children }) => {
     } else {
       setPersist(false);
     }
-    return success;
+    return {success, error};
+  }
+
+  const signUp: AuthContextType["signUp"] = async ({username, password, code}) => {
+    const {data, success, error} = await api.post('/users', {username, password, code: `${code}`.toLowerCase()});
+    if(success) {
+      const {username, user_id, acl} = data;
+      setUser({user_id, username, acl});
+      setPersist(true);
+    } else {
+      setPersist(false);
+    }
+    return {success, error};
   }
 
   const signOut: AuthContextType["signOut"] = async () => {
@@ -54,6 +66,7 @@ const AuthProvider: React.FC<Props> = ({ children }) => {
         persist,
         setPersist,
         signIn,
+        signUp,
         signOut,
       }}
     >

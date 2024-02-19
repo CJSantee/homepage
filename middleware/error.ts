@@ -6,8 +6,8 @@ export function errorHandler (err, req, res, next) {
     return next(err);
   }
   if(err instanceof ApplicationError && err.statusCode) {
-    console.error(err.message);
-    res.status(err.statusCode).send(err.statusMessage);
+    console.error('Error:', err.message);
+    res.status(err.statusCode).json({error: {code: err.code, message: err.statusMessage}});
     return;
   }
   console.error(err.stack);

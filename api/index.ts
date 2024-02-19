@@ -1,12 +1,13 @@
-import express from 'express';
+import express, { Request } from 'express';
 import db from '../db';
 import auth from '../controllers/authentication';
 import { confirmPermission, verifyToken } from '../middleware/auth';
-import { addUserHandle, archiveUser, createUser, getAllUsers, updateUser } from '../controllers/users';
+import { addUserHandle, archiveUser, createUser, filterUserFieldsByAcl, getAllUsers, updateUser } from '../controllers/users';
 
 import wordleApi from './wordle';
 import messageApi from './message';
 import smsApi from './sms';
+import poolApi from './pool';
 
 const isDevelopment = process.env.NODE_ENV === 'development';
 
@@ -14,21 +15,25 @@ const router = express.Router();
 
 router.get('/', async (req, res) => {
   const {rows: [{now: time}]} = await db.query('SELECT NOW()');
-  const {rows: [sys_params]} = await db.file('db/sys_params/get.sql');
+  const {rows: [sys_params]} = await db.file<any>('db/sys_params/get.sql');
   res.status(200).json({time, sys_params});
 });
 
 router.route('/users')
-  .get(confirmPermission('admin'), async (req, res, next) => {
+  .get(verifyToken, async (req: Request<{}, {}, {}, {acl?: string}>, res, next) => {
+    const {acl: search_acl} = req.query;
+    const {acl} = req.user || {};
+    if(!acl) return;
     try {
-      const users = await getAllUsers();
-      res.status(200).json({users});
+      const users = await getAllUsers({acl: search_acl});
+      const filteredUsers = filterUserFieldsByAcl(users, acl);
+      res.status(200).json({users: filteredUsers});
     } catch(err) {
       next(err);
     }
   })  
   .post(async (req, res, next) => {
-    const {password} = req.body;
+    const {password, code} = req.body;
     try {
       let user;
       if(password) {
@@ -117,5 +122,6 @@ router.post('/welcome', verifyToken, (req, res) => {
 router.use('/sms', smsApi);
 router.use('/message', messageApi);
 router.use('/wordle', wordleApi);
+router.use('/pool', poolApi);
 
 export = router;

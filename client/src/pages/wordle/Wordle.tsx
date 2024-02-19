@@ -7,7 +7,7 @@ import Leaderboard from "./components/Leaderboard";
 
 function Wordle() {
   const [wordlesPlayed, setWordlesPlayed] = useState(0);
-  const [winPercentage, setWinPercentage] = useState(0);
+  const [winPercentage, setWinPercentage] = useState('0.00');
   const [currentStreak, setCurrentStreak] = useState(0);
   const [maxStreak, setMaxStreak] = useState(0);
   const [guessDistribution, setGuessDistribution] = useState({
@@ -25,7 +25,7 @@ function Wordle() {
       setWordlesPlayed(played);
     }
     if(win_percentage) {
-      setWinPercentage(win_percentage);
+      setWinPercentage(Number(win_percentage * 100).toFixed(2));
     }
     if(current_streak) {
       setCurrentStreak(current_streak);
@@ -62,7 +62,7 @@ function Wordle() {
             </div>
             <div className="col-6 col-md-3 p-2">
               <div className="d-flex flex-column justify-content-center align-items-center rounded border p-2 h-100">
-                <span className="fw-bold">{winPercentage * 100}</span>
+                <span className="fw-bold">{winPercentage}</span>
                 <p className="m-0 text-center">Win %</p>
               </div>
             </div>
