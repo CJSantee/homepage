@@ -12,11 +12,16 @@ import Dropdown from 'react-bootstrap/Dropdown';
 
 // Components
 import { Link } from "react-router-dom";
-import { hasPermission } from "../utils";
 import AuthContainer from "./AuthContainer";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+
+// Assets
+import { faCircleExclamation } from "@fortawesome/free-solid-svg-icons";
+import { useSystem } from "../hooks/useSystem";
 
 function Header() {
   const auth = useAuth();
+  const system = useSystem();
   const navigate = useNavigate();
 
   const signOut = () => {
@@ -67,8 +72,9 @@ function Header() {
                   </Dropdown>
                 </Nav.Item>
               ) : (
-                <Nav.Item>
+                <Nav.Item className="position-relative">
                   <Button onClick={() => navigate('/signin')} variant='outline-secondary'>Sign In</Button>
+                  {system.offline && <FontAwesomeIcon className="position-absolute top-0 end-0 mt-n2 me-n2 w-auto text-danger" icon={faCircleExclamation}/>}
                 </Nav.Item>
               )}
             </Nav>

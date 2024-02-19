@@ -1,12 +1,21 @@
 import express from 'express';
 import { Player, PlayerGameData } from '../types/models/pool';
-import { addPlayerScore, createNewPoolGame, getGameData, subtractPlayerScore } from '../controllers/pool';
+import { addPlayerScore, createNewPoolGame, getGameData, getPlayerGames, subtractPlayerScore } from '../controllers/pool';
 import { ApplicationError } from '../lib/applicationError';
+import { verifyToken } from '../middleware/auth';
 
 const router = express.Router();
 
 // Get all games
-router.get('/');
+router.get('/', verifyToken, async (req, res, next) => {
+  const {user_id} = req.user || {};
+  try {
+    const games = getPlayerGames(user_id);
+    res.status(200).json(games);
+  } catch(err) {
+    next(err);
+  }
+});
 
 // Create new game
 // <P = ParamsDictionary, ResBody = any, ReqBody = any, ReqQuery = QueryString.ParsedQs>

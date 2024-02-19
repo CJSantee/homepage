@@ -1,4 +1,5 @@
 import db from "../db";
+import { ApplicationError } from "../lib/applicationError";
 import {Player, PlayerGameData} from "../types/models/pool";
 
 export async function createNewPoolGame(players:Player[]): Promise<string> {
@@ -24,4 +25,27 @@ export async function subtractPlayerScore({pool_game_id, user_id}:ScoreInput): P
 export async function getGameData(pool_game_id:string): Promise<PlayerGameData[]> {
   const {rows: game_data} = await db.file<PlayerGameData>('db/pool/get_game_data.sql', {pool_game_id});
   return game_data;
+}
+
+interface PoolGame {
+  pool_game_id: string,
+  started: string,
+  winner_user_id: string,
+  users: {
+    user_id: string,
+    username: string,
+    winner: boolean,
+  },
+};
+export async function getPlayerGames(user_id:string|undefined) {
+  if(!user_id) {
+    throw new ApplicationError({
+      type: ApplicationError.TYPES.SERVER,
+      code: 'MISSING_USER_ID',
+      message: 'undefined user_id',
+      statusCode: 400,
+    });
+  }
+  const {rows: games} = await db.file<PoolGame>('db/pool/get_player_games.sql', {user_id});
+  return games;
 }
