@@ -8,7 +8,8 @@ WITH players AS (
     pg.winner_user_id IS NOT NULL AS winner
   FROM pool_game_users pgu
   INNER JOIN users u USING(user_id)
-  LEFT JOIN pool_games pg ON pg.winner_user_id = u.user_id 
+  LEFT JOIN pool_games pg ON (pg.pool_game_id = pgu.pool_game_id 
+    AND pg.winner_user_id = u.user_id)
   WHERE pgu.pool_game_id = ${pool_game_id}
   UNION ALL (SELECT ${pool_game_id}, 'Dead Balls', NULL, 0, 25, FALSE)
 )

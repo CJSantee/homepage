@@ -10,6 +10,8 @@ SELECT
   jsonb_agg(jsonb_build_object(
   	'user_id', user_id,
   	'username', username,
+    'score', score,
+    'handicap', handicap,
   	'winner', winner_user_id = user_id
   )) AS users
 FROM pool_games pg

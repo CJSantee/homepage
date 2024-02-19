@@ -34,8 +34,10 @@ interface PoolGame {
   users: {
     user_id: string,
     username: string,
+    score: number,
+    handicap: number,
     winner: boolean,
-  },
+  }[],
 };
 export async function getPlayerGames(user_id:string|undefined) {
   if(!user_id) {

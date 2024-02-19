@@ -10,7 +10,7 @@ const router = express.Router();
 router.get('/', verifyToken, async (req, res, next) => {
   const {user_id} = req.user || {};
   try {
-    const games = getPlayerGames(user_id);
+    const games = await getPlayerGames(user_id);
     res.status(200).json(games);
   } catch(err) {
     next(err);

@@ -128,7 +128,7 @@ function PoolGame() {
           <FontAwesomeIcon icon={faChevronLeft} />
         </Button>
         <Text size={5}>{title}</Text>
-        <Button onClick={() => setEditing(!editing)}>
+        <Button>
           <FontAwesomeIcon icon={editing ? faUsers : faGear} />
         </Button>
       </div>
