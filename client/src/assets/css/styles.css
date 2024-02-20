@@ -115,3 +115,19 @@
     transform: translate3d(0px, 0px, 0px);
   }
 }
+
+/* BLINKING */
+.blink {
+  font-weight: 100;
+  font-size: 22px;
+  animation: 1s blink step-end infinite;
+}
+
+@keyframes blink {
+  from, to {
+    color: transparent;
+  }
+  50% {
+    color: #dcdcd2;
+  }
+}
