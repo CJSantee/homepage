@@ -5,7 +5,7 @@ import Button from "react-bootstrap/Button";
 import { faPaperPlane } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useEffect, useRef, useState } from "react";
-import MessageType from "../../../@types/message";
+import MessageType from "../../@types/message";
 import api from "../../utils/api";
 import { toReadablePhone } from "../../utils";
 

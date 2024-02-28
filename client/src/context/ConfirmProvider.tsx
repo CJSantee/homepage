@@ -1,5 +1,5 @@
 import { createContext, useState } from "react";
-import { ConfirmContextType } from "../../@types/confirm";
+import { ConfirmContextType } from "../@types/confirm";
 import ConfirmationModal from "../components/ConfirmationModal";
 
 export const ConfirmContext = createContext<ConfirmContextType>({});

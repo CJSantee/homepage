@@ -1,7 +1,9 @@
 WITH user_games AS (
   SELECT pool_game_id
   FROM pool_game_users
+  INNER JOIN pool_games pg USING(pool_game_id)
   WHERE user_id = ${user_id}
+    AND pg.archived IS NULL
 )
 SELECT
   pool_game_id,
