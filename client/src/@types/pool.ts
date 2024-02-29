@@ -1,6 +1,7 @@
 export interface PoolGame {
   pool_game_id: string,
   started: string,
+  tags: string[],
   winner_user_id: string,
   users: {
     user_id: string,

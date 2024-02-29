@@ -1,6 +1,14 @@
 import express from 'express';
 import { Player, PlayerGameData } from '../types/models/pool';
-import { addPlayerScore, archiveGame, createNewPoolGame, getGameData, getPlayerGames, subtractPlayerScore } from '../controllers/pool';
+import { 
+  addPlayerScore, 
+  archiveGame, 
+  createNewPoolGame, 
+  getGameData, 
+  getPlayerGames, 
+  subtractPlayerScore, 
+  updateGameTags,
+} from '../controllers/pool';
 import { ApplicationError } from '../lib/applicationError';
 import { verifyToken } from '../middleware/auth';
 
@@ -30,11 +38,22 @@ router.post<any, {players: Player[]}, any, any>('/', async (req, res, next) => {
 });
 
 router.route('/:pool_game_id')
+  .all(verifyToken)
   .get(async (req, res, next) => {
     const {pool_game_id} = req.params;
     try {
       const game_data = await getGameData(pool_game_id);
-      res.status(200).json(game_data)
+      res.status(200).json(game_data);
+    } catch(err) {
+      next(err);
+    }
+  })
+  .patch(async (req, res, next) => {
+    const {pool_game_id} = req.params;
+    const {tags} = req.body;
+    try {
+      await updateGameTags(pool_game_id, tags);
+      res.sendStatus(200);
     } catch(err) {
       next(err);
     }

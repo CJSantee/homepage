@@ -8,6 +8,7 @@ WITH user_games AS (
 SELECT
   pool_game_id,
   started,
+  COALESCE(tags, '{}'::TEXT[]) AS tags,
   winner_user_id,
   jsonb_agg(jsonb_build_object(
   	'user_id', user_id,

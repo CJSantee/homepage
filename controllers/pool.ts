@@ -27,6 +27,10 @@ export async function getGameData(pool_game_id:string): Promise<PlayerGameData[]
   return game_data;
 }
 
+export async function updateGameTags(pool_game_id: string, tags: string[]) {
+  await db.file('db/pool/update_tags.sql', {pool_game_id, tags});
+}
+
 export async function archiveGame(pool_game_id:string) {
   await db.file('db/pool/archive_game.sql', {pool_game_id});
 }
@@ -34,6 +38,7 @@ export async function archiveGame(pool_game_id:string) {
 interface PoolGame {
   pool_game_id: string,
   started: string,
+  tags: string[],
   winner_user_id: string,
   users: {
     user_id: string,
