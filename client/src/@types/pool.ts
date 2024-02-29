@@ -16,5 +16,7 @@ export interface Player {
   user_id: string | null,
   racks: number[],
   total: number,
+  handicap: number,
+  remaining: number,
   winner: boolean,
 }

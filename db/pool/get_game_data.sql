@@ -18,6 +18,7 @@ SELECT
   p.user_id, 
   jsonb_agg(COALESCE(prs.score, 0) ORDER BY prs.pool_rack_id) AS racks,
   SUM(prs.score)::INTEGER AS total,
+  p.handicap,
   p.handicap - p.score AS remaining,
   winner
 FROM players p

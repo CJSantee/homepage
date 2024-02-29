@@ -56,8 +56,10 @@ function GameRow({game, todayStr, deleteCb}:Props) {
   const hideDetails = () => setShowDetails(false);
 
   const deleteGame = async () => {
-    const {data, success} = await api.delete(`/pool/${game.pool_game_id}`);
-    deleteCb();
+    const {success} = await api.delete(`/pool/${game.pool_game_id}`);
+    if(success) {
+      deleteCb();
+    }
   }
 
   const onDelete = () => {
@@ -99,6 +101,7 @@ function GameRow({game, todayStr, deleteCb}:Props) {
       <Offcanvas show={showDetails} onHide={hideDetails} placement='bottom'>
         <div className="container py-4 h-100">
           <div className="d-flex justify-content-end">
+            <Button className="me-2 text-white" variant="tertiary" onClick={() => navigate(`/pool/${game.pool_game_id}`)}>Edit Game</Button>
             <Button variant="danger" onClick={onDelete}>
               Delete Game
             </Button>

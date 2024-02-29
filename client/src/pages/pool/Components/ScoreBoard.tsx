@@ -13,22 +13,28 @@ function ScoreBoard({players}:ScoreBoardProps) {
             <div className="col-3 text-muted text-end">
               <Text size={6}>Rack</Text>
             </div>
-            {players[0].racks.map((_, idx) => (
-              <div key={`rack-idx-${idx}`} className="col-1 text-center text-muted">
-                <Text size={6}>{idx + 1}</Text>
-              </div>
-            ))}
+            <div className="col-8 row">
+              {players[0].racks.map((_, idx) => (
+                <div key={`rack-idx-${idx}`} className="col-1 text-center text-muted">
+                  <Text size={6}>{idx + 1}</Text>
+                </div>
+              ))}
+            </div>
+            <div className="col-1"/>
           </div>
 
           <div className="row">
             <div className="col-3 text-muted text-end">
               <Text size={6}>DB</Text>
             </div>
-            {players[players.length - 1].racks.map((score, idx) => (
-              <div key={`db-rack-${idx}`} className="col-1 text-center text-muted">
-                <Text size={6}>{score}</Text>
-              </div>
-            ))}
+            <div className="col-8 row">
+              {players[players.length - 1].racks.map((score, idx) => (
+                <div key={`db-rack-${idx}`} className="col-1 text-center text-muted">
+                  <Text size={6}>{score}</Text>
+                </div>
+              ))}
+            </div>
+            <div className="col-1"/>
           </div>
 
           {players.filter(u => u.user_id).map((player, idx) => (
@@ -36,11 +42,16 @@ function ScoreBoard({players}:ScoreBoardProps) {
               <div className="col-3">
                 <Text size={5}>{player.username}</Text>
               </div>
-              {player.racks.map((score, idx) => (
-                <div key={`player-${player.user_id}-rack_score-${idx}`} className="col-1 text-center text-muted">
-                  <Text size={5}>{score}</Text>
-                </div>
-              ))}
+              <div className="col-8 row">
+                {player.racks.map((score, idx) => (
+                  <div key={`player-${player.user_id}-rack_score-${idx}`} className="col-1 text-center text-muted">
+                    <Text size={5}>{score}</Text>
+                  </div>
+                ))}
+              </div>
+              <div className="col-1 text-muted">
+                <Text size={6} className="ms-2">({player.handicap})</Text>
+              </div>
             </div>
           ))}
         </div>
