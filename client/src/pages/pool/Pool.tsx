@@ -4,6 +4,8 @@ import { useNavigate } from "react-router-dom";
 import { useConfirm } from "../../hooks/useConfirm";
 // Components
 import Button from "react-bootstrap/Button";
+import InputGroup from "react-bootstrap/InputGroup";
+import Form from "react-bootstrap/Form";
 import Text from "../../components/Text";
 import Offcanvas from "react-bootstrap/Offcanvas";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -13,19 +15,21 @@ import api from "../../utils/api";
 // Types
 import { Player, PoolGame } from "../../@types/pool";
 // Assets
-import { faCircleUser, faBars } from "@fortawesome/free-solid-svg-icons";
+import { faCircleUser, faBars, faX } from "@fortawesome/free-solid-svg-icons";
 
 interface Props {
   game: PoolGame,
   todayStr: string,
   deleteCb: () => void,
+  refreshGames: () => void,
 };
-function GameRow({game, todayStr, deleteCb}:Props) {
+function GameRow({game, todayStr, deleteCb, refreshGames}:Props) {
   const navigate = useNavigate();
   const confirm = useConfirm();
 
   const [showDetails, setShowDetails] = useState(false);
   const [players, setPlayers] = useState<Player[]>([]);
+  const [tagInput, setTagInput] = useState('');
 
   const gameDateStr = new Date(game.started).toLocaleString('en-us', {
     year: 'numeric',
@@ -56,8 +60,30 @@ function GameRow({game, todayStr, deleteCb}:Props) {
   const hideDetails = () => setShowDetails(false);
 
   const deleteGame = async () => {
-    const {data, success} = await api.delete(`/pool/${game.pool_game_id}`);
-    deleteCb();
+    const {success} = await api.delete(`/pool/${game.pool_game_id}`);
+    if(success) {
+      deleteCb();
+    }
+  }
+
+  const addTag = async () => {
+    const newTags = Array.from(new Set([...game.tags, tagInput]));
+    const {success} = await api.patch(`/pool/${game.pool_game_id}`, {tags: newTags});
+    if(success) {
+      setTagInput('');
+      setShowDetails(false);
+      refreshGames();
+    }
+  }
+  
+  const removeTag = async (tag:string) => {
+    const newTags = game.tags.filter(t => t !== tag);
+    const {success} = await api.patch(`/pool/${game.pool_game_id}`, {tags: newTags});
+    if(success) {
+      setTagInput('');
+      setShowDetails(false);
+      refreshGames();
+    }
   }
 
   const onDelete = () => {
@@ -74,9 +100,14 @@ function GameRow({game, todayStr, deleteCb}:Props) {
       <div className="border-bottom py-2" onClick={onRowClick}>
         <div className="row">
           <div className="col-9 row">
-            <Text size={6} className="mb-2">
-              {gameDateStr}
-            </Text>
+            <div className="d-flex">
+              <Text size={6} className="mb-2">
+                {gameDateStr}
+              </Text>
+              {game.tags.map((tag) => (
+                <small key={`tag-${tag}`}><span className="badge bg-secondary text-dark ms-2">{tag}</span></small>
+              ))}
+            </div>
             {game.users.map((user) => (
               <div key={`${user.user_id}`} className="col">
                 <div className="d-flex align-items-center">
@@ -97,15 +128,46 @@ function GameRow({game, todayStr, deleteCb}:Props) {
         </div>
       </div>
       <Offcanvas show={showDetails} onHide={hideDetails} placement='bottom'>
-        <div className="container py-4 h-100">
-          <div className="d-flex justify-content-end">
-            <Button variant="danger" onClick={onDelete}>
-              Delete Game
-            </Button>
+        <div className="container d-flex flex-column py-4 h-100">
+          <div className="row d-flex justify-content-between">
+            <div className="order-2 order-md-1 col-12 col-md-4 my-2">
+              <InputGroup className="align-items-center">
+                <Form.Control 
+                  type="text"
+                  placeholder=""
+                  value={tagInput}
+                  onChange={(e) => setTagInput(e.target.value)}
+                  className="rounded"
+                />
+                <Button variant='primary' onClick={addTag}>
+                  Add Tag
+                </Button>
+              </InputGroup>
+            </div>
+            <div className="order-1 order-md-2 col-12 col-md-4 justify-content-between justify-content-md-end d-flex my-2">
+              <Button 
+                className="me-2 text-white" 
+                variant="tertiary" 
+                onClick={() => navigate(`/pool/${game.pool_game_id}`)}>
+                Edit Game
+              </Button>
+              <Button variant="danger" onClick={onDelete}>
+                Delete Game
+              </Button>
+            </div>
           </div>
-          <div className="h-100 pb-4 d-flex">
-            <ScoreBoard players={players} />
+          <div className="d-flex py-3">
+            {game.tags.map((tag) => (
+              <div key={`edit-tag-${tag}`}
+                className="border border-secondary py-2 px-3 me-3 rounded-pill"
+                onClick={() => removeTag(tag)}
+              >
+                <span>{tag}</span>
+                <FontAwesomeIcon className="ms-2" icon={faX} />
+              </div>
+            ))}
           </div>
+          <ScoreBoard players={players} />
         </div>
       </Offcanvas>
     </>
@@ -123,13 +185,14 @@ function Pool() {
     timeZone: 'utc'
   });
 
-  useEffect(() => {
-    const getGames = async () => {
-      const {data, success} = await api.get('/pool');
-      if(success) {
-        setGames(data);
-      }
+  const getGames = async () => {
+    const {data, success} = await api.get('/pool');
+    if(success) {
+      setGames(data);
     }
+  }
+
+  useEffect(() => {
     getGames();
   }, []);
 
@@ -140,7 +203,12 @@ function Pool() {
   return (
     <div className="container h-100 d-flex flex-column">
       {games.map((game) => (
-        <GameRow key={`${game.pool_game_id}`} game={game} todayStr={todayStr} deleteCb={() => onDelete(game.pool_game_id)}/>
+        <GameRow key={`${game.pool_game_id}`} 
+          game={game} 
+          todayStr={todayStr} 
+          deleteCb={() => onDelete(game.pool_game_id)} 
+          refreshGames={getGames} 
+        />
       ))}
       <Button className="mt-3" onClick={() => navigate('/pool/new')}>New Game</Button>      
     </div>

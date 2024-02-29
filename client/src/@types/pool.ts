@@ -1,6 +1,7 @@
 export interface PoolGame {
   pool_game_id: string,
   started: string,
+  tags: string[],
   winner_user_id: string,
   users: {
     user_id: string,
@@ -16,5 +17,7 @@ export interface Player {
   user_id: string | null,
   racks: number[],
   total: number,
+  handicap: number,
+  remaining: number,
   winner: boolean,
 }
