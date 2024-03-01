@@ -62,10 +62,21 @@ router.route('/')
   })
 
 router.route('/:username')
-  .get(verifyToken, async (req, res, next) => {
+  .all(verifyToken)
+  .get(async (req, res, next) => {
     const {username} = req.params;
     try {
       const user = await getUser({username});
+      res.status(200).json(user);
+    } catch(err) {
+      next(err);
+    }
+  })
+  .patch(async (req, res, next) => {
+    const {username} = req.params;
+    try {
+      const {user_id} = await getUser({username}); 
+      const user = await updateUser({...req.body, user_id});
       res.status(200).json(user);
     } catch(err) {
       next(err);

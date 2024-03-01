@@ -1,7 +1,6 @@
-import { search } from '../api';
 import db from '../db';
 import { ApplicationError } from '../lib/applicationError';
-import User from '../types/models/user';
+import User, { UserIdentifiers } from '../types/models/user';
 import { aclHasPermission } from '../utils';
 import auth from './authentication';
 
@@ -17,14 +16,14 @@ export async function createUser({username}:{username:string}) {
   }
 }
 
-export async function getUser(params:{user_id?: string, username?: string}): Promise<User&{password:string}> {
+export async function getUser(params:UserIdentifiers): Promise<User&{password:string}> {
   const {rows: [user]} = await db.file<User&{password:string}>('db/users/get.sql', params);
   return user;
 }
 
 export async function updateUser({user_id, username}:{user_id:string, username:string}) {
-  const {rows: [user]} = await db.file<User>('db/users/update.sql', {user_id, username});
-  return user;
+  await db.file<User>('db/users/update.sql', {user_id, username});
+  return getUser({user_id, username});
 }
 
 export async function addUserHandle({user_id, handle, protocol}) {

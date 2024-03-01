@@ -1,22 +1,33 @@
+// Hooks
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import Button from "react-bootstrap/Button";
-import api from "../../utils/api";
 import { useConfirm } from "../../hooks/useConfirm";
 import { useAuth } from "../../hooks/useAuth";
-import Text from "../../components/Text";
-import { User } from "../../@types/auth";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faEdit, faUser, faUserCircle, faUserEdit } from "@fortawesome/free-solid-svg-icons";
+import { useAlert } from "../../hooks/useAlert";
+// Components
+import Button from "react-bootstrap/Button";
+import InputGroup from "react-bootstrap/InputGroup";
 import Form from "react-bootstrap/Form";
+import Text from "../../components/Text";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+// Utils
+import api from "../../utils/api";
+// Types
+import { User } from "../../@types/auth";
+// Assets
+import { faCheck, faEdit, faUserCircle } from "@fortawesome/free-solid-svg-icons";
 
 function Profile() {
   const { username } = useParams();
   const auth = useAuth();
+  const alertManager = useAlert();
   const navigate = useNavigate();
   const confirm = useConfirm();
 
   const [user, setUser] = useState<User|null>(null);
+  const [editUser, setEditUser] = useState(false);
+  const [newUsername, setNewUsername] = useState('');
+
   const [oldPassword, setOldPassword] = useState('');
   const [newPassword, setNewPassword] = useState('');
 
@@ -25,16 +36,39 @@ function Profile() {
       const { success, data } = await api.get(`/users/${username}`);
       if (success) {
         setUser(data);
+        setNewUsername(data.username);
       }
     }
     getUser();
   }, []);
 
   const deleteUser = async () => {
-    const {success} = await api.delete(`/users/${username}`);
+    if(!user) {
+      return;
+    }
+    const {success} = await api.delete(`/users/${user.username}`);
     if(success && typeof auth.signOut === 'function') {
       auth.signOut();
       navigate('/');
+    }
+  }
+
+  const updateUser = async () => {
+    if(!user) {
+      return;
+    }
+    const {success, data} = await api.patch(`/users/${user.username}`, {
+      username: newUsername
+    });
+    if(success) {
+      setUser(data);
+      if(typeof auth.setUser === 'function') {
+        auth.setUser(data);
+      }
+      if(typeof alertManager.addAlert === 'function') {
+        alertManager.addAlert({type: 'success', message: 'User Updated', timeout: 1000});
+      }
+      setEditUser(false);
     }
   }
 
@@ -43,9 +77,24 @@ function Profile() {
       {user && (
         <>
         <div className="d-flex justify-content-between align-items-end mb-2">
-          <Text size={2}><FontAwesomeIcon icon={faUserCircle} className="me-2"/>{user.username}</Text>
+          {editUser 
+            ? <InputGroup className="h-100 me-4">
+                <InputGroup.Text>
+                  <FontAwesomeIcon icon={faUserCircle} />
+                </InputGroup.Text>
+                <Form.Control
+                  type="text"
+                  value={newUsername}
+                  onChange={(e) => setNewUsername(e.target.value)}
+                />
+                <Button onClick={updateUser}>
+                  <FontAwesomeIcon icon={faCheck} />
+                </Button>
+              </InputGroup>
+            : <Text size={2}><FontAwesomeIcon icon={faUserCircle} className="me-2"/>{user.username}</Text>
+          }
           
-          <Button>
+          <Button onClick={() => setEditUser(!editUser)}>
             <FontAwesomeIcon icon={faEdit}/>
           </Button>
         </div>

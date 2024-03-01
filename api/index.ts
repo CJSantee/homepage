@@ -1,8 +1,7 @@
-import express, { Request } from 'express';
+import express from 'express';
 import db from '../db';
 import auth from '../controllers/authentication';
-import { confirmPermission, verifyToken } from '../middleware/auth';
-import { addUserHandle, createUser, filterUserFieldsByAcl, getAllUsers, updateUser } from '../controllers/users';
+import { verifyToken } from '../middleware/auth';
 
 import userApi from './users';
 import wordleApi from './wordle';
