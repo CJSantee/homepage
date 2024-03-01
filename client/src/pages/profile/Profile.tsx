@@ -53,13 +53,24 @@ function Profile() {
     }
   }
 
-  const updateUser = async () => {
+  const updateUser = async (field: string) => {
     if(!user) {
       return;
     }
-    const {success, data} = await api.patch(`/users/${user.username}`, {
+    // Validate
+    if(field === 'username' && !newUsername) {
+      return;
+    }
+    if(field === 'password' && !newPassword) {
+      return;
+    }
+    const body = field === 'username' ? {
       username: newUsername
-    });
+    } : {
+      oldPassword,
+      newPassword,
+    };
+    const {success, data, error} = await api.patch(`/users/${user.username}`, body);
     if(success) {
       setUser(data);
       if(typeof auth.setUser === 'function') {
@@ -69,6 +80,10 @@ function Profile() {
         alertManager.addAlert({type: 'success', message: 'User Updated', timeout: 1000});
       }
       setEditUser(false);
+    } else {
+      if(typeof alertManager.addAlert === 'function') {
+        alertManager.addAlert({type: 'warning', message: error.message, timeout: 3000});
+      }
     }
   }
 
@@ -87,7 +102,7 @@ function Profile() {
                   value={newUsername}
                   onChange={(e) => setNewUsername(e.target.value)}
                 />
-                <Button onClick={updateUser}>
+                <Button onClick={() => updateUser('username')}>
                   <FontAwesomeIcon icon={faCheck} />
                 </Button>
               </InputGroup>
@@ -119,7 +134,9 @@ function Profile() {
                 />
               </Form.Group>
               <Form.Group>
-                <Button className="w-100" variant="outline-primary">Update Password</Button>
+                <Button className="w-100" variant="outline-primary"
+                  onClick={() => updateUser('password')}
+                >Update Password</Button>
               </Form.Group>
             </Form>
           </div>

@@ -1,8 +1,10 @@
+import bcrypt from 'bcrypt';
 import db from '../db';
-import { ApplicationError } from '../lib/applicationError';
+import { ApplicationError, AUTHENTICATION_ERRORS } from '../lib/applicationError';
 import User, { UserIdentifiers } from '../types/models/user';
 import { aclHasPermission } from '../utils';
-import auth from './authentication';
+
+const {ENCRYPTION_ROUNDS} = process.env;
 
 export async function createUser({username}:{username:string}) {
   try {
@@ -10,7 +12,7 @@ export async function createUser({username}:{username:string}) {
     return user;
   } catch(err: any) {
     if(err.constraint == 'unique_username') {
-      throw new ApplicationError(auth.AUTHENTICATION_ERRORS.USERNAME_IN_USE);
+      throw new ApplicationError(AUTHENTICATION_ERRORS.USERNAME_IN_USE);
     }
     throw err;
   }
@@ -21,8 +23,28 @@ export async function getUser(params:UserIdentifiers): Promise<User&{password:st
   return user;
 }
 
-export async function updateUser({user_id, username}:{user_id:string, username:string}) {
-  await db.file<User>('db/users/update.sql', {user_id, username});
+interface UpdateParams {
+  user_id: string,
+  username?: string,
+  oldPassword?: string,
+  newPassword?: string,
+}
+export async function updateUser({user_id, username, oldPassword, newPassword}:UpdateParams) {
+  let password;
+  if(newPassword) {
+    const {password: encrypted} = await getUser({user_id});
+    if(!oldPassword || !await bcrypt.compare(oldPassword, encrypted)) {
+      throw new ApplicationError(AUTHENTICATION_ERRORS.INCORRECT_PASSWORD);
+    }
+    password = await bcrypt.hash(newPassword, Number(ENCRYPTION_ROUNDS));
+  }
+  try {
+    await db.file<User>('db/users/update.sql', {user_id, username, password});
+  } catch(err: any) {
+    if(err.constraint == 'unique_username') {
+      throw new ApplicationError(AUTHENTICATION_ERRORS.USERNAME_IN_USE);
+    }
+  }
   return getUser({user_id, username});
 }
 
