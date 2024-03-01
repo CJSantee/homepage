@@ -33,8 +33,8 @@ function Admin() {
     setShowUserModal(true);
   }
   
-  const deleteUser = async (user_id: string) => {
-    const {success} = await api.post('/users/archive', {user_id});
+  const deleteUser = async (username: string) => {
+    const {success} = await api.delete(`/users/${username}`);
     if(success) {
       updateUsers();
     }
@@ -60,7 +60,7 @@ function Admin() {
                   onEdit={() => selectUser(user)} 
                   onDelete={() => {
                     if(confirm) confirm(
-                      () => deleteUser(user.user_id), // onConfirm
+                      () => deleteUser(user.username), // onConfirm
                       () => {},                       // onCancel
                       'Are you sure?',                // header
                       'Do you really want to delete this user? This process cannot be undone.' // body

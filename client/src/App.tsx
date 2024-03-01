@@ -1,19 +1,20 @@
 import { Routes, Route, Outlet } from "react-router-dom";
 // Custom Components
 import Header from './components/Header';
+import AuthRoute from "./components/AuthRoute";
+import PersistLogin from "./components/PersistLogin";
 // Pages
 import Home from "./pages/home";
 import NotFound from './pages/not-found';
-import PersistLogin from "./components/PersistLogin";
 import Admin from "./pages/admin";
 import Wordle from "./pages/wordle";
-import AuthRoute from "./components/AuthRoute";
 import Message from "./pages/message";
 import SignIn from "./pages/sign-in";
 import SignUp from "./pages/sign-up";
 import Pool from "./pages/pool";
 import PoolGame from "./pages/pool/PoolGame";
 import PoolGameUsers from "./pages/pool/PoolGameUsers";
+import Profile from "./pages/profile";
 
 function App() {
   return (
@@ -38,6 +39,7 @@ function App() {
               <Route path='/pool/new' element={<PoolGameUsers />} />
               <Route path='/pool/:pool_game_id' element={<PoolGame />}/>
             </Route>
+            <Route path='/users/:username' element={<Profile />} />
           </Route>
           <Route path='*' element={<NotFound />} />
         </Route>
