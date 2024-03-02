@@ -41,3 +41,55 @@ export class ApplicationError extends Error {
     this.statusMessage = statusMessage || 'An unexpected error occurred.';
   }
 }
+
+export const AUTHENTICATION_ERRORS = {
+  USERNAME_IN_USE: {
+    type: ApplicationError.TYPES.CLIENT,
+    code: 'USERNAME_IN_USE',
+    message: 'Username already in use.',
+    statusMessage: 'This username is already in use.',
+    statusCode: 400,
+  },
+  INCORRECT_PASSWORD: {
+    type: ApplicationError.TYPES.CLIENT,
+    code: 'INCORRECT_PASSWORD',
+    message: 'Invalid password',
+    statusMessage: 'Password is incorrect.',
+    statusCode: 400,
+  },
+  REGISTER_ERROR: {
+    type: ApplicationError.TYPES.SERVER,
+    code: 'REGISTRATION_FAILED',
+    message: 'Unexpected registration error',
+    statusMessage: 'An unexpected error occurred, please try agin.',
+    statusCode: 500,
+  },
+  UNAUTHORIZED: {
+    type: ApplicationError.TYPES.CLIENT,
+    code: 'USER_UNAUTHORIZED',
+    message: 'User is not authorized for this action.',
+    statusMessage: 'Invalid login.',
+    statusCode: 401,
+  },
+  USERNAME_REQUIRED: {
+    type: ApplicationError.TYPES.CLIENT,
+    code: 'USERNAME_REQUIRED',
+    message: 'User did not provide a username.',
+    statusMessage: 'Username is required.',
+    statusCode: 400,
+  },
+  PASSWORD_REQUIRED: {
+    type: ApplicationError.TYPES.CLIENT,
+    code: 'PASSWORD_REQUIRED',
+    message: 'User did not provide a password.',
+    statusMessage: 'Password is required.',
+    statusCode: 400,
+  },
+  INVALID_CODE: {
+    type: ApplicationError.TYPES.CLIENT,
+    code: 'INVALID_CODE',
+    message: 'User provided an invalid referral code.',
+    statusMessage: 'Invalid referral code.',
+    statusCode: 400,
+  },
+};

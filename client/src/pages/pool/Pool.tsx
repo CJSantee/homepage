@@ -137,7 +137,6 @@ function GameRow({game, todayStr, deleteCb, refreshGames}:Props) {
                   placeholder=""
                   value={tagInput}
                   onChange={(e) => setTagInput(e.target.value)}
-                  className="rounded"
                 />
                 <Button variant='primary' onClick={addTag}>
                   Add Tag

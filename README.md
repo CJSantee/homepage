@@ -40,6 +40,7 @@ DATABASE_URL=postgres://postgres:@localhost:5432/homepage-db
 SECRET_KEY=anyvalue
 TWILIO_ACCOUNT_SID=xxxx
 TWILIO_AUTH_TOKEN=xxxx
+ENCRYPTION_ROUNDS=10
 ```
 
 ### Troubleshooting

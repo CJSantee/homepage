@@ -10,8 +10,8 @@ interface ConfirmationModalProps {
 };
 function ConfirmationModal({show, onCancel, onConfirm, headerText, bodyText}:ConfirmationModalProps) {
   return (
-    <Modal show={show} fullscreen={"md-down"} onHide={onCancel}>
-      {headerText && <Modal.Header className='border-0 pb-0'>
+    <Modal show={show} fullscreen={"md-down"} onHide={onCancel} contentClassName="d-flex justify-content-center align-items-center">
+      {headerText && <Modal.Header className='border-0 pb-0 flex-grow-1 align-items-end'>
         <h4 className='text-primary m-0'>{headerText}</h4>
       </Modal.Header>}
       <Modal.Body>
