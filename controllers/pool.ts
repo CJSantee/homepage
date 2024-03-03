@@ -1,9 +1,14 @@
 import db from "../db";
+import { io } from "../core/sockets";
 import { ApplicationError } from "../lib/applicationError";
-import {Player, PlayerGameData} from "../types/models/pool";
+import { Player, PlayerGameData } from "../types/models/pool";
 
 export async function createNewPoolGame(players:Player[]): Promise<string> {
   const {rows: [{cs_create_new_pool_game: pool_game_id}]} = await db.call<{cs_create_new_pool_game: number}>('cs_create_new_pool_game', {users: JSON.stringify(players)});
+  players.forEach((player) => {
+    const {user_id} = player;
+    io.to(`user:${user_id}`).emit(`games:new`, {pool_game_id});
+  });
   return `${pool_game_id}`;
 }
 

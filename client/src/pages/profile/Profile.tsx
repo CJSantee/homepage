@@ -142,7 +142,7 @@ function Profile() {
           </div>
 
         </div>
-        <div className="d-flex my-2">
+        <div className="d-flex mt-2 mb-4">
           <Button onClick={() => {
             if(confirm) confirm(
               () => deleteUser(), // onConfirm

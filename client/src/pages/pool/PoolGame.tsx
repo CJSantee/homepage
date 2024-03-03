@@ -13,10 +13,12 @@ import { useNavigate, useParams } from "react-router-dom";
 import { Player } from "../../@types/pool";
 // Utils
 import api from "../../utils/api";
+import { useSocket } from "../../hooks/useSocket";
 
 function PoolGame() {
   const { pool_game_id } = useParams();
   const navigate = useNavigate();
+  const socket = useSocket();
   const [title] = useState(new Date().toLocaleDateString());
   const [editing] = useState(pool_game_id === 'new');
 
@@ -30,7 +32,18 @@ function PoolGame() {
         setPlayers(data);
       }
     };
+    if(typeof socket.on === 'function') {
+      socket.on('game:update', () => {
+        getGameData();
+      });
+    }
     getGameData();
+
+    return () => {
+      if(typeof socket.off === 'function') {
+        socket.off('game:update');
+      }
+    }
   }, [pool_game_id]);
 
   /**

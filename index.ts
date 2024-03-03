@@ -1,5 +1,6 @@
 require('dotenv').config();
 import express, { type Express, type Request, type Response } from 'express';
+import { createServer } from 'http';
 import cors from 'cors';
 import bodyParser from 'body-parser';
 import cookieParser from 'cookie-parser';
@@ -8,12 +9,31 @@ import path from 'path';
 import  api from './api';
 import db from './db';
 import { errorHandler } from './middleware/error';
+import { io, initSocket } from './core/sockets';
 
 const {NODE_ENV, PORT} = process.env;
 const isDevelopment = NODE_ENV === 'development';
+const port = PORT || 8080;
 
 const app: Express = express();
-const port = PORT || 8080;
+const server = createServer(app);
+initSocket(server);
+io.on('connect', (socket) => {
+  socket.on('user:id', (user_id) => {
+    if(user_id) {
+      console.log(`Joining Room: user:${user_id}`);
+      socket.join(`user:${user_id}`)
+    } else {
+      socket.rooms.forEach(room => {
+        if(room.substring(0,5) === 'user:') {
+          console.log(`Leaving Room: ${room}`);
+          socket.leave(room);
+        }
+      });
+    }
+  });
+  console.log('user connected');
+});
 
 // parse application/x-www-form-urlencoded
 app.use(bodyParser.urlencoded({limit: '5mb', extended: false}));
@@ -36,7 +56,7 @@ app.get('*', (req: Request, res: Response) => {
 
 app.use(errorHandler);
 
-app.listen(port, () => {
+server.listen(port, () => {
   console.log(`⚡️[server]: Server is running at http://localhost:${port}`);
 });
 
