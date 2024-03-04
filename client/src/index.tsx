@@ -15,6 +15,7 @@ import AlertProvider from './context/AlertProvider';
 import reportWebVitals from './reportWebVitals';
 import ConfirmProvider from './context/ConfirmProvider';
 import ErrorBoundary from './components/ErrorBoundary';
+import SocketProvider from './context/SocketProvider';
 
 const root = ReactDOM.createRoot(
   document.getElementById('root') as HTMLElement
@@ -23,17 +24,19 @@ root.render(
   <React.StrictMode>
     <ErrorBoundary>
       <BrowserRouter>
-        <SystemProvider>
-          <ConfirmProvider>
-            <AlertProvider>
-              <AuthProvider>
-                <Routes>
-                  <Route path='/*' element={<App />} />
-                </Routes>
-              </AuthProvider>
-            </AlertProvider>
-          </ConfirmProvider>
-        </SystemProvider>
+        <SocketProvider>
+          <SystemProvider>
+            <ConfirmProvider>
+              <AlertProvider>
+                <AuthProvider>
+                  <Routes>
+                    <Route path='/*' element={<App />} />
+                  </Routes>
+                </AuthProvider>
+              </AlertProvider>
+            </ConfirmProvider>
+          </SystemProvider>
+        </SocketProvider>
       </BrowserRouter>
     </ErrorBoundary>
   </React.StrictMode>

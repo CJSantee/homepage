@@ -1,6 +1,7 @@
 import React, { createContext, useEffect, useState } from "react";
 import {AuthContextType, User} from "../@types/auth";
 import api from "../utils/api";
+import { useSocket } from "../hooks/useSocket";
 
 export const AuthContext = createContext<AuthContextType>({user: null, persist: false});
 
@@ -12,6 +13,13 @@ const AuthProvider: React.FC<Props> = ({ children }) => {
   const [persist, setPersist] = useState(
     JSON.parse(localStorage.getItem("persist") || 'false')
   );
+  const socket = useSocket();
+
+  useEffect(() => {
+    if(typeof socket.emit === 'function') {
+      socket.emit('user:id', user?.user_id);
+    }
+  }, [user]);
 
   // Update local storage with persist
   useEffect(() => {

@@ -39,7 +39,7 @@ function ScoreBoard({players}:ScoreBoardProps) {
 
           {players.filter(u => u.user_id).map((player, idx) => (
             <div key={`score-${player.user_id}`} className={`row py-1 ${idx !== players.length - 2 ? 'border-bottom' : ''}`}>
-              <div className="col-3">
+              <div className="col-3 text-break">
                 <Text size={5}>{player.username}</Text>
               </div>
               <div className="col-7 row">

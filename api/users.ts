@@ -2,19 +2,22 @@ import express, { Request } from 'express';
 import auth from '../controllers/authentication';
 import { confirmPermission, verifyToken } from '../middleware/auth';
 import { addUserHandle, archiveUser, createUser, filterUserFieldsByAcl, getAllUsers, getUser, updateUser } from '../controllers/users';
+import { AUTHENTICATION_ERRORS, ApplicationError } from '../lib/applicationError';
 
 const isDevelopment = process.env.NODE_ENV === 'development';
 
 const router = express.Router();
 
+
 router.route('/')
   .get(verifyToken, async (req: Request<{}, {}, {}, {acl?: string}>, res, next) => {
     const {acl: search_acl} = req.query;
-    const {acl} = req.user || {};
-    if(!acl) return;
+    const {acl, user_id} = req.user || {};
     try {
+      if(!acl) throw new ApplicationError(AUTHENTICATION_ERRORS.UNAUTHORIZED);
+      const sortRequestUserFirst = (a, _) => a.user_id === user_id ? -1 : 0;
       const users = await getAllUsers({acl: search_acl});
-      const filteredUsers = filterUserFieldsByAcl(users, acl);
+      const filteredUsers = filterUserFieldsByAcl(users, acl).sort(sortRequestUserFirst);
       res.status(200).json({users: filteredUsers});
     } catch(err) {
       next(err);

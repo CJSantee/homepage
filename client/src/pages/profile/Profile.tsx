@@ -40,7 +40,7 @@ function Profile() {
       }
     }
     getUser();
-  }, []);
+  }, [username]);
 
   const deleteUser = async () => {
     if(!user) {
@@ -80,7 +80,7 @@ function Profile() {
         alertManager.addAlert({type: 'success', message: 'User Updated', timeout: 1000});
       }
       setEditUser(false);
-    } else {
+    } else if(error) {
       if(typeof alertManager.addAlert === 'function') {
         alertManager.addAlert({type: 'warning', message: error.message, timeout: 3000});
       }
@@ -142,7 +142,7 @@ function Profile() {
           </div>
 
         </div>
-        <div className="d-flex my-2">
+        <div className="d-flex mt-2 mb-4">
           <Button onClick={() => {
             if(confirm) confirm(
               () => deleteUser(), // onConfirm

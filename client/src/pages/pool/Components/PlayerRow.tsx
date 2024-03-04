@@ -13,7 +13,7 @@ interface PlayerRowProps {
   active?: boolean,
   editing?: boolean,
   togglePlayer?: (user_id: string) => void,
-  updatePlayerScore: (user_id: string | null, action: string) => void,
+  updatePlayerScore: (user_id: string, action: string) => void,
   deadballs?: boolean,
 }
 function PlayerRow({ player, active = false, editing = false, togglePlayer, updatePlayerScore, deadballs = false }: PlayerRowProps) {
