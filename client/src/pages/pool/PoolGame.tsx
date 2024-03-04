@@ -9,16 +9,18 @@ import { faChevronLeft, faGear, faUsers } from "@fortawesome/free-solid-svg-icon
 // Hooks
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
+import { useSocket } from "../../hooks/useSocket";
+import { useAlert } from "../../hooks/useAlert";
 // Types
 import { Player } from "../../@types/pool";
 // Utils
 import api from "../../utils/api";
-import { useSocket } from "../../hooks/useSocket";
 
 function PoolGame() {
   const { pool_game_id } = useParams();
   const navigate = useNavigate();
   const socket = useSocket();
+  const alertManager = useAlert();
   const [title] = useState(new Date().toLocaleDateString());
   const [editing] = useState(pool_game_id === 'new');
 
@@ -27,8 +29,8 @@ function PoolGame() {
 
   useEffect(() => {
     const getGameData = async () => {
-      const {data, success} = await api.get(`/pool/${pool_game_id}`);
-      if(success) {
+      const {data} = await api.get<Player[]>(`/pool/${pool_game_id}`);
+      if(data) {
         setPlayers(data);
       }
     };
@@ -37,6 +39,9 @@ function PoolGame() {
         getGameData();
       });
     }
+    if(typeof socket.emit === 'function') {
+      socket.emit('game:id', pool_game_id);
+    }
     getGameData();
 
     return () => {
@@ -44,7 +49,7 @@ function PoolGame() {
         socket.off('game:update');
       }
     }
-  }, [pool_game_id]);
+  }, [pool_game_id, socket]);
 
   /**
    * @description Toggle the active player
@@ -57,7 +62,8 @@ function PoolGame() {
     setActivePlayer(user_id);
   }
 
-  const updatePlayerScore = async (user_id: string|null, action: string) => {
+  const updatePlayerScore = async (user_id: string, action: string) => {
+    const oldPlayers = [...players];
     // If there already exists a winner, don't update the scores unless you're subtracting from their score
     const winner = players.find(p => p.winner);
     const currentPlayer = players.find(p => p.user_id === user_id);
@@ -70,9 +76,35 @@ function PoolGame() {
       }
     }
 
-    const {data, success} = await api.post(`/pool/${pool_game_id}/scores/${action}`, {user_id});
+    // Optimistic Update
+    const newPlayers = players.map((player) => {
+      let total = player.total;
+      if(player.user_id === user_id) {
+        if(action === 'add' && total < player.handicap) {
+          total += 1;
+        } else if(action === 'subtract' && total > 0) {
+          total -= 1;
+        }
+      }
+
+      return {
+        ...player,
+        total,
+      };
+    });
+    setPlayers(newPlayers);
+
+    const {data, success, error} = await api.post(`/pool/${pool_game_id}/scores/${action}`, {user_id});
     if(success) {
       setPlayers(data);
+      if(typeof socket.emit === 'function') {
+        socket.emit('game:update', pool_game_id);
+      }
+    } else if(error) {
+      setPlayers(oldPlayers);
+      if(typeof alertManager.addAlert === 'function') {
+        alertManager.addAlert({type: 'danger', message: error.message, timeout: 3000});
+      }
     }
   }
 

@@ -33,8 +33,7 @@ function Pool() {
 
   useEffect(() => {
     if(typeof socket.on === 'function') {
-      socket.on('games:new', (game) => {
-        console.log('new game', game);
+      socket.on('games:new', () => {
         getGames();
       });
     }
@@ -45,7 +44,7 @@ function Pool() {
         socket.off('games:new');
       }
     }
-  }, []);
+  }, [socket]);
 
   const onDelete = (pool_game_id: string) => {
     setGames(games.filter(g => g.pool_game_id !== pool_game_id));
@@ -69,7 +68,7 @@ function Pool() {
           </div>
         )
       }
-      <div className="container fixed-bottom">
+      <div className="container fixed-bottom bg-body">
         <Button className="w-100 my-3" onClick={() => navigate('/pool/new')}>New Game</Button>      
       </div>
     </div>

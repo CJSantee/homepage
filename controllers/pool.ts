@@ -7,7 +7,7 @@ export async function createNewPoolGame(players:Player[]): Promise<string> {
   const {rows: [{cs_create_new_pool_game: pool_game_id}]} = await db.call<{cs_create_new_pool_game: number}>('cs_create_new_pool_game', {users: JSON.stringify(players)});
   players.forEach((player) => {
     const {user_id} = player;
-    io.to(`user:${user_id}`).emit(`games:new`, {pool_game_id});
+    io.to(`user:${user_id}`).emit('games:new', {pool_game_id});
   });
   return `${pool_game_id}`;
 }
@@ -18,13 +18,35 @@ interface ScoreInput {
 };
 
 export async function addPlayerScore({pool_game_id, user_id}:ScoreInput): Promise<number> {
-  const {rows: [{cs_add_pool_player_score: score}]} = await db.call<{cs_add_pool_player_score: number}>('cs_add_pool_player_score', {pool_game_id, user_id});
-  return Number(score);
+  try {
+    const {rows: [{cs_add_pool_player_score: score}]} = await db.call<{cs_add_pool_player_score: number}>('cs_add_pool_player_score', {pool_game_id, user_id});
+    return Number(score);
+  } catch(err) {
+    console.log('err', err);
+    throw new ApplicationError({
+      type: ApplicationError.TYPES.CLIENT,
+      code: 'INVALID_RACK_ADDITION',
+      message: 'Invalid Rack Action: add',
+      statusMessage: 'Cannot add player score to the current rack.',
+      statusCode: 400, 
+    });
+  }
 }
 
 export async function subtractPlayerScore({pool_game_id, user_id}:ScoreInput): Promise<number> {
-  const {rows: [{cs_subtract_pool_player_score: score}]} = await db.call<{cs_subtract_pool_player_score: number}>('cs_subtract_pool_player_score', {pool_game_id, user_id});
-  return Number(score);
+  try {
+    const {rows: [{cs_subtract_pool_player_score: score}]} = await db.call<{cs_subtract_pool_player_score: number}>('cs_subtract_pool_player_score', {pool_game_id, user_id});
+    return Number(score);
+  } catch(err) {
+    console.log(err, 'err');
+    throw new ApplicationError({
+      type: ApplicationError.TYPES.CLIENT,
+      code: 'INVALID_RACK_SUBTRACTION',
+      message: 'Invalid Rack Action: subtract',
+      statusMessage: 'Cannot remove player score from current rack.',
+      statusCode: 400,
+    });
+  }
 }
 
 export async function getGameData(pool_game_id:string): Promise<PlayerGameData[]> {

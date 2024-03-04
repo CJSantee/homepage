@@ -30,11 +30,11 @@ function ResultsForm({updateStats}:ResultsFormProps) {
 
   const submitWordle = async () => {
     if(!wordleResults) return;
-    const {data, success} = await api.post('/wordle', {results: wordleResults});
+    const {data, success, error} = await api.post('/wordle', {results: wordleResults});
     if(success) {
       updateStats(data);
-    } else {
-      if(alertManager.addAlert) alertManager.addAlert({type: 'danger', message: data, timeout: 3000});
+    } else if(error) {
+      if(alertManager.addAlert) alertManager.addAlert({type: 'danger', message: error.message, timeout: 3000});
     }
   }
 

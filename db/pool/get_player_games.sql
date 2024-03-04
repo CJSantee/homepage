@@ -21,4 +21,5 @@ FROM pool_games pg
 INNER JOIN user_games ug USING(pool_game_id)
 LEFT JOIN pool_game_users pgu USING(pool_game_id)
 LEFT JOIN users u USING(user_id)
-GROUP BY pg.pool_game_id, ug.pool_game_id;
+GROUP BY pg.pool_game_id, ug.pool_game_id
+ORDER BY started DESC;

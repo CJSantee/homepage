@@ -99,7 +99,7 @@ function GameRow({ game, todayStr, deleteCb, refreshGames }: Props) {
     <>
       <div className="border-bottom py-2" onClick={onRowClick}>
         <div className="row">
-          <div className="col-9 row">
+          <div className="col-10 row">
             <div className="d-flex">
               <Text size={6} className="mb-2">
                 {gameDateStr}
@@ -110,9 +110,9 @@ function GameRow({ game, todayStr, deleteCb, refreshGames }: Props) {
             </div>
             {game.users.map((user) => (
               <div key={`${user.user_id}`} className="col">
-                <div className="d-flex align-items-center">
+                <div className="d-flex align-items-center text-break">
                   <FontAwesomeIcon icon={faCircleUser} size="2x" />
-                  <div className="ms-2">
+                  <div className="mx-2">
                     <p className={`m-0 ${user.winner ? 'text-primary' : ''}`}>{user.username}</p>
                     <small><p className="text-muted m-0">{user.score} ({user.handicap})</p></small>
                   </div>
@@ -120,7 +120,7 @@ function GameRow({ game, todayStr, deleteCb, refreshGames }: Props) {
               </div>
             ))}
           </div>
-          <div className="col-3 d-flex justify-content-end align-items-start">
+          <div className="col-2 d-flex justify-content-end align-items-start">
             <Button onClick={onDetailsClick}>
               <FontAwesomeIcon icon={faBars} />
             </Button>

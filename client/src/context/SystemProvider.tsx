@@ -16,7 +16,7 @@ const SystemProvider: React.FC<Props> = ({ children }) => {
       if(success) {
         const {sys_params} = data;
         setShowCreateAdmin(sys_params?.show_create_admin);
-      } else if(error.code === 'ERR_CONNECTION_REFUSED') {
+      } else if(error && error.code === 'ERR_CONNECTION_REFUSED') {
         setOffline(true);
       }
     }

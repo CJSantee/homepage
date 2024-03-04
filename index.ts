@@ -10,6 +10,8 @@ import  api from './api';
 import db from './db';
 import { errorHandler } from './middleware/error';
 import { io, initSocket } from './core/sockets';
+import { registerUserHandlers } from './handlers/userHandler';
+import { registerPoolHandlers } from './handlers/poolHandler';
 
 const {NODE_ENV, PORT} = process.env;
 const isDevelopment = NODE_ENV === 'development';
@@ -18,22 +20,13 @@ const port = PORT || 8080;
 const app: Express = express();
 const server = createServer(app);
 initSocket(server);
-io.on('connect', (socket) => {
-  socket.on('user:id', (user_id) => {
-    if(user_id) {
-      console.log(`Joining Room: user:${user_id}`);
-      socket.join(`user:${user_id}`)
-    } else {
-      socket.rooms.forEach(room => {
-        if(room.substring(0,5) === 'user:') {
-          console.log(`Leaving Room: ${room}`);
-          socket.leave(room);
-        }
-      });
-    }
-  });
-  console.log('user connected');
-});
+
+const onConnection = (socket) => {
+  registerUserHandlers(io, socket);
+  registerPoolHandlers(io, socket);
+} 
+
+io.on('connect', onConnection);
 
 // parse application/x-www-form-urlencoded
 app.use(bodyParser.urlencoded({limit: '5mb', extended: false}));
