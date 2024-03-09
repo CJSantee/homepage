@@ -54,7 +54,7 @@ function Header() {
               {auth?.user ? (
                 <Nav.Item>
                   <Dropdown as={ButtonGroup}>
-                    <Button>{auth.user.username}</Button>
+                    <Button onClick={() => navigate(`/users/${auth.user?.username}`)}>{auth.user.username}</Button>
                     <Dropdown.Toggle split />
                     <Dropdown.Menu className="bg-card" align={"end"}>
                       <AuthContainer permission="admin">

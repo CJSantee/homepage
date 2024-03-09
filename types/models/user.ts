@@ -5,3 +5,8 @@ export default interface User {
   handle?: string,
   password?: string,
 };
+
+export interface UserIdentifiers {
+  user_id?: string,
+  username?: string,
+};

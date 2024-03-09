@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import api from "../../../utils/api";
 import ListGroup from "react-bootstrap/ListGroup";
 import Badge from "react-bootstrap/Badge";
-import { LeaderboardEntry } from "../../../../@types/wordle";
+import { LeaderboardEntry } from "../../../@types/wordle";
 
 function Leaderboard() {
   const [leaderboard, setLeaderboard] = useState<LeaderboardEntry[]>([]);

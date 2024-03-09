@@ -1,5 +1,5 @@
 import { createContext, useRef, useState } from "react";
-import {InputAlert, StoredAlert, AlertContextType} from "../../@types/alert";
+import {InputAlert, StoredAlert, AlertContextType} from "../@types/alert";
 import Toast from "react-bootstrap/Toast";
 
 export const AlertContext = createContext<AlertContextType>({alerts: []});

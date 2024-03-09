@@ -12,6 +12,7 @@ $body-emphasis-color: #fdfdfd;
 $border-color: #27354A;
 
 $text-dark: #0C0C17;
+$text-tertiary: #fdfdfd;
 
 // Fonts
 $font-family-sans-serif: Menlo, Monaco, "Courier New", monospace;
@@ -22,6 +23,11 @@ $nav-link-font-size: 1.15rem;
 
 $primary: #e49e4c;
 $secondary: #5db490;
+$light: $body-color;
+$success: #198754;
+$info: #0dcaf0;
+$warning: #ffc107;
+$danger: #dc3545;
 
 // Navbar Colors
 $navbar-dark-color: $primary;
@@ -37,18 +43,28 @@ $input-bg: #273649;
 
 $enable-negative-margins: true;
 
+$offcanvas-vertical-height: 65vh;
 // Offcanvas Color
 // $modal-content-bg: $body-bg;
 // $modal-content-color: $secondary; // Offcanvas Title
 
 $toast-color: #343a40;
 
-@import "../../../node_modules/bootstrap/scss/bootstrap";
-
 $theme-colors: (
+  "primary": $primary,
+  "secondary": $secondary,
+  "tertiary": #738794,
+  "success": $success,
+  "info": $info,
+  "warning": $warning,
+  "danger": $danger,
+  "light": $light,
   "dark": #081D35,
   "card": #273649,
 );
+
+@import "../../../node_modules/bootstrap/scss/bootstrap";
+
 @each $color, $value in $theme-colors {
   .bg-#{$color} {
     background-color: #{$value};

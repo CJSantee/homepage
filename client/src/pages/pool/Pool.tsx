@@ -1,46 +1,113 @@
 // Hooks
-import { useEffect, useState } from "react";
+import { MouseEventHandler, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useConfirm } from "../../hooks/useConfirm";
 // Components
 import Button from "react-bootstrap/Button";
+import InputGroup from "react-bootstrap/InputGroup";
+import Form from "react-bootstrap/Form";
 import Text from "../../components/Text";
+import Offcanvas from "react-bootstrap/Offcanvas";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import ScoreBoard from "./Components/ScoreBoard";
 // Utils
 import api from "../../utils/api";
 // Types
-import { PoolGame } from "../../../@types/pool";
+import { Player, PoolGame } from "../../@types/pool";
 // Assets
-import { faCircleUser, faChevronRight } from "@fortawesome/free-solid-svg-icons";
+import { faCircleUser, faBars, faX } from "@fortawesome/free-solid-svg-icons";
 
-function Pool() {
+interface Props {
+  game: PoolGame,
+  todayStr: string,
+  deleteCb: () => void,
+  refreshGames: () => void,
+};
+function GameRow({game, todayStr, deleteCb, refreshGames}:Props) {
   const navigate = useNavigate();
-  const [games, setGames] = useState<PoolGame[]>([]);
+  const confirm = useConfirm();
 
-  useEffect(() => {
-    const getGames = async () => {
-      const {data, success} = await api.get('/pool');
+  const [showDetails, setShowDetails] = useState(false);
+  const [players, setPlayers] = useState<Player[]>([]);
+  const [tagInput, setTagInput] = useState('');
+
+  const gameDateStr = new Date(game.started).toLocaleString('en-us', {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
+    timeZone: 'utc'
+  })
+  const sameDayGame = todayStr === gameDateStr;
+
+  const onRowClick = () => {
+    if(game.winner_user_id || !sameDayGame) {
+      return;
+    } 
+    navigate(`/pool/${game.pool_game_id}`);
+  }
+
+  const onDetailsClick:MouseEventHandler<HTMLButtonElement> = async (event) => {
+    event.stopPropagation();
+    if(!players.length) {
+      const {data, success} = await api.get(`/pool/${game.pool_game_id}`);
       if(success) {
-        setGames(data);
+        setPlayers(data);
       }
     }
-    getGames();
-  }, []);
+    setShowDetails(true);
+  }
+
+  const hideDetails = () => setShowDetails(false);
+
+  const deleteGame = async () => {
+    const {success} = await api.delete(`/pool/${game.pool_game_id}`);
+    if(success) {
+      deleteCb();
+    }
+  }
+
+  const addTag = async () => {
+    const newTags = Array.from(new Set([...game.tags, tagInput]));
+    const {success} = await api.patch(`/pool/${game.pool_game_id}`, {tags: newTags});
+    if(success) {
+      setTagInput('');
+      setShowDetails(false);
+      refreshGames();
+    }
+  }
+  
+  const removeTag = async (tag:string) => {
+    const newTags = game.tags.filter(t => t !== tag);
+    const {success} = await api.patch(`/pool/${game.pool_game_id}`, {tags: newTags});
+    if(success) {
+      setTagInput('');
+      setShowDetails(false);
+      refreshGames();
+    }
+  }
+
+  const onDelete = () => {
+    if(confirm) confirm(
+      () => deleteGame(), // onConfirm
+      () => {},                       // onCancel
+      'Are you sure?',                // header
+      'Do you really want to delete this game? This process cannot be undone.' // body
+    );
+  }
 
   return (
-    <div className="container h-100 d-flex flex-column">
-      {games.map((game) => (
-        <div key={`${game.pool_game_id}`}
-          className="border-bottom py-2 my-2"
-        >
-          <Text size={6}>
-            {new Date(game.started).toLocaleString('en-us', {
-              year: 'numeric',
-              month: 'long',
-              day: 'numeric',
-              timeZone: 'utc'
-            })}
-          </Text>
-          <div className="row">
+    <>
+      <div className="border-bottom py-2" onClick={onRowClick}>
+        <div className="row">
+          <div className="col-9 row">
+            <div className="d-flex">
+              <Text size={6} className="mb-2">
+                {gameDateStr}
+              </Text>
+              {game.tags.map((tag) => (
+                <small key={`tag-${tag}`}><span className="badge bg-secondary text-dark ms-2">{tag}</span></small>
+              ))}
+            </div>
             {game.users.map((user) => (
               <div key={`${user.user_id}`} className="col">
                 <div className="d-flex align-items-center">
@@ -52,17 +119,97 @@ function Pool() {
                 </div>
               </div>
             ))}
-            {!game.winner_user_id && (
-              <div className="col d-flex justify-content-end">
-                <Button onClick={() => navigate(`/pool/${game.pool_game_id}`)}>
-                  <FontAwesomeIcon icon={faChevronRight} />
-                </Button>
-              </div>
-            )}
+          </div>
+          <div className="col-3 d-flex justify-content-end align-items-start">
+            <Button onClick={onDetailsClick}>
+              <FontAwesomeIcon icon={faBars} />
+            </Button>
           </div>
         </div>
+      </div>
+      <Offcanvas show={showDetails} onHide={hideDetails} placement='bottom'>
+        <div className="container d-flex flex-column py-4 h-100">
+          <div className="row d-flex justify-content-between">
+            <div className="order-2 order-md-1 col-12 col-md-4 my-2">
+              <InputGroup className="align-items-center">
+                <Form.Control 
+                  type="text"
+                  placeholder=""
+                  value={tagInput}
+                  onChange={(e) => setTagInput(e.target.value)}
+                />
+                <Button variant='primary' onClick={addTag}>
+                  Add Tag
+                </Button>
+              </InputGroup>
+            </div>
+            <div className="order-1 order-md-2 col-12 col-md-4 justify-content-between justify-content-md-end d-flex my-2">
+              <Button 
+                className="me-2 text-white" 
+                variant="tertiary" 
+                onClick={() => navigate(`/pool/${game.pool_game_id}`)}>
+                Edit Game
+              </Button>
+              <Button variant="danger" onClick={onDelete}>
+                Delete Game
+              </Button>
+            </div>
+          </div>
+          <div className="d-flex py-3">
+            {game.tags.map((tag) => (
+              <div key={`edit-tag-${tag}`}
+                className="border border-secondary py-2 px-3 me-3 rounded-pill"
+                onClick={() => removeTag(tag)}
+              >
+                <span>{tag}</span>
+                <FontAwesomeIcon className="ms-2" icon={faX} />
+              </div>
+            ))}
+          </div>
+          <ScoreBoard players={players} />
+        </div>
+      </Offcanvas>
+    </>
+  )
+}
+
+function Pool() {
+  const navigate = useNavigate();
+  const [games, setGames] = useState<PoolGame[]>([]);
+
+  const todayStr = new Date().toLocaleString('en-us', {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
+    timeZone: 'utc'
+  });
+
+  const getGames = async () => {
+    const {data, success} = await api.get('/pool');
+    if(success) {
+      setGames(data);
+    }
+  }
+
+  useEffect(() => {
+    getGames();
+  }, []);
+
+  const onDelete = (pool_game_id: string) => {
+    setGames(games.filter(g => g.pool_game_id !== pool_game_id));
+  }
+
+  return (
+    <div className="container h-100 d-flex flex-column">
+      {games.map((game) => (
+        <GameRow key={`${game.pool_game_id}`} 
+          game={game} 
+          todayStr={todayStr} 
+          deleteCb={() => onDelete(game.pool_game_id)} 
+          refreshGames={getGames} 
+        />
       ))}
-      <Button onClick={() => navigate('/pool/new')}>New Game</Button>      
+      <Button className="mt-3" onClick={() => navigate('/pool/new')}>New Game</Button>      
     </div>
   )
 }

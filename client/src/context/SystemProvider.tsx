@@ -1,5 +1,5 @@
 import { createContext, useEffect, useState } from "react";
-import { SystemContextType } from "../../@types/system";
+import { SystemContextType } from "../@types/system";
 import api from "../utils/api";
 
 export const SystemContext = createContext<SystemContextType>({show_create_admin: false, offline: false});

@@ -1,6 +1,14 @@
 import express from 'express';
 import { Player, PlayerGameData } from '../types/models/pool';
-import { addPlayerScore, createNewPoolGame, getGameData, getPlayerGames, subtractPlayerScore } from '../controllers/pool';
+import { 
+  addPlayerScore, 
+  archiveGame, 
+  createNewPoolGame, 
+  getGameData, 
+  getPlayerGames, 
+  subtractPlayerScore, 
+  updateGameTags,
+} from '../controllers/pool';
 import { ApplicationError } from '../lib/applicationError';
 import { verifyToken } from '../middleware/auth';
 
@@ -29,15 +37,36 @@ router.post<any, {players: Player[]}, any, any>('/', async (req, res, next) => {
   }
 });
 
-router.get('/:pool_game_id', async (req, res, next) => {
-  const {pool_game_id} = req.params;
-  try {
-    const game_data = await getGameData(pool_game_id);
-    res.status(200).json(game_data)
-  } catch(err) {
-    next(err);
-  }
-});
+router.route('/:pool_game_id')
+  .all(verifyToken)
+  .get(async (req, res, next) => {
+    const {pool_game_id} = req.params;
+    try {
+      const game_data = await getGameData(pool_game_id);
+      res.status(200).json(game_data);
+    } catch(err) {
+      next(err);
+    }
+  })
+  .patch(async (req, res, next) => {
+    const {pool_game_id} = req.params;
+    const {tags} = req.body;
+    try {
+      await updateGameTags(pool_game_id, tags);
+      res.sendStatus(200);
+    } catch(err) {
+      next(err);
+    }
+  })
+  .delete(async (req, res, next) => {
+    const {pool_game_id} = req.params;
+    try {
+      await archiveGame(pool_game_id);
+      res.sendStatus(200);
+    } catch(err) {
+      next(err);
+    }
+  });
 
 router.post<{pool_game_id: string, action: string}, PlayerGameData[], {user_id: string|null}, any>('/:pool_game_id/scores/:action', 
   async (req, res, next) => {

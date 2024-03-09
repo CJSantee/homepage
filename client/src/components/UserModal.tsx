@@ -1,10 +1,10 @@
 import Modal from 'react-bootstrap/Modal';
 import Form from 'react-bootstrap/Form';
 import Button from 'react-bootstrap/Button';
-import { ModalProps } from '../../@types/modal';
+import { ModalProps } from '../@types/modal';
 import { useEffect, useState } from 'react';
 import api from '../utils/api';
-import { User } from '../../@types/auth';
+import { User } from '../@types/auth';
 
 interface UserModalProps extends ModalProps {
   user: User|null,

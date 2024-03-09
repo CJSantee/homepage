@@ -9,6 +9,7 @@ declare global {
       SECRET_KEY: string;
       TWILIO_ACCOUNT_SID: string;
       TWILIO_AUTH_TOKEN: string;
+      ENCRYPTION_ROUNDS: number,
     }
   }
 }
