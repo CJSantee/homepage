@@ -2,13 +2,11 @@ import { useSystem } from "../../../hooks/useSystem";
 // Bootstrap Components
 import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
-import Button from "react-bootstrap/Button";
 import {ReactComponent as DeskImg} from "../../../assets/img/ColinAtDesk.svg";
 import {ReactComponent as Cloud1} from "../../../assets/img/Cloud1.svg";
 import {ReactComponent as Cloud2} from "../../../assets/img/Cloud2.svg";
 import {ReactComponent as Cloud3} from "../../../assets/img/Cloud3.svg";
-
-
+import TypeText from "../../../components/TypeText";
 
 function AboutMe() {
   const system = useSystem();
@@ -17,9 +15,7 @@ function AboutMe() {
     <Row className='section justify-content-center' id='AboutMe'>
       <Col md style={{zIndex: 1}}>
         <h2 className='text-primary'>About Me</h2>
-        <p>Hi! {system.show_create_admin ? (
-          <Button variant="link" className="text-seocndary p-0">I'm Colin</Button>
-        ) : 'I\'m Colin'}.</p>
+        <TypeText>Hi! I'm Colin.</TypeText>
         <p>
           I'm a creative and technically minded software developer inspired by
           software solutions with significant societal impact. I'm passionate
