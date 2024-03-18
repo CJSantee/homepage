@@ -101,7 +101,6 @@ async function hasPermission(user_id: string, permission: string): Promise<boole
 }
 
 export = {
-  AUTHENTICATION_ERRORS,
   register,
   login,
   refresh,

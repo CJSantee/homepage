@@ -38,7 +38,7 @@ function Header() {
           </Navbar.Brand>
           <Navbar.Toggle aria-controls='navbarScroll' />
           <Navbar.Collapse className='d-flex-ui my-2 justify-content-between'>
-            <Nav className="d-flex flex-row align-items-end">
+            <Nav className="d-flex flex-row align-items-center">
               <Nav.Item className="me-2">
                 <Link to={'/#AboutMe'} className="nav-link text-secondary" reloadDocument>
                   About Me

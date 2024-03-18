@@ -91,13 +91,11 @@ router.post<{pool_game_id: string, action: string}, PlayerGameData[], {user_id: 
           statusMessage: 'Sorry, something went wrong.',
         });
       }
+      const game_data = await getGameData(pool_game_id);
+      res.status(200).json(game_data);
     } catch(err) {
       next(err);
-      return;
     }
-
-    const game_data = await getGameData(pool_game_id);
-    res.status(200).json(game_data);
   });
 
 export = router;

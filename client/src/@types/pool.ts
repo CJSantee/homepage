@@ -14,7 +14,7 @@ export interface PoolGame {
 
 export interface Player {
   username: string,
-  user_id: string | null,
+  user_id: string,
   racks: number[],
   total: number,
   handicap: number,

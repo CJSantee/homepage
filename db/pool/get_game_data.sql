@@ -2,7 +2,7 @@ WITH players AS (
   SELECT 
     pgu.pool_game_id,
 	  username,
-    user_id, 
+    COALESCE(user_id, '-1') AS user_id, -- represent deadballs as '-1' 
     score, 
     handicap,
     pg.winner_user_id IS NOT NULL AS winner

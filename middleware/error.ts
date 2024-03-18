@@ -11,5 +11,5 @@ export function errorHandler (err, req, res, next) {
     return;
   }
   console.error(err.stack);
-  res.status(500).send('An unexpected error occurred.');
+  res.status(500).json({error: {code: 'UNKNOWN_ERROR', message: 'An unexpected error occurred.'}});
 }

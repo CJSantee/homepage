@@ -1,18 +1,22 @@
 // Hooks
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useSocket } from "../../hooks/useSocket";
 // Components
 import Button from "react-bootstrap/Button";
+import GameRow from "./Components/GameRow";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 // Utils
 import api from "../../utils/api";
 // Types
 import { PlayerStats, PoolGame } from "../../@types/pool";
 // Assets
-import GameRow from "./Components/GameRow";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faGears } from "@fortawesome/free-solid-svg-icons";
+// Assets
+import Text from "../../components/Text";
 
 function Pool() {
+  const socket = useSocket();
   const navigate = useNavigate();
   const [games, setGames] = useState<PoolGame[]>([]);
   const [stats, setStats] = useState<PlayerStats>({
@@ -39,8 +43,19 @@ function Pool() {
   }
 
   useEffect(() => {
+    if(typeof socket.on === 'function') {
+      socket.on('games:new', () => {
+        getGames();
+      });
+    }
     getGames();
-  }, []);
+
+    return () => {
+      if(typeof socket.off === 'function') {
+        socket.off('games:new');
+      }
+    }
+  }, [socket]);
 
   const onDelete = (pool_game_id: string) => {
     setGames(games.filter(g => g.pool_game_id !== pool_game_id));

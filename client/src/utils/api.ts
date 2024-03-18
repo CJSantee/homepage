@@ -14,7 +14,11 @@ interface FetchOptions {
   body?: object,
   headers?: object,
 };
-async function callFetch(url: string, options: FetchOptions = {method: "GET"}) {
+interface ErrorObject {
+  code: string,
+  message: string,
+}
+async function callFetch<ReturnType = any>(url: string, options: FetchOptions = {method: "GET"}) {
   const { method, body = {}, headers } = options;
 
   let response;
@@ -34,18 +38,32 @@ async function callFetch(url: string, options: FetchOptions = {method: "GET"}) {
 
   const contentType = response.headers.get('Content-Type') || '';
   const isJSON = contentType.includes('application/json');
-  const responseData = isJSON ? await response.json() : await response.text();
+  const responseData: ReturnType & {error?: ErrorObject} = isJSON ? await response.json() : await response.text();
 
-  return {
-    data: responseData?.error ? null : responseData,
-    error: responseData?.error,
-    success: response.ok,
+  const returnData: {
+    data: ReturnType,
+    error: null,
+    success: true,
+  }|{
+    data: null,
+    error: ErrorObject,
+    success: false,
+  } = responseData?.error ? {
+    data: null,
+    error: responseData.error,
+    success: false,
+  } : {
+    data: responseData,
+    error: null,
+    success: true,
   };
+
+  return returnData;
 }
 
 const api = {
-  async get(url: string) {
-    return callFetch(url);
+  async get<ReturnType = any>(url: string) {
+    return callFetch<ReturnType>(url);
   },
   async post(url: string, data: any) {
     return callFetch(url, { method: "POST", body: data });
