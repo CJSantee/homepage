@@ -1,6 +1,6 @@
 import db from "../db";
 import { ApplicationError } from "../lib/applicationError";
-import {Player, PlayerGameData} from "../types/models/pool";
+import {Player, PlayerGameData, PlayerStatsDB} from "../types/models/pool";
 
 export async function createNewPoolGame(players:Player[]): Promise<string> {
   const {rows: [{cs_create_new_pool_game: pool_game_id}]} = await db.call<{cs_create_new_pool_game: number}>('cs_create_new_pool_game', {users: JSON.stringify(players)});
@@ -59,4 +59,21 @@ export async function getPlayerGames(user_id:string|undefined) {
   }
   const {rows: games} = await db.file<PoolGame>('db/pool/get_player_games.sql', {user_id});
   return games;
+}
+
+export async function getPlayerStats(user_id:string) {
+  const {rows: [stats]} = await db.file<PlayerStatsDB>('db/pool/get_player_stats.sql', {user_id});
+  
+  const games_played = Number(stats.games_played);
+  const games_won = Number(stats.games_won);
+  const skill_level = Number(stats.skill_level);
+
+  const win_percentage = games_won / games_played;
+
+  return {
+    games_played,
+    games_won,
+    win_percentage,
+    skill_level,
+  };
 }

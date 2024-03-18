@@ -6,6 +6,7 @@ import {
   createNewPoolGame, 
   getGameData, 
   getPlayerGames, 
+  getPlayerStats, 
   subtractPlayerScore, 
   updateGameTags,
 } from '../controllers/pool';
@@ -16,10 +17,13 @@ const router = express.Router();
 
 // Get all games
 router.get('/', verifyToken, async (req, res, next) => {
-  const {user_id} = req.user || {};
+  const {user_id} = req.user || {user_id: ''};
   try {
-    const games = await getPlayerGames(user_id);
-    res.status(200).json(games);
+    const [games, stats] = await Promise.all([
+      getPlayerGames(user_id),
+      getPlayerStats(user_id),
+    ]);
+    res.status(200).json({games, stats});
   } catch(err) {
     next(err);
   }

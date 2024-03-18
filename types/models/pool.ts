@@ -11,3 +11,9 @@ export interface PlayerGameData {
   total: number,
   remaining: number,
 };
+
+export interface PlayerStatsDB {
+  games_played: number,
+  games_won: number,
+  skill_level: number,
+}

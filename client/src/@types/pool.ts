@@ -21,3 +21,10 @@ export interface Player {
   remaining: number,
   winner: boolean,
 }
+
+export interface PlayerStats {
+  games_played: number,
+  games_won: number,
+  win_percentage: number,
+  skill_level: number,
+}
