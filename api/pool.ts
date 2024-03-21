@@ -33,10 +33,10 @@ router.route('/')
   })
   .post(async (req, res, next) => {
     const {user_id} = req.user || {user_id: ''};
-    const {skill_level} = req.body;
+    const {skill_level, discipline} = req.body;
     try {
-      if(skill_level) {
-        await upsertPlayerSkill(user_id, skill_level);
+      if(skill_level && discipline) {
+        await upsertPlayerSkill(user_id, skill_level, discipline);
       }
       res.sendStatus(200);
     } catch(err) {

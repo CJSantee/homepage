@@ -12,8 +12,12 @@ export interface PlayerGameData {
   remaining: number,
 };
 
+interface SkillLevels {
+  '8-Ball': number,
+  '9-Ball': number,
+};
 export interface PlayerStatsDB {
   games_played: number,
   games_won: number,
-  skill_level: number,
+  skill_levels: SkillLevels,
 }

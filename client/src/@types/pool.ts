@@ -22,9 +22,17 @@ export interface Player {
   winner: boolean,
 }
 
+export type EightBallSkillLevel = 2|3|4|5|6|7;
+export type NineBallSkillLevel = 1|2|3|4|5|6|7|8|9;
+
+export interface SkillLevels {
+  '8-Ball': EightBallSkillLevel,
+  '9-Ball': NineBallSkillLevel,
+}
+
 export interface PlayerStats {
   games_played: number,
   games_won: number,
   win_percentage: number,
-  skill_level: number,
+  skill_levels: SkillLevels,
 }

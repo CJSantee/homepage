@@ -3,15 +3,10 @@ import jwt from 'jsonwebtoken';
 import db from '../db';
 import { ApplicationError, AUTHENTICATION_ERRORS } from '../lib/applicationError';
 import User from '../types/models/user';
-import { getUser } from './users';
+import { createUser, getUser } from './users';
 import { aclHasPermission } from '../utils';
 
 const {SECRET_KEY, ENCRYPTION_ROUNDS} = process.env;
-
-// Map of referral codes to acls
-const REFERRAL_CODES = {
-  pool: 'pool',
-};
 
 // Used to ensure only these fields are returned for users
 const transformUser = (user: User) => {
@@ -27,30 +22,18 @@ const transformUser = (user: User) => {
  * @description Register a new user
  */
 async function register({username, password, code}: {username: string, password: string, code: string}): Promise<{user: User, token: string}>{
-  const existingUser = await getUser({username});
-  if(existingUser) {
-    throw new ApplicationError(AUTHENTICATION_ERRORS.USERNAME_IN_USE);
-  }
-
-  if(!username) {
-    throw new ApplicationError(AUTHENTICATION_ERRORS.USERNAME_REQUIRED);
-  }
   if(!password) {
     throw new ApplicationError(AUTHENTICATION_ERRORS.PASSWORD_REQUIRED);
   }
-  if(!code || !REFERRAL_CODES[code]) {
+  if(!code) {
     throw new ApplicationError(AUTHENTICATION_ERRORS.INVALID_CODE);
   }
 
-  const hashedPasword = await bcrypt.hash(password, Number(ENCRYPTION_ROUNDS));
-
-  const {rows: [user]} = await db.file<{user_id: string, username: string}>('db/users/put.sql', {username, password: hashedPasword});
-  const {rows: [{acl}]} = await db.file<{acl: string}>('db/acls/put.sql', {user_id: user.user_id, acl: REFERRAL_CODES[code]});
-
+  const user = await createUser({username, password, code});
   const token = jwt.sign({user_id: user.user_id, username: user.username}, SECRET_KEY);
 
   return {
-    user: transformUser({...user, acl}),
+    user: transformUser(user),
     token,
   };
 }

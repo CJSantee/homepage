@@ -8,8 +8,10 @@ import { User } from '../@types/auth';
 
 interface UserModalProps extends ModalProps {
   user: User|null,
+  code?: string,
+  onSuccess?: () => void,
 }
-function UserModal({user, show, onHide}:UserModalProps) {
+function UserModal({user, code, show, onHide, onSuccess}:UserModalProps) {
   const [username, setUsername] = useState('');
 
   useEffect(() => {
@@ -21,8 +23,11 @@ function UserModal({user, show, onHide}:UserModalProps) {
   }, [user]);
 
   const createUser = async () => {
-    const {success} = await api.post('/users', {username});
+    const {success} = await api.post('/users', {username, code});
     if(success) {
+      if(typeof onSuccess === 'function') {
+        onSuccess();
+      }
       onHide();
     }
   }
@@ -32,6 +37,9 @@ function UserModal({user, show, onHide}:UserModalProps) {
     const {user_id} = user;
     const {success} = await api.patch('/users', {user_id, username});
     if(success) {
+      if(typeof onSuccess === 'function') {
+        onSuccess();
+      }
       onHide();
     }
   }

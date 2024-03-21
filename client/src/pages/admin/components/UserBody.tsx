@@ -1,11 +1,11 @@
 import Button from "react-bootstrap/Button";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faTrash, faUserPen,faUnlock } from "@fortawesome/free-solid-svg-icons";
-import { User } from "../Admin";
 import { useAuth } from "../../../hooks/useAuth";
 import api from "../../../utils/api";
 import { useConfirm } from "../../../hooks/useConfirm";
 import { useAlert } from "../../../hooks/useAlert";
+import { User } from "../../../@types/auth";
 
 interface UserBodyProps {
   user: User,

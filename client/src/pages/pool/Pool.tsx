@@ -30,7 +30,10 @@ function Pool() {
     games_played: 0,
     games_won: 0,
     win_percentage: 0,
-    skill_level: 0,
+    skill_levels: {
+      '8-Ball': 3,
+      '9-Ball': 3,
+    },
   });
 
   const todayStr = new Date().toLocaleString('en-us', {
@@ -85,7 +88,7 @@ function Pool() {
           </OverlayTrigger>
           <div onClick={() => setShowSkillModal(true)} className="col-4 d-flex flex-column justify-content-start align-items-end cursor-pointer">
             <p className="m-0 text-muted text-end text-decoration-underline">Skill Level</p>
-            <p className="m-0 fw-bold text-end">{stats.skill_level}</p>
+            <p className="m-0 fw-bold text-end">{stats.skill_levels['8-Ball']} <span className="text-muted"><small>(8)</small></span> / {stats.skill_levels['9-Ball']} <span className="text-muted"><small>(9)</small></span></p>
           </div>
         </div>
         <Button className="mt-2" onClick={() => navigate('/pool/new')}>New Game</Button>      
@@ -101,7 +104,7 @@ function Pool() {
       </div>
 
       <SkillLevelModal 
-        skill_level={stats.skill_level}
+        skill_levels={stats.skill_levels}
         show={showSkillModal} 
         onUpdate={getGames}
         onHide={() => setShowSkillModal(false)} 

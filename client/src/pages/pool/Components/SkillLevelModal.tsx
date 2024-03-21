@@ -1,5 +1,6 @@
 import Modal from "react-bootstrap/Modal";
 import Button from "react-bootstrap/Button";
+import ButtonGroup from "react-bootstrap/ButtonGroup";
 import { ModalProps } from "../../../@types/modal";
 import { useEffect, useState } from "react";
 import api from "../../../utils/api";
@@ -21,20 +22,42 @@ const SkillButton = ({ className, level, skillLevel, onClick }: SkillButtonProps
   )
 }
 
+interface SkillLevels {
+  '8-Ball': number,
+  '9-Ball': number,
+}
 interface SkillLevelModalProps extends ModalProps {
   onUpdate: () => void,
-  skill_level: number,
+  skill_levels: SkillLevels,
 }
-function SkillLevelModal({ skill_level, show, onUpdate, onHide }: SkillLevelModalProps) {
-  const [skillLevel, setSkillLevel] = useState(skill_level);
+function SkillLevelModal({ skill_levels, show, onUpdate, onHide }: SkillLevelModalProps) {
+  const [discipline, setDiscipline] = useState<'9-Ball'|'8-Ball'>('9-Ball');
+  const [eightBallSkill, setEightBallSkill] = useState(skill_levels['8-Ball']);
+  const [nineBallSkill, setNineBallSkill] = useState(skill_levels['9-Ball']);
   const alertManager = useAlert();
 
+  const setSkillLevels = (skill_levels: SkillLevels) => {
+    setEightBallSkill(skill_levels['8-Ball']);
+    setNineBallSkill(skill_levels['9-Ball']);
+  }
+
   useEffect(() => {
-    setSkillLevel(skill_level);
-  }, [skill_level]);
+    setSkillLevels(skill_levels);
+  }, [skill_levels]);
+  
+  const setSkillLevel = (level: number) => {
+    if(discipline === '8-Ball') {
+      setEightBallSkill(level);
+    } else if(discipline === '9-Ball') {
+      setNineBallSkill(level);
+    }
+  }
 
   async function updateSkillLevel() {
-    const {success} = await api.post('/pool', {skill_level: skillLevel});
+    const {success} = await api.post('/pool', {
+      discipline,
+      skill_level: discipline === '8-Ball' ? eightBallSkill : nineBallSkill,
+    });
     if(success && typeof alertManager.addAlert === 'function') {
       onUpdate();
       onHide();
@@ -44,7 +67,7 @@ function SkillLevelModal({ skill_level, show, onUpdate, onHide }: SkillLevelModa
   
   return (
     <Modal show={show} fullscreen={"md-down"} onHide={() => {
-      setSkillLevel(skill_level);
+      setSkillLevels(skill_levels);
       onHide();
     }}>
       <Modal.Header className="border-0 pb-0" closeButton closeVariant="white">
@@ -52,18 +75,73 @@ function SkillLevelModal({ skill_level, show, onUpdate, onHide }: SkillLevelModa
       </Modal.Header>
       <Modal.Body>
         <div className="d-flex flex-column">
+          <ButtonGroup className="mb-3">
+            <Button 
+              onClick={() => setDiscipline('8-Ball')}
+              variant={discipline !== '8-Ball' ? 'outline-primary' : 'primary'}>8-Ball</Button>
+            <Button 
+              onClick={() => setDiscipline('9-Ball')}
+              variant={discipline !== '9-Ball' ? 'outline-primary' : 'primary'}>9-Ball</Button>
+          </ButtonGroup>
+          {discipline === '9-Ball' && (
+            <div className="row">
+              <SkillButton 
+                level={1} 
+                className="pb-2 col-12" 
+                skillLevel={nineBallSkill} 
+                onClick={setSkillLevel} />
+            </div>
+          )}
           <div className="row">
-            <SkillButton level={2} className="pe-1 pb-1" skillLevel={skillLevel} onClick={setSkillLevel} />
-            <SkillButton level={3} className="ps-1 pb-1" skillLevel={skillLevel} onClick={setSkillLevel} />
+          <SkillButton 
+            level={2} 
+            className="pe-1 pb-1" 
+            skillLevel={discipline === '8-Ball' ? eightBallSkill : nineBallSkill} 
+            onClick={setSkillLevel} />
+            <SkillButton 
+              level={3} 
+              className="ps-1 pb-1" 
+              skillLevel={discipline === '8-Ball' ? eightBallSkill : nineBallSkill} 
+              onClick={setSkillLevel} />
           </div>
           <div className="row">
-            <SkillButton level={4} className="pe-1 py-1" skillLevel={skillLevel} onClick={setSkillLevel} />
-            <SkillButton level={5} className="ps-1 py-1" skillLevel={skillLevel} onClick={setSkillLevel} />
+            <SkillButton 
+              level={4} 
+              className="pe-1 py-1" 
+              skillLevel={discipline === '8-Ball' ? eightBallSkill : nineBallSkill} 
+              onClick={setSkillLevel} />
+            <SkillButton 
+              level={5} 
+              className="ps-1 py-1" 
+              skillLevel={discipline === '8-Ball' ? eightBallSkill : nineBallSkill} 
+              onClick={setSkillLevel} />
           </div>
           <div className="row">
-            <SkillButton level={6} className="pe-1 pt-1" skillLevel={skillLevel} onClick={setSkillLevel} />
-            <SkillButton level={7} className="ps-1 pt-1" skillLevel={skillLevel} onClick={setSkillLevel} />
+            <SkillButton 
+              level={6} 
+              className="pe-1 pt-1" 
+              skillLevel={discipline === '8-Ball' ? eightBallSkill : nineBallSkill} 
+              onClick={setSkillLevel} />
+            <SkillButton 
+              level={7} 
+              className="ps-1 pt-1" 
+              skillLevel={discipline === '8-Ball' ? eightBallSkill : nineBallSkill} 
+              onClick={setSkillLevel} />
           </div>
+          {discipline === '9-Ball' && (
+            <div className="row">
+              <SkillButton 
+                level={8} 
+                className="pe-1 pt-2" 
+                skillLevel={nineBallSkill} 
+                onClick={setSkillLevel} />
+              <SkillButton 
+                level={9} 
+                className="ps-1 pt-2" 
+                skillLevel={nineBallSkill} 
+                onClick={setSkillLevel} />
+            </div>
+          )}
           <div className="row mt-3">
             <Button onClick={updateSkillLevel}>Update</Button>
           </div>

@@ -91,29 +91,30 @@ export async function getPlayerGames(user_id:string|undefined) {
 export async function getPlayerStats(user_id:string) {
   const {rows: [stats]} = await db.file<PlayerStatsDB>('db/pool/get_player_stats.sql', {user_id});
   
+  const {skill_levels} = stats;
   const games_played = Number(stats.games_played);
   const games_won = Number(stats.games_won);
-  const skill_level = Number(stats.skill_level);
-
   const win_percentage = games_won / games_played;
 
   return {
     games_played,
     games_won,
     win_percentage,
-    skill_level,
+    skill_levels,
   };
 }
 
-export async function upsertPlayerSkill(user_id: string, skill_level: number) {
-  if(skill_level < 2 || skill_level > 7) {
+export async function upsertPlayerSkill(user_id: string, skill_level: number, discipline: '8-Ball'|'9-Ball') {
+  const minSkill = discipline === '8-Ball' ? 2 : 1;
+  const maxSkill = discipline === '8-Ball' ? 7 : 9;
+  if(skill_level < minSkill || skill_level > maxSkill) {
     throw new ApplicationError({
       type: ApplicationError.TYPES.CLIENT,
       code: 'INVALID_SKILL_LEVEL',
-      message: `skill_level: ${skill_level} is invalid`,
+      message: `skill_level: ${skill_level} is invalid for ${discipline}`,
       statusCode: 400,
-      statusMessage: 'Invalid Skill Level: must be between 2 and 7.',
+      statusMessage: `Invalid Skill Level: must be between ${minSkill} and ${maxSkill}.`,
     });
   }
-  await db.file('db/pool/upsert_skill_level.sql', {user_id, skill_level});
+  await db.file('db/pool/upsert_skill_level.sql', {user_id, skill_level, discipline});
 }
