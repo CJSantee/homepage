@@ -5,19 +5,26 @@ import { useSocket } from "../../hooks/useSocket";
 // Components
 import Button from "react-bootstrap/Button";
 import GameRow from "./Components/GameRow";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import Tooltip from "react-bootstrap/Tooltip";
+import OverlayTrigger from "react-bootstrap/OverlayTrigger";
+import SkillLevelModal from "./Components/SkillLevelModal";
 // Utils
 import api from "../../utils/api";
 // Types
 import { PlayerStats, PoolGame } from "../../@types/pool";
-// Assets
-import { faGears } from "@fortawesome/free-solid-svg-icons";
-// Assets
-import Text from "../../components/Text";
+
+const MatchEfficiencyTooltip = (
+  <Tooltip id="tooltip">
+    <strong>Match Efficiency (ME%)</strong>
+    A player’s winning percentage of total matche
+  </Tooltip>
+);
+
 
 function Pool() {
   const socket = useSocket();
   const navigate = useNavigate();
+  const [showSkillModal, setShowSkillModal] = useState(false);
   const [games, setGames] = useState<PoolGame[]>([]);
   const [stats, setStats] = useState<PlayerStats>({
     games_played: 0,
@@ -62,30 +69,44 @@ function Pool() {
   }
 
   return (
-    <div className="container h-100 d-flex flex-column">
-      <div className="row justify-content-between">
-        <div className="col-3 d-flex flex-column justify-content-center align-items-center rounded border p-2 h-100">
-          <span className="fw-bold">{stats.win_percentage}</span>
-          <p className="m-0 text-center">ME%</p>
+    <>
+      <div className="container h-100 d-flex flex-column">
+        <hr className="mt-0 mb-2" />
+        <div className="row justify-content-between">
+          <div className="col-4 d-flex flex-column justify-content-start align-items-start">
+            <p className="m-0 text-muted text-start">Total</p>
+            <p className="m-0 fw-bold text-start">{stats.games_played} Matches</p>
+          </div>
+          <OverlayTrigger placement="bottom" overlay={MatchEfficiencyTooltip}>
+            <div className="col-4 d-flex flex-column justify-content-start align-items-center">
+              <p className="m-0 text-muted text-center">ME %</p>
+              <p className="m-0 fw-bold text-center">{stats.win_percentage * 100}</p>
+            </div>
+          </OverlayTrigger>
+          <div onClick={() => setShowSkillModal(true)} className="col-4 d-flex flex-column justify-content-start align-items-end cursor-pointer">
+            <p className="m-0 text-muted text-end text-decoration-underline">Skill Level</p>
+            <p className="m-0 fw-bold text-end">{stats.skill_level}</p>
+          </div>
         </div>
-        <div className="col-3 d-flex flex-column justify-content-center align-items-center rounded border p-2 h-100 position-relative">
-          <span className="fw-bold">{stats.skill_level}</span>
-          <p className="m-0 text-center">Skill Level</p>
-          <span className="position-absolute top-0 end-0 mt-n2 me-n2 w-auto text-primary">
-            <FontAwesomeIcon size={"lg"} icon={faGears} />
-          </span>
-        </div>
-      </div>
-      {games.map((game) => (
-        <GameRow key={`${game.pool_game_id}`} 
+        <Button className="mt-2" onClick={() => navigate('/pool/new')}>New Game</Button>      
+        <hr className="mt-2 mb-2" />
+        {games.map((game) => (
+          <GameRow key={`${game.pool_game_id}`} 
           game={game} 
           todayStr={todayStr} 
           deleteCb={() => onDelete(game.pool_game_id)} 
           refreshGames={getGames} 
-        />
-      ))}
-      <Button className="mt-3" onClick={() => navigate('/pool/new')}>New Game</Button>      
-    </div>
+          />
+          ))}
+      </div>
+
+      <SkillLevelModal 
+        skill_level={stats.skill_level}
+        show={showSkillModal} 
+        onUpdate={getGames}
+        onHide={() => setShowSkillModal(false)} 
+      />
+    </>
   )
 }
 

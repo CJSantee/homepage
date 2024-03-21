@@ -13,7 +13,7 @@ import { io, initSocket } from './core/sockets';
 import { registerUserHandlers } from './handlers/userHandler';
 import { registerPoolHandlers } from './handlers/poolHandler';
 
-const {NODE_ENV, PORT} = process.env;
+const { NODE_ENV, PORT } = process.env;
 const isDevelopment = NODE_ENV === 'development';
 const port = PORT || 8080;
 

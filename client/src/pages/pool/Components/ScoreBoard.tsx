@@ -15,7 +15,7 @@ function ScoreBoard({players}:ScoreBoardProps) {
             </div>
             <div className="col-7 row">
               {players[0].racks.map((_, idx) => (
-                <div key={`rack-idx-${idx}`} className="col-1 text-center text-muted">
+                <div key={`rack-idx-${idx}`} className="col-2 text-center text-muted">
                   <Text size={6}>{idx + 1}</Text>
                 </div>
               ))}
@@ -29,7 +29,7 @@ function ScoreBoard({players}:ScoreBoardProps) {
             </div>
             <div className="col-7 row">
               {players[players.length - 1].racks.map((score, idx) => (
-                <div key={`db-rack-${idx}`} className="col-1 text-center text-muted">
+                <div key={`db-rack-${idx}`} className="col-2 text-center text-muted">
                   <Text size={6}>{score}</Text>
                 </div>
               ))}
@@ -44,7 +44,7 @@ function ScoreBoard({players}:ScoreBoardProps) {
               </div>
               <div className="col-7 row">
                 {player.racks.map((score, idx) => (
-                  <div key={`player-${player.user_id}-rack_score-${idx}`} className="col-1 text-center text-muted">
+                  <div key={`player-${player.user_id}-rack_score-${idx}`} className="col-2 text-center text-muted">
                     <Text size={5}>{score}</Text>
                   </div>
                 ))}

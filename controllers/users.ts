@@ -37,7 +37,11 @@ export async function updateUser({user_id, username, oldPassword, newPassword}:U
       throw new ApplicationError(AUTHENTICATION_ERRORS.INCORRECT_PASSWORD);
     }
     password = await bcrypt.hash(newPassword, Number(ENCRYPTION_ROUNDS));
+  } else if(newPassword === '') {
+    console.log('HERE');
+    password = '';
   }
+
   try {
     await db.file<User>('db/users/update.sql', {user_id, username, password});
   } catch(err: any) {

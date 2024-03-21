@@ -104,3 +104,16 @@ export async function getPlayerStats(user_id:string) {
     skill_level,
   };
 }
+
+export async function upsertPlayerSkill(user_id: string, skill_level: number) {
+  if(skill_level < 2 || skill_level > 7) {
+    throw new ApplicationError({
+      type: ApplicationError.TYPES.CLIENT,
+      code: 'INVALID_SKILL_LEVEL',
+      message: `skill_level: ${skill_level} is invalid`,
+      statusCode: 400,
+      statusMessage: 'Invalid Skill Level: must be between 2 and 7.',
+    });
+  }
+  await db.file('db/pool/upsert_skill_level.sql', {user_id, skill_level});
+}

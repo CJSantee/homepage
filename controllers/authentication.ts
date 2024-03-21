@@ -59,7 +59,13 @@ async function login({username, password}: {username: string, password: string})
   const user = await getUser({username});
 
   let token;
-  if(user && (await bcrypt.compare(password, user.password))) {
+  if(user && !user.password) {
+    // Update password
+    const hashedPasword = await bcrypt.hash(password, Number(ENCRYPTION_ROUNDS));
+    await db.file('db/users/update.sql', {user_id:  user.user_id, password: hashedPasword});
+    token = jwt.sign({user_id: user.user_id, username: user.username}, SECRET_KEY);
+  } else if(user && (await bcrypt.compare(password, user.password))) {
+    // Login with password
     token = jwt.sign({user_id: user.user_id, username: user.username}, SECRET_KEY);
   } else {
     throw new ApplicationError(AUTHENTICATION_ERRORS.UNAUTHORIZED);

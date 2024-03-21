@@ -8,7 +8,6 @@ const isDevelopment = process.env.NODE_ENV === 'development';
 
 const router = express.Router();
 
-
 router.route('/')
   .get(verifyToken, async (req: Request<{}, {}, {}, {acl?: string}>, res, next) => {
     const {acl: search_acl} = req.query;
@@ -24,7 +23,7 @@ router.route('/')
     }
   })  
   .post(async (req, res, next) => {
-    const {password, code} = req.body;
+    const {password} = req.body;
     try {
       let user;
       if(password) {

@@ -9,6 +9,7 @@ import {
   getPlayerStats, 
   subtractPlayerScore, 
   updateGameTags,
+  upsertPlayerSkill,
 } from '../controllers/pool';
 import { ApplicationError } from '../lib/applicationError';
 import { verifyToken } from '../middleware/auth';
@@ -16,18 +17,32 @@ import { verifyToken } from '../middleware/auth';
 const router = express.Router();
 
 // Get all games
-router.get('/', verifyToken, async (req, res, next) => {
-  const {user_id} = req.user || {user_id: ''};
-  try {
-    const [games, stats] = await Promise.all([
-      getPlayerGames(user_id),
-      getPlayerStats(user_id),
-    ]);
-    res.status(200).json({games, stats});
-  } catch(err) {
-    next(err);
-  }
-});
+router.route('/')
+  .all(verifyToken)
+  .get(async (req, res, next) => {
+    const {user_id} = req.user || {user_id: ''};
+    try {
+      const [games, stats] = await Promise.all([
+        getPlayerGames(user_id),
+        getPlayerStats(user_id),
+      ]);
+      res.status(200).json({games, stats});
+    } catch(err) {
+      next(err);
+    }
+  })
+  .post(async (req, res, next) => {
+    const {user_id} = req.user || {user_id: ''};
+    const {skill_level} = req.body;
+    try {
+      if(skill_level) {
+        await upsertPlayerSkill(user_id, skill_level);
+      }
+      res.sendStatus(200);
+    } catch(err) {
+      next(err);
+    }
+  });
 
 // Create new game
 // <P = ParamsDictionary, ResBody = any, ReqBody = any, ReqQuery = QueryString.ParsedQs>
