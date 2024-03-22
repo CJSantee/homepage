@@ -1,10 +1,11 @@
 import db from "../db";
 import { io } from "../core/sockets";
 import { ApplicationError } from "../lib/applicationError";
-import { Player, PlayerGameData, PlayerStatsDB } from "../types/models/pool";
+import { GameData, GameType, Player, PlayerGameData, PlayerStatsDB } from "../types/models/pool";
 
-export async function createNewPoolGame(players:Player[]): Promise<string> {
-  const {rows: [{cs_create_new_pool_game: pool_game_id}]} = await db.call<{cs_create_new_pool_game: number}>('cs_create_new_pool_game', {users: JSON.stringify(players)});
+export async function createNewPoolGame(players:Player[], game_type: GameType): Promise<string> {
+  const {rows: [{cs_create_new_pool_game: pool_game_id}]} = await db.call<{cs_create_new_pool_game: number}>('cs_create_new_pool_game', {users: JSON.stringify(players), game_type});
+  // Notify the player channels of a new game being created
   players.forEach((player) => {
     const {user_id} = player;
     io.to(`user:${user_id}`).emit('games:new', {pool_game_id});
@@ -49,9 +50,9 @@ export async function subtractPlayerScore({pool_game_id, user_id}:ScoreInput): P
   }
 }
 
-export async function getGameData(pool_game_id:string): Promise<PlayerGameData[]> {
-  const {rows: game_data} = await db.file<PlayerGameData>('db/pool/get_game_data.sql', {pool_game_id});
-  return game_data;
+export async function getGameData(pool_game_id:string): Promise<GameData> {
+  const {rows: [game]} = await db.file<GameData>('db/pool/get_game_data.sql', {pool_game_id});
+  return game;
 }
 
 export async function updateGameTags(pool_game_id: string, tags: string[]) {

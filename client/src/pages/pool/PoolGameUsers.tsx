@@ -66,7 +66,7 @@ function PoolGameUsers() {
       user_id: p.user_id,
       handicap: p.total,
     }));
-    const {data, success} = await api.post('/pool', {players: gamePlayers});
+    const {data, success} = await api.post('/pool', {players: gamePlayers, game_type: gameType});
 
     if(success) {
       const {pool_game_id} = data;

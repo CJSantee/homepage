@@ -22,6 +22,11 @@ export interface Player {
   winner: boolean,
 }
 
+export enum GameType {
+  EIGHT_BALL = '8-Ball',
+  NINE_BALL = '9-Ball',
+}
+
 export type EightBallSkillLevel = 2|3|4|5|6|7;
 export type NineBallSkillLevel = 1|2|3|4|5|6|7|8|9;
 

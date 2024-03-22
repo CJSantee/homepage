@@ -1,4 +1,4 @@
-CREATE OR REPLACE FUNCTION cs_create_new_pool_game(_users JSONB) RETURNS BIGINT AS $$
+CREATE OR REPLACE FUNCTION cs_create_new_pool_game(_users JSONB, _game_type game_type_enum) RETURNS BIGINT AS $$
 DECLARE
   _pool_game_id BIGINT;
   _pool_rack_id BIGINT;
@@ -6,8 +6,10 @@ DECLARE
   _handicap INTEGER;
 BEGIN
   -- Create new game
-  INSERT INTO pool_games DEFAULT VALUES
-  RETURNING pool_game_id INTO _pool_game_id;
+  INSERT INTO pool_games (game_type) 
+  VALUES (_game_type)
+  RETURNING pool_game_id 
+  INTO _pool_game_id;
   
   -- Add users
   FOR _user_id, _handicap IN (SELECT user_id, handicap FROM jsonb_to_recordset(_users) AS users(user_id BIGINT, handicap INTEGER)) LOOP
@@ -21,8 +23,9 @@ BEGIN
   -- Create first rack (will trigger insert of pool_rack_scores)
   INSERT INTO pool_racks (pool_game_id) 
   VALUES (_pool_game_id)
-  RETURNING pool_rack_id INTO _pool_rack_id;
-  
+  RETURNING pool_rack_id 
+  INTO _pool_rack_id;
+
   RETURN _pool_game_id;
 END;
 $$ LANGUAGE plpgsql;
@@ -35,6 +38,7 @@ DECLARE
   _player_handicap INTEGER;
   _player_rack_score INTEGER; 
   _pool_rack_score INTEGER;
+  _max_rack_score INTEGER;
 BEGIN
   IF _user_id IS NOT NULL THEN
     -- Confirm user is playing in the game
@@ -58,6 +62,15 @@ BEGIN
     END IF;
   END IF;
 
+  SELECT 
+    CASE WHEN game_type = '9-Ball' 
+      THEN 10
+      ELSE 1
+    END AS max_rack_score
+  FROM pool_games
+  WHERE pool_game_id = _pool_game_id
+  INTO _max_rack_score;
+
   -- Get current rack
   SELECT pool_rack_id
   FROM pool_racks
@@ -71,23 +84,22 @@ BEGIN
   FROM pool_rack_scores
   WHERE pool_rack_id = _pool_rack_id
   INTO _pool_rack_score;
-  
-  IF _pool_rack_score = 10 THEN
-  	-- Create new rack
-  	INSERT INTO pool_racks (pool_game_id)
-    VALUES (_pool_game_id) 
- 	  RETURNING pool_rack_id INTO _pool_rack_id;
-
-    _pool_rack_score := 0;
-  END IF;
-  
+    
   -- Update the player's rack score
   UPDATE pool_rack_scores 
   SET score = score + 1
   WHERE pool_rack_id = _pool_rack_id
     AND (user_id = _user_id 
-     OR (user_id IS NULL AND _user_id IS NULL))
+    OR (user_id IS NULL AND _user_id IS NULL))
   RETURNING score INTO _player_rack_score;
+
+  IF (_pool_rack_score + 1) = _max_rack_score THEN 
+    INSERT INTO pool_racks (pool_game_id)
+    VALUES (_pool_game_id)
+    RETURNING pool_rack_id INTO _pool_rack_id;
+
+    _pool_rack_score := 0;
+  END IF;
 
   RETURN (_player_game_score + 1);
 END;
@@ -115,12 +127,12 @@ BEGIN
   -- Get current rack
   SELECT 
     pr.pool_rack_id,
-  	score
+    score
   FROM pool_racks pr
   INNER JOIN pool_rack_scores USING(pool_rack_id)
   WHERE pool_game_id = _pool_game_id
     AND (user_id = _user_id 
-     OR (user_id IS NULL AND _user_id IS NULL))
+    OR (user_id IS NULL AND _user_id IS NULL))
   ORDER BY pr.pool_rack_id DESC 
   LIMIT 1
   INTO _pool_rack_id,
@@ -131,7 +143,7 @@ BEGIN
   FROM pool_rack_scores
   WHERE pool_rack_id = _pool_rack_id
   INTO _pool_rack_score;
-   
+  
   -- If you can't remove any from the current rack, check the previous rack
   IF _pool_rack_score = 0 THEN
     DELETE FROM pool_rack_scores
@@ -140,8 +152,8 @@ BEGIN
     DELETE FROM pool_racks 
     WHERE pool_rack_id = _pool_rack_id;
 
-  	-- Get the previous pool_rack_id
-  	SELECT pool_rack_id
+    -- Get the previous pool_rack_id
+    SELECT pool_rack_id
     FROM pool_racks
     WHERE pool_game_id = _pool_game_id
     ORDER BY pool_rack_id DESC 

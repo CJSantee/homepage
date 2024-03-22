@@ -4,12 +4,21 @@ export interface Player {
   score?: number,
 };
 
+export interface GameData {
+  players: PlayerGameData[],
+}
+
 export interface PlayerGameData {
   username: string,
   user_id: string,
   racks: number[],
   total: number,
   remaining: number,
+};
+
+export enum GameType {
+  EIGHT_BALL = '8-Ball',
+  NINE_BALL = '9-Ball',
 };
 
 interface SkillLevels {

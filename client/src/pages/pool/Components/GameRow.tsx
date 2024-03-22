@@ -13,7 +13,7 @@ import ScoreBoard from "./ScoreBoard";
 // Utils
 import api from "../../../utils/api";
 // Types
-import { Player, PoolGame } from "../../../@types/pool";
+import { GameType, Player, PoolGame } from "../../../@types/pool";
 // Assets
 import { faCircleUser, faBars, faX } from "@fortawesome/free-solid-svg-icons";
 
@@ -29,6 +29,7 @@ function GameRow({ game, todayStr, deleteCb, refreshGames }: Props) {
   const confirm = useConfirm();
 
   const [showDetails, setShowDetails] = useState(false);
+  const [gameType, setGameType] = useState<GameType>(GameType.NINE_BALL);
   const [players, setPlayers] = useState<Player[]>([]);
   const [tagInput, setTagInput] = useState('');
 
@@ -52,7 +53,9 @@ function GameRow({ game, todayStr, deleteCb, refreshGames }: Props) {
     if (!players.length) {
       const { data, success } = await api.get(`/pool/${game.pool_game_id}`);
       if (success) {
-        setPlayers(data);
+        const {players, game_type} = data;
+        setPlayers(players);
+        setGameType(game_type);
       }
     }
     setShowDetails(true);
@@ -128,6 +131,7 @@ function GameRow({ game, todayStr, deleteCb, refreshGames }: Props) {
           </div>
         </div>
       </div>
+
       <Offcanvas show={showDetails} onHide={hideDetails} placement='bottom'>
         <div className="container d-flex flex-column py-4 h-100">
           <div className="row d-flex justify-content-between">
@@ -167,7 +171,7 @@ function GameRow({ game, todayStr, deleteCb, refreshGames }: Props) {
               </div>
             ))}
           </div>
-          <ScoreBoard players={players} />
+          <ScoreBoard players={players} game_type={gameType} />
         </div>
       </Offcanvas>
     </>

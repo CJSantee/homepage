@@ -54,7 +54,7 @@ function SkillLevelModal({ skill_levels, show, onUpdate, onHide }: SkillLevelMod
   }
 
   async function updateSkillLevel() {
-    const {success} = await api.post('/pool', {
+    const {success} = await api.patch('/users', {
       discipline,
       skill_level: discipline === '8-Ball' ? eightBallSkill : nineBallSkill,
     });
