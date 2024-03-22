@@ -16,7 +16,7 @@ import { PlayerStats, PoolGame } from "../../@types/pool";
 const MatchEfficiencyTooltip = (
   <Tooltip id="tooltip">
     <strong>Match Efficiency (ME%)</strong>
-    A player’s winning percentage of total matche
+    is a player’s winning percentage of their total matches.
   </Tooltip>
 );
 
@@ -68,7 +68,10 @@ function Pool() {
   }, [socket]);
 
   const onDelete = (pool_game_id: string) => {
+    // Optimistic Update: Remove game
     setGames(games.filter(g => g.pool_game_id !== pool_game_id));
+    // Re-query for updated stats
+    getGames();
   }
 
   return (
@@ -83,7 +86,7 @@ function Pool() {
           <OverlayTrigger placement="bottom" overlay={MatchEfficiencyTooltip}>
             <div className="col-4 d-flex flex-column justify-content-start align-items-center">
               <p className="m-0 text-muted text-center">ME %</p>
-              <p className="m-0 fw-bold text-center">{stats.win_percentage * 100}</p>
+              <p className="m-0 fw-bold text-center">{Number(stats.win_percentage * 100).toFixed(2)}</p>
             </div>
           </OverlayTrigger>
           <div onClick={() => setShowSkillModal(true)} className="col-4 d-flex flex-column justify-content-start align-items-end cursor-pointer">

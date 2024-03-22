@@ -46,19 +46,17 @@ function ScoreBoard({players, game_type}:ScoreBoardProps) {
                   ))}
                 </div>
               ))}
-              {numRacks < 8 && new Array(8 - numRacks).fill(0).map((_, idx) => (
-                <div key={`filler-${idx}`} className="d-flex flex-column w-auto min-w-2rem">
+              <div className="d-flex flex-column w-100">
+                <Text size={6} hide>.</Text>
+                {game_type === '9-Ball' && (
                   <Text size={6} hide>.</Text>
-                  {game_type === '9-Ball' && (
-                    <Text size={6} hide>.</Text>
-                  )}
-                  {humanPlayers.map((_, pIdx) => (
-                    <Text size={5} className={`px-2 py-1 ${playersBorderClass(pIdx)}`}>
-                      <span className="opacity-0">.</span>
-                    </Text>
-                  ))}
-                </div>
-              ))}
+                )}
+                {humanPlayers.map((_, pIdx) => (
+                  <Text size={5} className={`px-2 py-1 ${playersBorderClass(pIdx)}`}>
+                    <span className="opacity-0">.</span>
+                  </Text>
+                ))}
+              </div>
             </div>
             <div className="col-2">
               <Text size={6} hide>.</Text>

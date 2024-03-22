@@ -93,7 +93,10 @@ BEGIN
     OR (user_id IS NULL AND _user_id IS NULL))
   RETURNING score INTO _player_rack_score;
 
-  IF (_pool_rack_score + 1) = _max_rack_score THEN 
+  _player_game_score := _player_game_score + 1;
+  _pool_rack_score := _pool_rack_score + 1;
+
+  IF _pool_rack_score = _max_rack_score AND _player_game_score <> _player_handicap THEN 
     INSERT INTO pool_racks (pool_game_id)
     VALUES (_pool_game_id)
     RETURNING pool_rack_id INTO _pool_rack_id;
@@ -101,7 +104,7 @@ BEGIN
     _pool_rack_score := 0;
   END IF;
 
-  RETURN (_player_game_score + 1);
+  RETURN _player_game_score;
 END;
 $$ LANGUAGE plpgsql;
 

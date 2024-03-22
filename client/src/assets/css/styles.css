@@ -80,12 +80,6 @@
   cursor: pointer;
 }
 
-/* SCORE BOARD */
-.score-board {
-  display: grid;
-  grid-template-columns: 25% 58.33% 16.66%;
-}
-
 /* CLOUD ANIMATIONS */
 
 .cloud {
