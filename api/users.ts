@@ -3,11 +3,11 @@ import auth from '../controllers/authentication';
 import { confirmPermission, verifyToken } from '../middleware/auth';
 import { addUserHandle, archiveUser, createUser, filterUserFieldsByAcl, getAllUsers, getUser, updateUser } from '../controllers/users';
 import { AUTHENTICATION_ERRORS, ApplicationError } from '../lib/applicationError';
+import { upsertPlayerSkill } from '../controllers/pool';
 
 const isDevelopment = process.env.NODE_ENV === 'development';
 
 const router = express.Router();
-
 
 router.route('/')
   .get(verifyToken, async (req: Request<{}, {}, {}, {acl?: string}>, res, next) => {
@@ -24,7 +24,7 @@ router.route('/')
     }
   })  
   .post(async (req, res, next) => {
-    const {password, code} = req.body;
+    const {password} = req.body;
     try {
       let user;
       if(password) {
@@ -49,12 +49,17 @@ router.route('/')
       next(err);
     }
   })
-  .patch(async (req, res, next) => {
+  .patch(verifyToken, async (req, res, next) => {
+    const user_id = req.user?.user_id || req.body.user_id;
     try {
-      const {handle} = req.body;
+      const {handle, skill_level} = req.body;
       if(handle) {
         await addUserHandle(req.body);
         res.status(200).send('Added User Handle.');
+      } else if(skill_level) {
+        const {discipline} = req.body;
+        await upsertPlayerSkill(user_id, skill_level, discipline);
+        res.sendStatus(200);
       } else {
         const user = await updateUser(req.body);
         res.status(200).json(user);

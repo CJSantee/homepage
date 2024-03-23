@@ -6,21 +6,56 @@ import { aclHasPermission } from '../utils';
 
 const {ENCRYPTION_ROUNDS} = process.env;
 
-export async function createUser({username}:{username:string}) {
+// Map of referral codes to acls
+export const REFERRAL_CODES = {
+  pool: 'pool',
+};
+
+export async function getUser(params:UserIdentifiers): Promise<User&{password:string}> {
+  const {rows: [user]} = await db.file<User&{password:string}>('db/users/get.sql', params);
+  return user;
+}
+
+interface CreateParams {
+  username: string,
+  password?: string,
+  code?: string,
+}
+export async function createUser({username, password, code}:CreateParams) {
   try {
-    const {rows: [user]} = await db.file('db/users/put.sql', {username});
-    return user;
+    if(!username) {
+      throw new ApplicationError(AUTHENTICATION_ERRORS.USERNAME_REQUIRED);
+    }
+
+    const existingUser = await getUser({username});
+    if(existingUser) {
+      throw new ApplicationError(AUTHENTICATION_ERRORS.USERNAME_IN_USE);
+    }
+
+    if(code && !REFERRAL_CODES[code]) {
+      throw new ApplicationError(AUTHENTICATION_ERRORS.INVALID_CODE);
+    }
+
+    let hashedPasword;
+    if(password) {
+      hashedPasword = await bcrypt.hash(password, Number(ENCRYPTION_ROUNDS));
+    }
+
+    const {rows: [user]} = await db.file<{user_id: string, username: string}>('db/users/put.sql', {username, password: hashedPasword});
+    
+    let acl;
+    if(code) {
+      const {rows: [{acl: dbAcl}]} = await db.file<{acl: string}>('db/acls/put.sql', {user_id: user.user_id, acl: REFERRAL_CODES[code]});
+      acl = dbAcl;
+    }
+
+    return {...user, acl};
   } catch(err: any) {
     if(err.constraint == 'unique_username') {
       throw new ApplicationError(AUTHENTICATION_ERRORS.USERNAME_IN_USE);
     }
     throw err;
   }
-}
-
-export async function getUser(params:UserIdentifiers): Promise<User&{password:string}> {
-  const {rows: [user]} = await db.file<User&{password:string}>('db/users/get.sql', params);
-  return user;
 }
 
 interface UpdateParams {
@@ -37,7 +72,11 @@ export async function updateUser({user_id, username, oldPassword, newPassword}:U
       throw new ApplicationError(AUTHENTICATION_ERRORS.INCORRECT_PASSWORD);
     }
     password = await bcrypt.hash(newPassword, Number(ENCRYPTION_ROUNDS));
+  } else if(newPassword === '') {
+    console.log('HERE');
+    password = '';
   }
+
   try {
     await db.file<User>('db/users/update.sql', {user_id, username, password});
   } catch(err: any) {
@@ -82,12 +121,13 @@ export function filterUserFieldsByAcl(users:User[], acl:string) {
   const fieldPermissions = {
     acl: 'admin',
     handle: 'admin',
+    skill_level: 'pool',
     password: 'none',
   };
   return users.reduce<any>((filteredUsers, user) => {
     const filteredUser = {};
     Object.keys(user).forEach((field) => {
-      if(!fieldPermissions[field] || aclHasPermission(acl, fieldPermissions[field])) {
+      if(!fieldPermissions[field] || (fieldPermissions[field] !== 'none' && aclHasPermission(acl, fieldPermissions[field]))) {
         filteredUser[field] = user[field];
       }
     });

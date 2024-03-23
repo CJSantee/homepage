@@ -1,33 +1,35 @@
 // Hooks
+import { MouseEventHandler, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useConfirm } from "../../../hooks/useConfirm";
-import { MouseEventHandler, useState } from "react";
-// Types
-import { Player, PoolGame } from "../../../@types/pool";
-// Utils
-import api from "../../../utils/api";
 // Components
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import Text from "../../../components/Text";
 import Button from "react-bootstrap/Button";
 import InputGroup from "react-bootstrap/InputGroup";
 import Form from "react-bootstrap/Form";
+import Text from "../../../components/Text";
 import Offcanvas from "react-bootstrap/Offcanvas";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import ScoreBoard from "./ScoreBoard";
+// Utils
+import api from "../../../utils/api";
+// Types
+import { GameType, Player, PoolGame } from "../../../@types/pool";
 // Assets
-import { faBars, faCircleUser, faX } from "@fortawesome/free-solid-svg-icons";
+import { faCircleUser, faBars, faX } from "@fortawesome/free-solid-svg-icons";
 
 interface Props {
-  game: PoolGame,
-  todayStr: string,
-  deleteCb: () => void,
-  refreshGames: () => void,
-};
+  game: PoolGame;
+  todayStr: string;
+  deleteCb: () => void;
+  refreshGames: () => void;
+}
+;
 function GameRow({ game, todayStr, deleteCb, refreshGames }: Props) {
   const navigate = useNavigate();
   const confirm = useConfirm();
 
   const [showDetails, setShowDetails] = useState(false);
+  const [gameType, setGameType] = useState<GameType>(GameType.NINE_BALL);
   const [players, setPlayers] = useState<Player[]>([]);
   const [tagInput, setTagInput] = useState('');
 
@@ -36,7 +38,7 @@ function GameRow({ game, todayStr, deleteCb, refreshGames }: Props) {
     month: 'long',
     day: 'numeric',
     timeZone: 'utc'
-  })
+  });
   const sameDayGame = todayStr === gameDateStr;
 
   const onRowClick = () => {
@@ -44,18 +46,20 @@ function GameRow({ game, todayStr, deleteCb, refreshGames }: Props) {
       return;
     }
     navigate(`/pool/${game.pool_game_id}`);
-  }
+  };
 
   const onDetailsClick: MouseEventHandler<HTMLButtonElement> = async (event) => {
     event.stopPropagation();
     if (!players.length) {
       const { data, success } = await api.get(`/pool/${game.pool_game_id}`);
       if (success) {
-        setPlayers(data);
+        const {players, game_type} = data;
+        setPlayers(players);
+        setGameType(game_type);
       }
     }
     setShowDetails(true);
-  }
+  };
 
   const hideDetails = () => setShowDetails(false);
 
@@ -64,7 +68,7 @@ function GameRow({ game, todayStr, deleteCb, refreshGames }: Props) {
     if (success) {
       deleteCb();
     }
-  }
+  };
 
   const addTag = async () => {
     const newTags = Array.from(new Set([...game.tags, tagInput]));
@@ -74,7 +78,7 @@ function GameRow({ game, todayStr, deleteCb, refreshGames }: Props) {
       setShowDetails(false);
       refreshGames();
     }
-  }
+  };
 
   const removeTag = async (tag: string) => {
     const newTags = game.tags.filter(t => t !== tag);
@@ -84,22 +88,22 @@ function GameRow({ game, todayStr, deleteCb, refreshGames }: Props) {
       setShowDetails(false);
       refreshGames();
     }
-  }
+  };
 
   const onDelete = () => {
     if (confirm) confirm(
       () => deleteGame(), // onConfirm
-      () => { },                       // onCancel
-      'Are you sure?',                // header
+      () => { }, // onCancel
+      'Are you sure?', // header
       'Do you really want to delete this game? This process cannot be undone.' // body
     );
-  }
+  };
 
   return (
     <>
       <div className="border-bottom py-2" onClick={onRowClick}>
         <div className="row">
-          <div className="col-10 row">
+          <div className="col-9 row">
             <div className="d-flex">
               <Text size={6} className="mb-2">
                 {gameDateStr}
@@ -110,9 +114,9 @@ function GameRow({ game, todayStr, deleteCb, refreshGames }: Props) {
             </div>
             {game.users.map((user) => (
               <div key={`${user.user_id}`} className="col">
-                <div className="d-flex align-items-center text-break">
+                <div className="d-flex align-items-center">
                   <FontAwesomeIcon icon={faCircleUser} size="2x" />
-                  <div className="mx-2">
+                  <div className="ms-2">
                     <p className={`m-0 ${user.winner ? 'text-primary' : ''}`}>{user.username}</p>
                     <small><p className="text-muted m-0">{user.score} ({user.handicap})</p></small>
                   </div>
@@ -120,13 +124,14 @@ function GameRow({ game, todayStr, deleteCb, refreshGames }: Props) {
               </div>
             ))}
           </div>
-          <div className="col-2 d-flex justify-content-end align-items-start">
+          <div className="col-3 d-flex justify-content-end align-items-start">
             <Button onClick={onDetailsClick}>
               <FontAwesomeIcon icon={faBars} />
             </Button>
           </div>
         </div>
       </div>
+
       <Offcanvas show={showDetails} onHide={hideDetails} placement='bottom'>
         <div className="container d-flex flex-column py-4 h-100">
           <div className="row d-flex justify-content-between">
@@ -166,11 +171,11 @@ function GameRow({ game, todayStr, deleteCb, refreshGames }: Props) {
               </div>
             ))}
           </div>
-          <ScoreBoard players={players} />
+          <ScoreBoard players={players} game_type={gameType} />
         </div>
       </Offcanvas>
     </>
-  )
+  );
 }
 
 export default GameRow;

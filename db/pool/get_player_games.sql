@@ -16,7 +16,7 @@ SELECT
     'score', score,
     'handicap', handicap,
   	'winner', winner_user_id = user_id
-  )) AS users
+  ) ORDER BY user_id = ${user_id} DESC, score DESC) AS users
 FROM pool_games pg
 INNER JOIN user_games ug USING(pool_game_id)
 LEFT JOIN pool_game_users pgu USING(pool_game_id)

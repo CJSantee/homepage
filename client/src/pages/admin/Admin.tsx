@@ -6,13 +6,7 @@ import api from "../../utils/api";
 import UserModal from "../../components/UserModal";
 import { useConfirm } from "../../hooks/useConfirm";
 import UserBody from "./components/UserBody";
-
-export interface User {
-  user_id: string,
-  username: string,
-  acl: string,
-  handle: string,
-}
+import { User } from "../../@types/auth";
 
 function Admin() {
   const [users, setUsers] = useState<User[]>([]);

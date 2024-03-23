@@ -31,7 +31,7 @@ const AuthProvider: React.FC<Props> = ({ children }) => {
 
   const signIn: AuthContextType["signIn"] = async ({ username, password, rememberMe }) => {
     const body = {
-      username,
+      username: username.trim(),
       password,
     };
 

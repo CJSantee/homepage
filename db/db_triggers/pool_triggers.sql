@@ -68,3 +68,19 @@ AFTER UPDATE ON pool_game_users
 FOR EACH ROW
 WHEN (NEW.score = OLD.handicap)
 EXECUTE PROCEDURE cs_update_pool_game_winner();
+
+CREATE OR REPLACE FUNCTION cs_insert_pool_user_skill_level() RETURNS TRIGGER AS $$
+BEGIN
+  INSERT INTO pool_user_skill_levels (user_id, discipline)
+  SELECT NEW.user_id AS user_id, discipline
+  FROM UNNEST('{"9-Ball", "8-Ball"}'::game_type_enum[]) AS discipline;
+  
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER cs_insert_skill_level_trg
+AFTER INSERT ON acls 
+FOR EACH ROW
+WHEN (NEW.acl = 'pool')
+EXECUTE PROCEDURE cs_insert_pool_user_skill_level();

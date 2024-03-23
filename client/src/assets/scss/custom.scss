@@ -129,6 +129,13 @@ $widths: 150, 300, 500;
   }
 }
 
+$rem-widths: 2;
+@each $width in $rem-widths {
+  .min-w-#{$width}rem {
+    min-width: #{$width}rem;
+  }
+}
+
 // SM
 @media (min-width: 576px) {
 }

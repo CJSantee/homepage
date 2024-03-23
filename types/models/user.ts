@@ -4,6 +4,7 @@ export default interface User {
   acl?: string,
   handle?: string,
   password?: string,
+  skill_level?: number,
 };
 
 export interface UserIdentifiers {

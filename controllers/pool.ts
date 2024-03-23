@@ -1,10 +1,11 @@
 import db from "../db";
 import { io } from "../core/sockets";
 import { ApplicationError } from "../lib/applicationError";
-import { Player, PlayerGameData } from "../types/models/pool";
+import { GameData, GameType, Player, PlayerGameData, PlayerStatsDB } from "../types/models/pool";
 
-export async function createNewPoolGame(players:Player[]): Promise<string> {
-  const {rows: [{cs_create_new_pool_game: pool_game_id}]} = await db.call<{cs_create_new_pool_game: number}>('cs_create_new_pool_game', {users: JSON.stringify(players)});
+export async function createNewPoolGame(players:Player[], game_type: GameType): Promise<string> {
+  const {rows: [{cs_create_new_pool_game: pool_game_id}]} = await db.call<{cs_create_new_pool_game: number}>('cs_create_new_pool_game', {users: JSON.stringify(players), game_type});
+  // Notify the player channels of a new game being created
   players.forEach((player) => {
     const {user_id} = player;
     io.to(`user:${user_id}`).emit('games:new', {pool_game_id});
@@ -49,9 +50,9 @@ export async function subtractPlayerScore({pool_game_id, user_id}:ScoreInput): P
   }
 }
 
-export async function getGameData(pool_game_id:string): Promise<PlayerGameData[]> {
-  const {rows: game_data} = await db.file<PlayerGameData>('db/pool/get_game_data.sql', {pool_game_id});
-  return game_data;
+export async function getGameData(pool_game_id:string): Promise<GameData> {
+  const {rows: [game]} = await db.file<GameData>('db/pool/get_game_data.sql', {pool_game_id});
+  return game;
 }
 
 export async function updateGameTags(pool_game_id: string, tags: string[]) {
@@ -86,4 +87,35 @@ export async function getPlayerGames(user_id:string|undefined) {
   }
   const {rows: games} = await db.file<PoolGame>('db/pool/get_player_games.sql', {user_id});
   return games;
+}
+
+export async function getPlayerStats(user_id:string) {
+  const {rows: [stats]} = await db.file<PlayerStatsDB>('db/pool/get_player_stats.sql', {user_id});
+  
+  const {skill_levels} = stats;
+  const games_played = Number(stats.games_played);
+  const games_won = Number(stats.games_won);
+  const win_percentage = games_won / games_played;
+
+  return {
+    games_played,
+    games_won,
+    win_percentage,
+    skill_levels,
+  };
+}
+
+export async function upsertPlayerSkill(user_id: string, skill_level: number, discipline: '8-Ball'|'9-Ball') {
+  const minSkill = discipline === '8-Ball' ? 2 : 1;
+  const maxSkill = discipline === '8-Ball' ? 7 : 9;
+  if(skill_level < minSkill || skill_level > maxSkill) {
+    throw new ApplicationError({
+      type: ApplicationError.TYPES.CLIENT,
+      code: 'INVALID_SKILL_LEVEL',
+      message: `skill_level: ${skill_level} is invalid for ${discipline}`,
+      statusCode: 400,
+      statusMessage: `Invalid Skill Level: must be between ${minSkill} and ${maxSkill}.`,
+    });
+  }
+  await db.file('db/pool/upsert_skill_level.sql', {user_id, skill_level, discipline});
 }

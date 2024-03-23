@@ -1,3 +1,5 @@
+import { SkillLevels } from "./pool";
+
 export interface SignInProps {
   username: string,
   password: string,
@@ -14,7 +16,9 @@ export interface User {
   user_id: string,
   username: string,
   acl: string,
-};
+  handle?: string,
+  skill_levels?: SkillLevels,
+}
 
 export type AuthContextType = {
   user: User | null,

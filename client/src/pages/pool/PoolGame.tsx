@@ -12,7 +12,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import { useSocket } from "../../hooks/useSocket";
 import { useAlert } from "../../hooks/useAlert";
 // Types
-import { Player } from "../../@types/pool";
+import { GameType, Player } from "../../@types/pool";
 // Utils
 import api from "../../utils/api";
 
@@ -24,14 +24,16 @@ function PoolGame() {
   const [title] = useState(new Date().toLocaleDateString());
   const [editing] = useState(pool_game_id === 'new');
 
+  const [gameType, setGameType] = useState<GameType>(GameType.NINE_BALL);
   const [players, setPlayers] = useState<Player[]>([]);
   const [activePlayer, setActivePlayer] = useState<null|string>(null);
 
   useEffect(() => {
     const getGameData = async () => {
-      const {data} = await api.get<Player[]>(`/pool/${pool_game_id}`);
+      const {data} = await api.get<{game_type: GameType, players: Player[]}>(`/pool/${pool_game_id}`);
       if(data) {
-        setPlayers(data);
+        setPlayers(data.players);
+        setGameType(data.game_type);
       }
     };
     if(typeof socket.on === 'function') {
@@ -96,7 +98,7 @@ function PoolGame() {
 
     const {data, success, error} = await api.post(`/pool/${pool_game_id}/scores/${action}`, {user_id});
     if(success) {
-      setPlayers(data);
+      setPlayers(data.players);
       if(typeof socket.emit === 'function') {
         socket.emit('game:update', pool_game_id);
       }
@@ -116,7 +118,7 @@ function PoolGame() {
           <FontAwesomeIcon icon={faChevronLeft} />
         </Button>
         <Text size={5}>{title}</Text>
-        <Button>
+        <Button className="opacity-0">
           <FontAwesomeIcon icon={editing ? faUsers : faGear} />
         </Button>
       </div>
@@ -131,7 +133,7 @@ function PoolGame() {
         />
       ))}
         
-      <ScoreBoard players={players} />
+      <ScoreBoard players={players} game_type={gameType}/>
     </div>
   )
 }

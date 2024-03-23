@@ -21,3 +21,23 @@ export interface Player {
   remaining: number,
   winner: boolean,
 }
+
+export enum GameType {
+  EIGHT_BALL = '8-Ball',
+  NINE_BALL = '9-Ball',
+}
+
+export type EightBallSkillLevel = 2|3|4|5|6|7;
+export type NineBallSkillLevel = 1|2|3|4|5|6|7|8|9;
+
+export interface SkillLevels {
+  '8-Ball': EightBallSkillLevel,
+  '9-Ball': NineBallSkillLevel,
+}
+
+export interface PlayerStats {
+  games_played: number,
+  games_won: number,
+  win_percentage: number,
+  skill_levels: SkillLevels,
+}
