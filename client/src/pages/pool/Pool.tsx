@@ -20,7 +20,6 @@ const MatchEfficiencyTooltip = (
   </Tooltip>
 );
 
-
 function Pool() {
   const socket = useSocket();
   const navigate = useNavigate();
@@ -77,33 +76,37 @@ function Pool() {
   return (
     <>
       <div className="container h-100 d-flex flex-column">
-        <hr className="mt-0 mb-2" />
-        <div className="row justify-content-between">
-          <div className="col-4 d-flex flex-column justify-content-start align-items-start">
-            <p className="m-0 text-muted text-start">Total</p>
-            <p className="m-0 fw-bold text-start">{stats.games_played} Matches</p>
-          </div>
-          <OverlayTrigger placement="bottom" overlay={MatchEfficiencyTooltip}>
-            <div className="col-4 d-flex flex-column justify-content-start align-items-center">
-              <p className="m-0 text-muted text-center">ME %</p>
-              <p className="m-0 fw-bold text-center">{Number(stats.win_percentage * 100).toFixed(2)}</p>
+        <div className="bg-body sticky-top">
+          <hr className="mt-0 mb-2" />
+          <div className="row justify-content-between">
+            <div className="col-4 d-flex flex-column justify-content-start align-items-start">
+              <p className="m-0 text-muted text-start">Total</p>
+              <p className="m-0 fw-bold text-start">{stats.games_played} Matches</p>
             </div>
-          </OverlayTrigger>
-          <div onClick={() => setShowSkillModal(true)} className="col-4 d-flex flex-column justify-content-start align-items-end cursor-pointer">
-            <p className="m-0 text-muted text-end text-decoration-underline">Skill Level</p>
-            <p className="m-0 fw-bold text-end">{stats.skill_levels['8-Ball']} <span className="text-muted"><small>(8)</small></span> / {stats.skill_levels['9-Ball']} <span className="text-muted"><small>(9)</small></span></p>
+            <OverlayTrigger placement="bottom" overlay={MatchEfficiencyTooltip}>
+              <div className="col-4 d-flex flex-column justify-content-start align-items-center">
+                <p className="m-0 text-muted text-center">ME %</p>
+                <p className="m-0 fw-bold text-center">{Number(stats.win_percentage * 100).toFixed(2)}</p>
+              </div>
+            </OverlayTrigger>
+            <div onClick={() => setShowSkillModal(true)} className="col-4 d-flex flex-column justify-content-start align-items-end cursor-pointer">
+              <p className="m-0 text-muted text-end text-decoration-underline">Skill Level</p>
+              <p className="m-0 fw-bold text-end">{stats.skill_levels['8-Ball']} <span className="text-muted"><small>(8)</small></span> / {stats.skill_levels['9-Ball']} <span className="text-muted"><small>(9)</small></span></p>
+            </div>
           </div>
+          <Button className="mt-2 w-100" onClick={() => navigate('/pool/new')}>New Game</Button>      
+          <hr className="my-2" />
         </div>
-        <Button className="mt-2" onClick={() => navigate('/pool/new')}>New Game</Button>      
-        <hr className="mt-2 mb-2" />
-        {games.map((game) => (
-          <GameRow key={`${game.pool_game_id}`} 
-          game={game} 
-          todayStr={todayStr} 
-          deleteCb={() => onDelete(game.pool_game_id)} 
-          refreshGames={getGames} 
-          />
+        <div className="mb-5">
+          {games.map((game) => (
+            <GameRow key={`${game.pool_game_id}`} 
+              game={game} 
+              todayStr={todayStr} 
+              deleteCb={() => onDelete(game.pool_game_id)} 
+              refreshGames={getGames} 
+            />
           ))}
+        </div>
       </div>
 
       <SkillLevelModal 
